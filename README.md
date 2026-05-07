@@ -27,7 +27,7 @@ The vocabulary database: words, themes, and on-topic writing prompts used in Ink
  
 Most English learning apps are passive. You memorize words you never use. You read grammar rules you never apply. You get praised for showing up, not for writing well.
  
-There's nowhere online where a non-native English speaker can **write under real constraints, receive honest AI judgment, and compete for visible status** — without it devolving into a pay-to-win game or a "good job, keep it up!" echo chamber (DUOLINGO).
+There's nowhere online where a non-native English speaker can **write under real constraints, receive honest AI judgment, and compete for visible status** - without it devolving into a pay-to-win game or a "good job, keep it up!" echo chamber (DUOLINGO).
  
 **Inkr8 is the answer.** It forces you to use vocabulary actively, judges your writing without flattery, and gives your skill a public rank that actually means something.
  
@@ -37,7 +37,7 @@ Inkr8 is a **competitive writing platform for Android** where users:
  
 - Write short paragraphs using **randomly assigned required words**
 - Receive an honest **AI score from 0.00% to 100.00%** across grammar, coherence, creativity, vocabulary, structure, and more
-- Earn **Merit** — an in-app currency that cannot be purchased, only earned through skill
+- Earn **Merit:** an in-app currency that cannot be purchased, only earned through skill
 - Climb through **ranked leagues**: Scribe → Stylist → Author → Novelist → Laureate → Luminary → Pantheon
 - Enter **tournaments** with prize pools, entry fees, and public leaderboards
 - Build a **visible competitive identity** through profile, rank, badges, and reputation
@@ -49,20 +49,24 @@ The emotional atmosphere is deliberate: **dark, premium, intellectual, sarcastic
 - Two gamemodes: *Standard Writing* (free-form, 4 required words) and *On-Topic Writing* (assigned theme + topic, 2 required words)
 - Three play modes: *Practice* (risk-free), *Ranked* (affects competitive standing), *Tournament* (high-stakes events)
 - Required words that highlight in real time as you type
-**R8 — The AI Evaluator**
+  
+**R8 - The AI Evaluator**
 - Powered by OpenAI's GPT-4o mini, running server-side via Firebase Cloud Functions
 - Evaluates craft, not opinion - grammar, coherence, depth, vocabulary, metaphors, structure, and required word usage
 - Delivers feedback in a sharp, sarcastic voice: direct, useful, never empty praise
 - A score of 90+ is rare. A perfect 100 is nearly unreachable
+  
 **Merit Economy**
 - Merit is earned by writing and competing - it cannot be purchased
 - Spent on ranked entry, tournaments, saving submissions, username changes, and more
-- Subject to a weekly tax, a soft cap, and a slow-release overflow mechanic — it stays meaningful
+- Subject to a weekly tax, a soft cap, and a slow-release overflow mechanic - it stays meaningful
+  
 **Competitive Structure**
 - Ranked leagues with rating-based progression and seasonal resets planned
 - The Pantheon: the top 100 players by rating, publicly visible
 - Tournament system: enrollment windows, submission deadlines, automated prize distribution, and post-tournament tipping
 - Reputation score: a hidden behavioral metric that affects ranked entry costs and tournament access
+
 **Philosopher Subscription**
 - No ads, free expanded feedback, free example sentences, profile glow and badge
 - Sells comfort and identity, never score advantage or competitive edge
@@ -102,7 +106,7 @@ Inkr8 is built with security-first practices throughout the stack:
  
 ## Project Status & Roadmap
  
-**Current:** Alpha v0.5.3 — core loop is fully functional end-to-end.
+**Current:** Alpha - core loop is fully functional end-to-end.
  
 **Completed:**
 - [x] Full writing → AI evaluation → results loop (Practice and Ranked)
@@ -126,7 +130,7 @@ Inkr8 is built with security-first practices throughout the stack:
  
 ## Developer
  
-**Renzo Adrianzén** — Solo developer, designer, and product architect
+**Renzo Adrianzén** - Solo developer, designer, and product architect
  
 For business inquiries, collaboration, or beta testing interest:
  
