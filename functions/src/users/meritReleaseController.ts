@@ -11,36 +11,47 @@ export const meritReleaseController = onSchedule("every 3 hours", async () => {
     return;
   }
 
-  for (const doc of usersWithHold.docs) {
-    await db.runTransaction(async (tx) => {
-      const userSnap = await tx.get(doc.ref);
-      if (!userSnap.exists) return;
+  const writer = db.bulkWriter();
+  let processedCount = 0;
 
-      const data = userSnap.data() || {};
-      const merit = data.merit ?? 0;
-      const meritHold = data.meritHold ?? 0;
-      const meritCap = data.meritCap ?? 50000;
+  writer.onWriteError((error) => {
+    console.error(`meritReleaseController: Error writing for ${error.documentRef.path}:`, error.message);
+    return false;
+  });
 
-      if (merit < meritCap) {
-        const remainingCapSpace = meritCap - merit;
-        const releaseAmount = Math.min(300, meritHold, remainingCapSpace);
+  usersWithHold.docs.forEach((doc) => {
+    const data = doc.data();
+    const merit = data.merit ?? 0;
+    const meritHold = data.meritHold ?? 0;
+    const meritCap = data.meritCap ?? 50000;
 
-        if (releaseAmount > 0) {
-          const newMerit = merit + releaseAmount;
-          tx.update(doc.ref, {
-            merit: newMerit,
-            meritHold: FieldValue.increment(-releaseAmount),
-          });
+    if (merit < meritCap) {
+      const remainingCapSpace = meritCap - merit;
+      const releaseAmount = Math.min(300, meritHold, remainingCapSpace);
 
-          const txRef = doc.ref.collection("meritTransactions").doc();
-          tx.set(txRef, {
-            amount: releaseAmount,
-            reason: "MERIT_RELEASE",
-            timestamp: Date.now(),
-            balanceAfter: newMerit,
-          });
-        }
+      if (releaseAmount > 0) {
+        writer.update(doc.ref, {
+          merit: FieldValue.increment(releaseAmount),
+          meritHold: FieldValue.increment(-releaseAmount),
+        });
+
+        const txRef = doc.ref.collection("meritTransactions").doc();
+        writer.set(txRef, {
+          amount: releaseAmount,
+          reason: "MERIT_RELEASE",
+          timestamp: Date.now(),
+          balanceAfter: merit + releaseAmount,
+        });
+        processedCount++;
       }
-    });
+    }
+  });
+
+  await writer.close();
+
+  if (processedCount > 0) {
+    console.log(`meritReleaseController: Released merit for ${processedCount} users.`);
+  } else {
+    console.log("meritReleaseController: No merit released (all users at cap).");
   }
 });

@@ -1,5 +1,5 @@
 import * as functions from "firebase-functions/v1";
-import {db, FieldValue} from "../firebase/admin";
+import {db} from "../firebase/admin";
 
 export const createUserProfile =
 functions.auth.user().onCreate(async (user) => {
@@ -10,6 +10,7 @@ functions.auth.user().onCreate(async (user) => {
     id: uid,
     name: user.displayName ?? "",
     email: user.email ?? "",
+    profileImageURL: user.photoURL ?? "",
     merit: 1000,
     rating: 0,
     reputation: 0,
@@ -22,14 +23,10 @@ functions.auth.user().onCreate(async (user) => {
     joinedDate: Date.now(),
     hasChosenUsername: false,
     isPhilosopher: false,
+    isPlaced: false,
+    placementMatchesPlayed: 0,
+    totalPlacementScore: 0,
   });
 
-  if (uid !== "R8") {
-    const statsRef = db.collection("metadata").doc("rankings");
-    await statsRef.set({
-      leagueCounts: {
-        SCRIBE: FieldValue.increment(1),
-      },
-    }, {merge: true});
-  }
+  // League counts are now handled in the evaluation engine after placement matches
 });

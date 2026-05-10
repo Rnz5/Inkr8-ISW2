@@ -143,6 +143,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
         const currentMerit = Number(userData.merit ?? 0);
         const meritCap = Number(userData.meritCap ?? 50000);
         const currentBestScore = Number(userData.bestScore ?? 0);
+        const isPlaced = userData.isPlaced === true;
 
         const liquidReward = meritToLiquid(currentMerit, meritEarned, meritCap);
         const holdReward = meritToHold(currentMerit, meritEarned, meritCap);
@@ -167,37 +168,78 @@ export const submissionEvaluationEngine = onDocumentCreated(
         }
 
         if (playmode === "RANKED") {
-          const newRating = calculateNewRating(
-            currentRating,
-            result.finalScore
-          );
+          if (!isPlaced) {
+            const played = (userData.placementMatchesPlayed ?? 0) + 1;
+            const totalScore = (userData.totalPlacementScore ?? 0) + result.finalScore;
 
-          ratingChange = newRating - currentRating;
+            if (played >= 6) {
+              const avgScore = totalScore / 6;
+              const initialRating = Math.min(120, Math.floor((avgScore / 100) * 120));
 
-          const newReputation = onRankedCompleted(
-            Number(userData.reputation ?? 0)
-          );
+              userUpdates = {
+                ...userUpdates,
+                rating: initialRating,
+                isPlaced: true,
+                placementMatchesPlayed: 6,
+                totalPlacementScore: totalScore,
+                reputation: onRankedCompleted(Number(userData.reputation ?? 0)),
+                currentlyInRanked: false,
+                rankedSessionStartedAt: FieldValue.delete(),
+              };
 
-          userUpdates = {
-            ...userUpdates,
-            rating: newRating,
-            reputation: newReputation,
-            currentlyInRanked: false,
-            rankedSessionStartedAt: FieldValue.delete(),
-          };
+              ratingChange = initialRating;
 
-          if (authorId !== "R8") {
-            const oldLeague = getLeagueFromRating(currentRating);
-            const newLeague = getLeagueFromRating(newRating);
+              if (authorId !== "R8") {
+                const newLeague = getLeagueFromRating(initialRating);
+                const statsRef = db.collection("metadata").doc("rankings");
+                tx.set(statsRef, {
+                  leagueCounts: {
+                    [newLeague]: FieldValue.increment(1),
+                  },
+                }, {merge: true});
+              }
+            } else {
+              userUpdates = {
+                ...userUpdates,
+                placementMatchesPlayed: played,
+                totalPlacementScore: totalScore,
+                currentlyInRanked: false,
+                rankedSessionStartedAt: FieldValue.delete(),
+              };
+            }
+          } else {
+            const newRating = calculateNewRating(
+              currentRating,
+              result.finalScore
+            );
 
-            if (oldLeague !== newLeague) {
-              const statsRef = db.collection("metadata").doc("rankings");
-              tx.set(statsRef, {
-                leagueCounts: {
-                  [oldLeague]: FieldValue.increment(-1),
-                  [newLeague]: FieldValue.increment(1),
-                },
-              }, {merge: true});
+            ratingChange = newRating - currentRating;
+
+            const newReputation = onRankedCompleted(
+              Number(userData.reputation ?? 0)
+            );
+
+            userUpdates = {
+              ...userUpdates,
+              rating: newRating,
+              reputation: newReputation,
+              currentlyInRanked: false,
+              rankedSessionStartedAt: FieldValue.delete(),
+            };
+
+            if (authorId !== "R8") {
+              const oldLeague = getLeagueFromRating(currentRating);
+              const newLeague = getLeagueFromRating(newRating);
+
+              if (oldLeague !== newLeague) {
+                const statsRef = db.collection("metadata").doc("rankings");
+                tx.set(statsRef, {
+                  leagueCounts: {
+                    [oldLeague]: FieldValue.increment(-1),
+                    [newLeague]: FieldValue.increment(1),
+                  },
+                }, {merge: true});
+              }
             }
           }
         }

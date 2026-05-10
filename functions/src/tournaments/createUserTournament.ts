@@ -64,6 +64,7 @@ export const createUserTournament = onCall(
       const user = userSnap.data();
       const currentMerit = user?.merit ?? 0;
       const creatorName = user?.name ?? "Unknown Host";
+      const creatorImageURL = user?.profileImageURL ?? "";
 
       if (currentMerit < prizePool) {
         throw new HttpsError("failed-precondition", "Not enough Merit.");
@@ -89,6 +90,7 @@ export const createUserTournament = onCall(
         title,
         creatorId: uid,
         creatorName,
+        creatorImageURL,
         prizePool,
         maxPlayers,
         minPlayers,
