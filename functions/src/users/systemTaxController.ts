@@ -4,8 +4,8 @@ import {adjustReputation} from "../utils/reputationManager";
 
 /**
  * the weekly tax system runs every Sunday at 00:00
- * it retires 1% of the user's max merit cap :-)
- * ensures merit does not drop below zero and excludes R8
+ * it retires 1% of the user's actual merit (capped at meritCap) :-)
+ * ensures merit does not drop below 1000 and excludes R8
  */
 export const weeklyTaxProcessor = onSchedule(
   {
@@ -35,12 +35,16 @@ export const weeklyTaxProcessor = onSchedule(
       const data = doc.data();
       const currentMerit = data.merit ?? 0;
       const meritCap = data.meritCap ?? 50000;
-      const taxAmount = Math.floor(meritCap * 0.01);
 
-      const newMerit = Math.max(0, currentMerit - taxAmount);
+      if (currentMerit <= 1000) return;
+
+      const taxBasis = Math.min(currentMerit, meritCap);
+      const taxAmount = Math.floor(taxBasis * 0.01);
+
+      const newMerit = Math.max(1000, currentMerit - taxAmount);
       const actualTax = currentMerit - newMerit;
 
-      if (newMerit !== currentMerit) {
+      if (actualTax > 0) {
         writer.update(doc.ref, {
           merit: newMerit,
         });

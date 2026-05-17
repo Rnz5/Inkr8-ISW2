@@ -91,6 +91,7 @@ async function createSystemTournament(
     systemFee: projection.systemFee,
     enrollmentDeadline,
     submissionDeadline,
+    nextPhaseCheckAt: enrollmentDeadline,
     refunded: false,
     requirements: config.requirements,
     status: "ENROLLING",

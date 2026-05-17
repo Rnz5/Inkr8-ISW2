@@ -100,6 +100,7 @@ export const createUserTournament = onCall(
         systemFee: projection.systemFee,
         enrollmentDeadline,
         submissionDeadline,
+        nextPhaseCheckAt: enrollmentDeadline,
         refunded: false,
         requirements: {
           minRating: requirements.minRating ?? null,

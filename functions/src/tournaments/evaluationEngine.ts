@@ -38,19 +38,17 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
       const tournamentId = event.params.tournamentId;
       const tournamentRef = db.collection("tournaments").doc(tournamentId);
 
-      const submissionsSnapshot = await tournamentRef
-        .collection("submissions")
-        .get();
-
-      const submissionsCount = submissionsSnapshot.size;
-
-      if (submissionsCount < after.minPlayers) {
+      if (after.playersCount < after.minPlayers) {
         await tournamentRef.update({
           status: "CANCELLED",
           cancelledAt: Date.now(),
         });
         return;
       }
+
+      const submissionsSnapshot = await tournamentRef
+        .collection("submissions")
+        .get();
 
       const apiKey = OPENAI_API_KEY.value();
 

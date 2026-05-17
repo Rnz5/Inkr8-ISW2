@@ -11,36 +11,32 @@ export const pruneOldTournaments = onSchedule("every 12 hours", async () => {
       .where("status", "==", "CANCELLED")
       .get();
 
-    const cancelledBatch = db.batch();
-    cancelledSnapshot.docs.forEach((doc) => {
-      cancelledBatch.delete(doc.ref);
-    });
-
-    if (cancelledSnapshot.size > 0) {
-      await cancelledBatch.commit();
-      console.log(`Pruned ${cancelledSnapshot.size} cancelled tournaments.`);
+    if (!cancelledSnapshot.empty) {
+      for (const doc of cancelledSnapshot.docs) {
+        await db.recursiveDelete(doc.ref);
+      }
+      console.log(`Pruned ${cancelledSnapshot.size} cancelled tournaments recursively.`);
     }
 
     const completedSnapshot = await db.collection("tournaments")
       .where("status", "==", "COMPLETED")
       .get();
 
-    const completedBatch = db.batch();
     let completedPrunedCount = 0;
 
-    completedSnapshot.docs.forEach((doc) => {
-      const data = doc.data();
-      const timestamp = data.completedAt || data.createdAt || 0;
+    if (!completedSnapshot.empty) {
+      for (const doc of completedSnapshot.docs) {
+        const data = doc.data();
+        const timestamp = data.completedAt || data.createdAt || 0;
 
-      if (now - timestamp > TWENTY_FOUR_HOURS_MS) {
-        completedBatch.delete(doc.ref);
-        completedPrunedCount++;
+        if (now - timestamp > TWENTY_FOUR_HOURS_MS) {
+          await db.recursiveDelete(doc.ref);
+          completedPrunedCount++;
+        }
       }
-    });
-
-    if (completedPrunedCount > 0) {
-      await completedBatch.commit();
-      console.log(`Pruned ${completedPrunedCount} completed tournaments.`);
+      if (completedPrunedCount > 0) {
+        console.log(`Pruned ${completedPrunedCount} completed tournaments recursively.`);
+      }
     }
   } catch (error) {
     console.error("Error pruning old tournaments:", error);

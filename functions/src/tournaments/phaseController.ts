@@ -105,7 +105,7 @@ export const tournamentPhaseController = onSchedule("every 15 minutes", async ()
       updates.topicName = gameContent.topicName;
       updates.words = gameWords;
     } else if (data.status === "ACTIVE" && now >= data.submissionDeadline) {
-      updates.status = "COMPLETED";
+      updates.status = "EVALUATING";
       updates.nextPhaseCheckAt = FieldValue.delete();
     }
 
