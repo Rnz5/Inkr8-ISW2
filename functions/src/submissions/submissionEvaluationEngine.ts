@@ -7,6 +7,21 @@ import {onRankedCompleted} from "../utils/reputationManager";
 import {pruneOldSubmissions} from "./pruneOldSubmissions";
 import {getLeagueFromRating} from "../utils/leagueManager";
 
+function getUtcDayInt(): number {
+  const now = new Date();
+  return now.getUTCFullYear() * 10000 + (now.getUTCMonth() + 1) * 100 + now.getUTCDate();
+}
+
+function getStreakMultiplier(streak: number): number {
+  if (streak >= 7) return 1.12;
+  if (streak >= 6) return 1.10;
+  if (streak >= 5) return 1.08;
+  if (streak >= 4) return 1.06;
+  if (streak >= 3) return 1.05;
+  if (streak >= 2) return 1.03;
+  return 1.0;
+}
+
 export const submissionEvaluationEngine = onDocumentCreated(
   {
     document: "submissions/{submissionId}",
@@ -109,6 +124,21 @@ export const submissionEvaluationEngine = onDocumentCreated(
         wordCount: data.wordCount ?? 0,
       });
 
+      const startOfTodayMs = new Date();
+      startOfTodayMs.setUTCHours(0, 0, 0, 0);
+
+      const todaySubmissionsSnap = await db.collection("submissions")
+        .where("authorId", "==", authorId)
+        .where("timestamp", ">=", startOfTodayMs.getTime())
+        .get();
+
+      const submissionsToday = todaySubmissionsSnap.size;
+
+      const userSnapForContext = await db.collection("users").doc(authorId).get();
+      const userDataForContext = userSnapForContext.data() ?? {};
+      const contextStreak = Number(userDataForContext.currentStreak ?? 0);
+      const contextRecentScores = Array.isArray(userDataForContext.recentScores) ? userDataForContext.recentScores : [];
+
       const result = await evaluateWithR8({
         apiKey,
         content: content,
@@ -116,6 +146,9 @@ export const submissionEvaluationEngine = onDocumentCreated(
         requiredWords,
         themeName: data.themeName ?? null,
         topicName: data.topicName ?? null,
+        submissionsToday,
+        currentStreak: contextStreak,
+        recentScores: contextRecentScores,
       });
 
       console.log("submissionEvaluationEngine: evaluation completed", {
@@ -124,13 +157,6 @@ export const submissionEvaluationEngine = onDocumentCreated(
       });
 
       const userRef = db.collection("users").doc(authorId);
-
-      const meritEarned = calculateMerit(
-        result.finalScore,
-        data.wordCount ?? 0,
-        data.gamemode,
-        playmode === "RANKED" || playmode === "TOURNAMENT"
-      );
 
       await db.runTransaction(async (tx) => {
         const userSnap = await tx.get(userRef);
@@ -145,12 +171,42 @@ export const submissionEvaluationEngine = onDocumentCreated(
         const currentBestScore = Number(userData.bestScore ?? 0);
         const isPlaced = userData.isPlaced === true;
 
+        const today = getUtcDayInt();
+        const lastDay = Number(userData.lastSubmissionDay ?? 0);
+        const currentStreak = Number(userData.currentStreak ?? 0);
+
+        let newStreak = 1;
+        if (lastDay > 0) {
+          const yesterday = new Date();
+          yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+          const yesterdayInt = yesterday.getUTCFullYear() * 10000 + (yesterday.getUTCMonth() + 1) * 100 + yesterday.getUTCDate();
+
+          if (lastDay === today) {
+            newStreak = currentStreak;
+          } else if (lastDay === yesterdayInt) {
+            newStreak = currentStreak + 1;
+          } else {
+            newStreak = 1;
+          }
+        }
+
+        const streakMultiplier = getStreakMultiplier(newStreak);
+
+        const meritEarned = Math.floor(calculateMerit(
+          result.finalScore,
+          data.wordCount ?? 0,
+          data.gamemode,
+          playmode === "RANKED" || playmode === "TOURNAMENT"
+        ) * streakMultiplier);
+
         const liquidReward = meritToLiquid(currentMerit, meritEarned, meritCap);
         const holdReward = meritToHold(currentMerit, meritEarned, meritCap);
         const newMerit = currentMerit + liquidReward;
 
         let userUpdates: Record<string, unknown> = {
           merit: newMerit,
+          currentStreak: newStreak,
+          lastSubmissionDay: today,
           meritHold: FieldValue.increment(holdReward),
           submissionsCount: FieldValue.increment(1),
         };
@@ -255,6 +311,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
             resultStatus: "EVALUATED",
           },
           status: "EVALUATED",
+          matchStatus: playmode === "RANKED" ? "PENDING" : "UNMATCHED",
           evaluationError: FieldValue.delete(),
         });
 
@@ -270,6 +327,22 @@ export const submissionEvaluationEngine = onDocumentCreated(
           });
         }
       });
+
+      if (playmode === "RANKED") {
+        const authorUserSnap = await db.collection("users").doc(authorId).get();
+        const authorName = authorUserSnap.data()?.name ?? "Unknown";
+        const currentRating = Number(authorUserSnap.data()?.rating ?? 0);
+
+        tryMatchRankedSubmission(
+          snapshot.id,
+          authorId,
+          result.finalScore,
+          currentRating,
+          authorName
+        ).catch((err) => {
+          console.error("tryMatchRankedSubmission failed:", err);
+        });
+      }
 
       pruneOldSubmissions(authorId).catch((err) => {
         console.error("Non-critical background task (pruning) failed:", err);
@@ -340,4 +413,109 @@ function meritToLiquid(current: number, earned: number, cap: number): number {
 function meritToHold(current: number, earned: number, cap: number): number {
   const liquid = meritToLiquid(current, earned, cap);
   return earned - liquid;
+}
+
+async function tryMatchRankedSubmission(
+  submissionId: string,
+  authorId: string,
+  authorScore: number,
+  authorRating: number,
+  authorName: string
+): Promise<void> {
+  const RATING_RANGE = 20;
+  const FORTY_EIGHT_HOURS_MS = 48 * 60 * 60 * 1000;
+  const since = Date.now() - FORTY_EIGHT_HOURS_MS;
+
+  const candidatesSnap = await db.collection("submissions")
+    .where("playmode", "==", "RANKED")
+    .where("status", "==", "EVALUATED")
+    .where("matchStatus", "==", "PENDING")
+    .where("timestamp", ">=", since)
+    .get();
+
+  const submitterRef = db.collection("users").doc(authorId);
+  const mySubmissionRef = db.collection("submissions").doc(submissionId);
+
+  for (const doc of candidatesSnap.docs) {
+    const candidate = doc.data();
+
+    if (candidate.authorId === authorId) continue;
+
+    const alreadyMatchedSnap = await db.collection("submissions")
+      .where("authorId", "==", authorId)
+      .where("matchResult.opponentId", "==", candidate.authorId)
+      .where("timestamp", ">=", since)
+      .limit(1)
+      .get();
+
+    if (!alreadyMatchedSnap.empty) continue;
+
+    const candidateUserSnap = await db.collection("users").doc(candidate.authorId).get();
+    if (!candidateUserSnap.exists) continue;
+    const candidateRating = Number(candidateUserSnap.data()?.rating ?? 0);
+
+    if (Math.abs(authorRating - candidateRating) > RATING_RANGE) continue;
+
+    const candidateScore = Number(candidate.evaluation?.finalScore ?? 0);
+    const candidateRef = doc.ref;
+    const candidateAuthorRef = db.collection("users").doc(candidate.authorId);
+
+    const myScoreWins = authorScore > candidateScore;
+    const isDraw = authorScore === candidateScore;
+
+    const RATING_WIN = 8;
+    const RATING_LOSS = -5;
+    const RATING_DRAW = 1;
+
+    const myRatingChange = isDraw ? RATING_DRAW : myScoreWins ? RATING_WIN : RATING_LOSS;
+    const theirRatingChange = isDraw ? RATING_DRAW : myScoreWins ? RATING_LOSS : RATING_WIN;
+
+    const candidateName = candidateUserSnap.data()?.name ?? "Unknown";
+
+    await db.runTransaction(async (tx) => {
+      const submitterSnap = await tx.get(submitterRef);
+      const candidateUserSnapTx = await tx.get(candidateAuthorRef);
+
+      if (!submitterSnap.exists || !candidateUserSnapTx.exists) return;
+
+      const currentMyRating = Number(submitterSnap.data()?.rating ?? 0);
+      const currentTheirRating = Number(candidateUserSnapTx.data()?.rating ?? 0);
+
+      tx.update(mySubmissionRef, {
+        matchStatus: "MATCHED",
+        matchResult: {
+          opponentId: candidate.authorId,
+          opponentName: candidateName,
+          opponentScore: candidateScore,
+          outcome: isDraw ? "DRAW" : myScoreWins ? "WIN" : "LOSS",
+          ratingChange: myRatingChange,
+        },
+        "evaluation.ratingChange": myRatingChange,
+      });
+
+      tx.update(candidateRef, {
+        matchStatus: "MATCHED",
+        matchResult: {
+          opponentId: authorId,
+          opponentName: authorName,
+          opponentScore: authorScore,
+          outcome: isDraw ? "DRAW" : myScoreWins ? "LOSS" : "WIN",
+          ratingChange: theirRatingChange,
+        },
+        "evaluation.ratingChange": theirRatingChange,
+      });
+
+      tx.update(submitterRef, {
+        rating: Math.max(0, currentMyRating + myRatingChange),
+      });
+
+      tx.update(candidateAuthorRef, {
+        rating: Math.max(0, currentTheirRating + theirRatingChange),
+      });
+    });
+
+    return;
+  }
+
+  await mySubmissionRef.update({ matchStatus: "PENDING" });
 }

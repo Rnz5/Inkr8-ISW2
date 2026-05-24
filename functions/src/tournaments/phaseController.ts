@@ -71,7 +71,7 @@ interface TournamentUpdates {
   themeName?: string;
   topicId?: string;
   topicName?: string;
-  words?: string[];
+  requiredWords?: string[];
   [key: string]: string | number | FieldValue | string[] | undefined;
 }
 
@@ -103,7 +103,7 @@ export const tournamentPhaseController = onSchedule("every 15 minutes", async ()
       updates.themeName = gameContent.themeName;
       updates.topicId = gameContent.topicId;
       updates.topicName = gameContent.topicName;
-      updates.words = gameWords;
+      updates.requiredWords = gameWords;
     } else if (data.status === "ACTIVE" && now >= data.submissionDeadline) {
       updates.status = "EVALUATING";
       updates.nextPhaseCheckAt = FieldValue.delete();

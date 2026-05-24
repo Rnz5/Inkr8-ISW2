@@ -26,7 +26,6 @@ functions.auth.user().onCreate(async (user) => {
     isPlaced: false,
     placementMatchesPlayed: 0,
     totalPlacementScore: 0,
+    hasSeenPlacementReveal: false,
   });
-
-  // League counts are now handled in the evaluation engine after placement matches
 });

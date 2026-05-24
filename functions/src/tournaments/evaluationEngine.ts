@@ -57,15 +57,21 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
       for (const doc of submissionsSnapshot.docs) {
         const data = doc.data();
 
-        const result = await evaluateWithR8({
-          apiKey,
-          content: data.content ?? "",
-          gamemode: after.gamemode ?? "STANDARD",
-          requiredWords: Array.isArray(after.requiredWords) ?
-            after.requiredWords : [],
-          themeName: after.themeName ?? null,
-          topicName: after.topicName ?? null,
-        });
+        let result;
+        try {
+          result = await evaluateWithR8({
+            apiKey,
+            content: data.content ?? "",
+            gamemode: after.gamemode ?? "STANDARD",
+            requiredWords: Array.isArray(after.requiredWords) ?
+              after.requiredWords : [],
+            themeName: after.themeName ?? null,
+            topicName: after.topicName ?? null,
+          });
+        } catch (err) {
+          console.error(`Evaluation failed for submission ${doc.id}:`, err);
+          result = {finalScore: 0, feedback: "Evaluation unavailable."};
+        }
 
         evaluated.push({
           authorId: data.authorId,

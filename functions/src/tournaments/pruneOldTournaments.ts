@@ -12,9 +12,7 @@ export const pruneOldTournaments = onSchedule("every 12 hours", async () => {
       .get();
 
     if (!cancelledSnapshot.empty) {
-      for (const doc of cancelledSnapshot.docs) {
-        await db.recursiveDelete(doc.ref);
-      }
+      await Promise.all(cancelledSnapshot.docs.map((doc) => db.recursiveDelete(doc.ref)));
       console.log(`Pruned ${cancelledSnapshot.size} cancelled tournaments recursively.`);
     }
 
@@ -22,20 +20,16 @@ export const pruneOldTournaments = onSchedule("every 12 hours", async () => {
       .where("status", "==", "COMPLETED")
       .get();
 
-    let completedPrunedCount = 0;
-
     if (!completedSnapshot.empty) {
-      for (const doc of completedSnapshot.docs) {
+      const toDelete = completedSnapshot.docs.filter((doc) => {
         const data = doc.data();
         const timestamp = data.completedAt || data.createdAt || 0;
+        return now - timestamp > TWENTY_FOUR_HOURS_MS;
+      });
 
-        if (now - timestamp > TWENTY_FOUR_HOURS_MS) {
-          await db.recursiveDelete(doc.ref);
-          completedPrunedCount++;
-        }
-      }
-      if (completedPrunedCount > 0) {
-        console.log(`Pruned ${completedPrunedCount} completed tournaments recursively.`);
+      if (toDelete.length > 0) {
+        await Promise.all(toDelete.map((doc) => db.recursiveDelete(doc.ref)));
+        console.log(`Pruned ${toDelete.length} completed tournaments recursively.`);
       }
     }
   } catch (error) {

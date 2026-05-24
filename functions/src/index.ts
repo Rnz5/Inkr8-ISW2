@@ -9,6 +9,7 @@ export * from "./tournaments/createUserTournament";
 export * from "./tournaments/pruneOldTournaments";
 
 export * from "./submissions/submissionEvaluationEngine";
+export * from "./submissions/ghostMatchProcessor";
 export * from "./submissions/unlockFeedbackExpansion";
 export * from "./submissions/pruneOldSubmissions";
 

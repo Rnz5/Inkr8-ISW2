@@ -166,6 +166,22 @@ export const applyMeritAction = onCall(
       }
 
       case "ENTER_RANKED": {
+        const startOfTodayMs = new Date();
+        startOfTodayMs.setUTCHours(0, 0, 0, 0);
+
+        const todayRankedSnap = await db.collection("submissions")
+          .where("authorId", "==", uid)
+          .where("playmode", "==", "RANKED")
+          .where("timestamp", ">=", startOfTodayMs.getTime())
+          .get();
+
+        if (todayRankedSnap.size >= 5) { // check daily ranked submission limit 5
+          throw new HttpsError(
+            "failed-precondition",
+            "Daily ranked limit reached. The system allows 5 ranked entries per day. Return tomorrow."
+          );
+        }
+
         if (user?.currentlyInRanked) {
           reputation = onRankedAbandoned(reputation);
           rankedLossStreak += 1;
