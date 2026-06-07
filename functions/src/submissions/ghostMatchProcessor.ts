@@ -1,5 +1,6 @@
 import {onSchedule} from "firebase-functions/v2/scheduler";
-import {db} from "../firebase/admin";
+import {db, FieldValue} from "../firebase/admin";
+import {getLeagueFromRating} from "../utils/leagueManager";
 
 export const ghostMatchProcessor = onSchedule(
   {
@@ -10,7 +11,7 @@ export const ghostMatchProcessor = onSchedule(
     const FORTY_EIGHT_HOURS_MS = 48 * 60 * 60 * 1000;
     const cutoff = Date.now() - FORTY_EIGHT_HOURS_MS;
 
-    // find ranked submissions still PENDING older than 48 hours which will be evaluated with their own average
+    // find ranked submissions still PENDING older than 48 hours
     const pendingSnap = await db.collection("submissions")
       .where("playmode", "==", "RANKED")
       .where("status", "==", "EVALUATED")
@@ -20,6 +21,8 @@ export const ghostMatchProcessor = onSchedule(
       .get();
 
     if (pendingSnap.empty) return;
+
+    const BENCHMARK_SCORE = 65.0;
 
     for (const doc of pendingSnap.docs) {
       const data = doc.data();
@@ -32,22 +35,22 @@ export const ghostMatchProcessor = onSchedule(
 
       const userData = userSnap.data() ?? {};
       const recentScores: number[] = Array.isArray(userData.recentScores) ? userData.recentScores : [];
+      const isPlaced = userData.isPlaced === true;
 
       let ghostRatingChange = 0;
       let outcome = "DRAW";
+      let opponentScore = BENCHMARK_SCORE;
 
       if (recentScores.length >= 3) {
-        const avg = recentScores.slice(-10).reduce((a, b) => a + b, 0) / Math.min(recentScores.length, 10);
-        if (myScore > avg + 2) {
-          ghostRatingChange = 3;
-          outcome = "WIN";
-        } else if (myScore < avg - 2) {
-          ghostRatingChange = -2;
-          outcome = "LOSS";
-        } else {
-          ghostRatingChange = 1;
-          outcome = "DRAW";
-        }
+        opponentScore = recentScores.slice(-10).reduce((a, b) => a + b, 0) / Math.min(recentScores.length, 10);
+      }
+
+      if (myScore > opponentScore + 2) {
+        ghostRatingChange = 2;
+        outcome = "WIN";
+      } else if (myScore < opponentScore - 2) {
+        ghostRatingChange = -4;
+        outcome = "LOSS";
       } else {
         ghostRatingChange = 1;
         outcome = "DRAW";
@@ -57,22 +60,38 @@ export const ghostMatchProcessor = onSchedule(
 
       await db.runTransaction(async (tx) => {
         tx.update(doc.ref, {
-          matchStatus: "GHOST",
-          matchResult: {
+          "matchStatus": "GHOST",
+          "matchResult": {
             opponentId: "GHOST",
             opponentName: "R8 Average",
-            opponentScore: recentScores.length >= 3
-              ? recentScores.slice(-10).reduce((a, b) => a + b, 0) / Math.min(recentScores.length, 10)
-              : 60.0,
+            opponentScore: opponentScore,
             outcome,
             ratingChange: ghostRatingChange,
           },
           "evaluation.ratingChange": ghostRatingChange,
         });
 
-        tx.update(userRef, {
-          rating: Math.max(0, currentRating + ghostRatingChange),
-        });
+        if (isPlaced) {
+          const newRating = Math.max(0, currentRating + ghostRatingChange);
+          tx.update(userRef, {
+            rating: newRating,
+          });
+
+          if (authorId !== "R8") {
+            const oldLeague = getLeagueFromRating(currentRating);
+            const newLeague = getLeagueFromRating(newRating);
+
+            if (oldLeague !== newLeague) {
+              const statsRef = db.collection("metadata").doc("rankings");
+              tx.set(statsRef, {
+                leagueCounts: {
+                  [oldLeague]: FieldValue.increment(-1),
+                  [newLeague]: FieldValue.increment(1),
+                },
+              }, {merge: true});
+            }
+          }
+        }
       });
     }
   }

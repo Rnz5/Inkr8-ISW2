@@ -2,7 +2,6 @@ import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {db, FieldValue} from "../firebase/admin";
 import {OPENAI_API_KEY, evaluateWithR8} from "../r8/evaluateWithR8";
 import {calculateMerit} from "../utils/meritCalculator";
-import {calculateNewRating} from "../utils/ratingCalculator";
 import {onRankedCompleted} from "../utils/reputationManager";
 import {pruneOldSubmissions} from "./pruneOldSubmissions";
 import {getLeagueFromRating} from "../utils/leagueManager";
@@ -20,6 +19,24 @@ function getStreakMultiplier(streak: number): number {
   if (streak >= 3) return 1.05;
   if (streak >= 2) return 1.03;
   return 1.0;
+}
+
+
+function calculateDynamicRatingChange(
+  myRating: number,
+  opponentRating: number,
+  outcome: "WIN" | "LOSS" | "DRAW"
+): number {
+  const ratingGap = opponentRating - myRating; // Positive if opponent is stronger
+  const gapAdjustment = Math.max(-2, Math.min(2, ratingGap * 0.1));
+
+  if (outcome === "WIN") {
+    return Math.max(1, Math.round(4 + gapAdjustment));
+  } else if (outcome === "LOSS") {
+    return Math.min(-1, Math.round(-6 + gapAdjustment));
+  } else {
+    return 1;
+  }
 }
 
 export const submissionEvaluationEngine = onDocumentCreated(
@@ -209,6 +226,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
           lastSubmissionDay: today,
           meritHold: FieldValue.increment(holdReward),
           submissionsCount: FieldValue.increment(1),
+          totalMeritEarned: FieldValue.increment(meritEarned),
         };
 
         if (playmode === "RANKED" || playmode === "TOURNAMENT") {
@@ -264,39 +282,16 @@ export const submissionEvaluationEngine = onDocumentCreated(
               };
             }
           } else {
-            const newRating = calculateNewRating(
-              currentRating,
-              result.finalScore
-            );
-
-            ratingChange = newRating - currentRating;
-
             const newReputation = onRankedCompleted(
               Number(userData.reputation ?? 0)
             );
 
             userUpdates = {
               ...userUpdates,
-              rating: newRating,
               reputation: newReputation,
               currentlyInRanked: false,
               rankedSessionStartedAt: FieldValue.delete(),
             };
-
-            if (authorId !== "R8") {
-              const oldLeague = getLeagueFromRating(currentRating);
-              const newLeague = getLeagueFromRating(newRating);
-
-              if (oldLeague !== newLeague) {
-                const statsRef = db.collection("metadata").doc("rankings");
-                tx.set(statsRef, {
-                  leagueCounts: {
-                    [oldLeague]: FieldValue.increment(-1),
-                    [newLeague]: FieldValue.increment(1),
-                  },
-                }, {merge: true});
-              }
-            }
           }
         }
 
@@ -441,15 +436,6 @@ async function tryMatchRankedSubmission(
 
     if (candidate.authorId === authorId) continue;
 
-    const alreadyMatchedSnap = await db.collection("submissions")
-      .where("authorId", "==", authorId)
-      .where("matchResult.opponentId", "==", candidate.authorId)
-      .where("timestamp", ">=", since)
-      .limit(1)
-      .get();
-
-    if (!alreadyMatchedSnap.empty) continue;
-
     const candidateUserSnap = await db.collection("users").doc(candidate.authorId).get();
     if (!candidateUserSnap.exists) continue;
     const candidateRating = Number(candidateUserSnap.data()?.rating ?? 0);
@@ -463,13 +449,6 @@ async function tryMatchRankedSubmission(
     const myScoreWins = authorScore > candidateScore;
     const isDraw = authorScore === candidateScore;
 
-    const RATING_WIN = 8;
-    const RATING_LOSS = -5;
-    const RATING_DRAW = 1;
-
-    const myRatingChange = isDraw ? RATING_DRAW : myScoreWins ? RATING_WIN : RATING_LOSS;
-    const theirRatingChange = isDraw ? RATING_DRAW : myScoreWins ? RATING_LOSS : RATING_WIN;
-
     const candidateName = candidateUserSnap.data()?.name ?? "Unknown";
 
     await db.runTransaction(async (tx) => {
@@ -478,12 +457,29 @@ async function tryMatchRankedSubmission(
 
       if (!submitterSnap.exists || !candidateUserSnapTx.exists) return;
 
-      const currentMyRating = Number(submitterSnap.data()?.rating ?? 0);
-      const currentTheirRating = Number(candidateUserSnapTx.data()?.rating ?? 0);
+      const submitterData = submitterSnap.data();
+      const candidateData = candidateUserSnapTx.data();
+
+      const currentMyRating = Number(submitterData?.rating ?? 0);
+      const currentTheirRating = Number(candidateData?.rating ?? 0);
+      const myIsPlaced = submitterData?.isPlaced === true;
+      const candidateIsPlaced = candidateData?.isPlaced === true;
+
+      const myRatingChange = calculateDynamicRatingChange(
+        currentMyRating,
+        currentTheirRating,
+        isDraw ? "DRAW" : myScoreWins ? "WIN" : "LOSS"
+      );
+
+      const theirRatingChange = calculateDynamicRatingChange(
+        currentTheirRating,
+        currentMyRating,
+        isDraw ? "DRAW" : myScoreWins ? "LOSS" : "WIN"
+      );
 
       tx.update(mySubmissionRef, {
-        matchStatus: "MATCHED",
-        matchResult: {
+        "matchStatus": "MATCHED",
+        "matchResult": {
           opponentId: candidate.authorId,
           opponentName: candidateName,
           opponentScore: candidateScore,
@@ -494,8 +490,8 @@ async function tryMatchRankedSubmission(
       });
 
       tx.update(candidateRef, {
-        matchStatus: "MATCHED",
-        matchResult: {
+        "matchStatus": "MATCHED",
+        "matchResult": {
           opponentId: authorId,
           opponentName: authorName,
           opponentScore: authorScore,
@@ -505,17 +501,47 @@ async function tryMatchRankedSubmission(
         "evaluation.ratingChange": theirRatingChange,
       });
 
-      tx.update(submitterRef, {
-        rating: Math.max(0, currentMyRating + myRatingChange),
-      });
+      if (myIsPlaced) {
+        const newRating = Math.max(0, currentMyRating + myRatingChange);
+        tx.update(submitterRef, {rating: newRating});
 
-      tx.update(candidateAuthorRef, {
-        rating: Math.max(0, currentTheirRating + theirRatingChange),
-      });
+        if (authorId !== "R8") {
+          const oldLeague = getLeagueFromRating(currentMyRating);
+          const newLeague = getLeagueFromRating(newRating);
+          if (oldLeague !== newLeague) {
+            const statsRef = db.collection("metadata").doc("rankings");
+            tx.set(statsRef, {
+              leagueCounts: {
+                [oldLeague]: FieldValue.increment(-1),
+                [newLeague]: FieldValue.increment(1),
+              },
+            }, {merge: true});
+          }
+        }
+      }
+
+      if (candidateIsPlaced) {
+        const newRating = Math.max(0, currentTheirRating + theirRatingChange);
+        tx.update(candidateAuthorRef, {rating: newRating});
+
+        if (candidate.authorId !== "R8") {
+          const oldLeague = getLeagueFromRating(currentTheirRating);
+          const newLeague = getLeagueFromRating(newRating);
+          if (oldLeague !== newLeague) {
+            const statsRef = db.collection("metadata").doc("rankings");
+            tx.set(statsRef, {
+              leagueCounts: {
+                [oldLeague]: FieldValue.increment(-1),
+                [newLeague]: FieldValue.increment(1),
+              },
+            }, {merge: true});
+          }
+        }
+      }
     });
 
     return;
   }
 
-  await mySubmissionRef.update({ matchStatus: "PENDING" });
+  await mySubmissionRef.update({matchStatus: "PENDING"});
 }

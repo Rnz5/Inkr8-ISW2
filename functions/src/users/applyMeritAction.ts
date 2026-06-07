@@ -1,5 +1,5 @@
 import {onCall, HttpsError} from "firebase-functions/v2/https";
-import {db} from "../firebase/admin";
+import {db, FieldValue} from "../firebase/admin";
 import {calculateRankedEntryCost} from "../utils/meritCalculator";
 import {onRankedAbandoned} from "../utils/reputationManager";
 
@@ -156,6 +156,7 @@ export const applyMeritAction = onCall(
         reason = "SAVE_SUBMISSION";
         updatedFields = {
           merit: currentMerit - cost,
+          savedSubmissionsCount: FieldValue.increment(1),
         };
         tx.update(userRef, updatedFields);
 

@@ -10,6 +10,11 @@ type EvaluatedSubmission = {
   submissionRef: FirebaseFirestore.DocumentReference;
 };
 
+function getUtcDayInt(): number {
+  const now = new Date();
+  return now.getUTCFullYear() * 10000 + (now.getUTCMonth() + 1) * 100 + now.getUTCDate();
+}
+
 function meritToLiquid(current: number, earned: number, cap: number): number {
   if (current + earned > cap) return Math.max(0, cap - current);
   return earned;
@@ -51,20 +56,17 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
         .get();
 
       const apiKey = OPENAI_API_KEY.value();
-
       const evaluated: EvaluatedSubmission[] = [];
 
       for (const doc of submissionsSnapshot.docs) {
         const data = doc.data();
-
         let result;
         try {
           result = await evaluateWithR8({
             apiKey,
             content: data.content ?? "",
             gamemode: after.gamemode ?? "STANDARD",
-            requiredWords: Array.isArray(after.requiredWords) ?
-              after.requiredWords : [],
+            requiredWords: Array.isArray(after.requiredWords) ? after.requiredWords : [],
             themeName: after.themeName ?? null,
             topicName: after.topicName ?? null,
           });
@@ -84,25 +86,13 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
       evaluated.sort((a, b) => b.score - a.score);
 
       const rewardPercentages = calculateRewardPercentages(evaluated.length);
+      const today = getUtcDayInt();
 
       for (let i = 0; i < evaluated.length; i++) {
         const entry = evaluated[i];
         const rank = i + 1;
         const rewardPercent = rewardPercentages[i] ?? 0;
         const reward = Math.floor(after.prizePool * rewardPercent);
-
-        if (reward <= 0) {
-          await entry.submissionRef.update({
-            evaluation: {
-              finalScore: entry.score,
-              feedback: entry.feedback,
-              meritEarned: 0,
-              rankLeaderboard: rank,
-            },
-            status: "EVALUATED",
-          });
-          continue;
-        }
 
         const userRef = db.collection("users").doc(entry.authorId);
 
@@ -114,22 +104,52 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
           const currentMerit = userData.merit ?? 0;
           const meritCap = userData.meritCap ?? 50000;
 
-          const liquid = meritToLiquid(currentMerit, reward, meritCap);
-          const hold = meritToHold(currentMerit, reward, meritCap);
+          const liquid = reward > 0 ? meritToLiquid(currentMerit, reward, meritCap) : 0;
+          const hold = reward > 0 ? meritToHold(currentMerit, reward, meritCap) : 0;
           const newMerit = currentMerit + liquid;
 
-          tx.update(userRef, {
+          const recentScores: number[] = Array.isArray(userData.recentScores) ? userData.recentScores : [];
+          recentScores.push(entry.score);
+
+          const lastDay = Number(userData.lastSubmissionDay ?? 0);
+          const currentStreak = Number(userData.currentStreak ?? 0);
+          let newStreak = currentStreak;
+
+          if (lastDay !== today) {
+            const yesterday = new Date();
+            yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+            const yesterdayInt = yesterday.getUTCFullYear() * 10000 + (yesterday.getUTCMonth() + 1) * 100 + yesterday.getUTCDate();
+            newStreak = (lastDay === yesterdayInt) ? currentStreak + 1 : 1;
+          }
+
+          const userUpdates: Record<string, any> = {
             merit: newMerit,
             meritHold: FieldValue.increment(hold),
-          });
+            submissionsCount: FieldValue.increment(1),
+            bestScore: Math.max(userData.bestScore || 0, entry.score),
+            recentScores: recentScores.slice(-20),
+            tournamentsPlayed: FieldValue.increment(1),
+            totalMeritEarned: FieldValue.increment(reward),
+            lastSubmissionDay: today,
+            currentStreak: newStreak
+          };
+
+          if (rank === 1) {
+            userUpdates.tournamentsWon = FieldValue.increment(1);
+          }
+
+          tx.update(userRef, userUpdates);
 
           tx.update(entry.submissionRef, {
             evaluation: {
+              submissionId: entry.submissionRef.id,
               finalScore: entry.score,
               feedback: entry.feedback,
               meritEarned: reward,
               meritToHold: hold,
+              ratingChange: 0,
               rankLeaderboard: rank,
+              resultStatus: "EVALUATED",
             },
             status: "EVALUATED",
           });
@@ -166,6 +186,7 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
           tx.update(hostRef, {
             merit: newMerit,
             meritHold: FieldValue.increment(hold),
+            totalMeritEarned: FieldValue.increment(hostProfit),
           });
 
           if (liquid !== 0) {
