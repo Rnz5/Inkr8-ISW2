@@ -6,7 +6,7 @@ export * from "./tournaments/finalizerEngine";
 export * from "./tournaments/enrollInTournament";
 export * from "./tournaments/systemTournamentSeeder";
 export * from "./tournaments/createUserTournament";
-export * from "./tournaments/pruneOldSubmissions";
+export * from "./tournaments/pruneOldTournaments";
 
 export * from "./submissions/submissionEvaluationEngine";
 export * from "./submissions/ghostMatchProcessor";

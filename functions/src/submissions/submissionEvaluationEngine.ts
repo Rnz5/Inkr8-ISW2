@@ -62,19 +62,19 @@ export const submissionEvaluationEngine = onDocumentCreated(
     }
 
     const submissionRef = snapshot.ref;
+    const authorId = data.authorId;
+    const playmode = data.playmode ?? "PRACTICE";
 
     try {
       console.log("submissionEvaluationEngine triggered", {
         submissionId: snapshot.id,
-        authorId: data.authorId ?? null,
-        playmode: data.playmode ?? null,
+        authorId: authorId ?? null,
+        playmode: playmode ?? null,
         gamemode: data.gamemode ?? null,
         status: data.status ?? null,
       });
 
       const apiKey = OPENAI_API_KEY.value();
-      const playmode = data.playmode ?? "PRACTICE";
-      const authorId = data.authorId;
 
       if (playmode === "TOURNAMENT") {
         console.log("submissionEvaluationEngine: skipped, TOURNAMENT playmode handled by tournamentEvaluationEngine", {
@@ -182,7 +182,6 @@ export const submissionEvaluationEngine = onDocumentCreated(
         }
 
         const userData = userSnap.data() ?? {};
-        const currentRating = Number(userData.rating ?? 0);
         const currentMerit = Number(userData.merit ?? 0);
         const meritCap = Number(userData.meritCap ?? 50000);
         const currentBestScore = Number(userData.bestScore ?? 0);
@@ -220,7 +219,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
         const holdReward = meritToHold(currentMerit, meritEarned, meritCap);
         const newMerit = currentMerit + liquidReward;
 
-        let userUpdates: Record<string, unknown> = {
+        const userUpdates: Record<string, unknown> = {
           merit: newMerit,
           currentStreak: newStreak,
           lastSubmissionDay: today,
@@ -233,7 +232,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
           userUpdates.bestScore = Math.max(currentBestScore, result.finalScore);
         }
 
-        let ratingChange = 0;
+        let ratingChangeResult = 0;
 
         if (playmode === "RANKED" || playmode === "TOURNAMENT") {
           const recentScores: number[] = Array.isArray(userData.recentScores) ? userData.recentScores : [];
@@ -250,18 +249,15 @@ export const submissionEvaluationEngine = onDocumentCreated(
               const avgScore = totalScore / 6;
               const initialRating = Math.min(120, Math.floor((avgScore / 100) * 120));
 
-              userUpdates = {
-                ...userUpdates,
-                rating: initialRating,
-                isPlaced: true,
-                placementMatchesPlayed: 6,
-                totalPlacementScore: totalScore,
-                reputation: onRankedCompleted(Number(userData.reputation ?? 0)),
-                currentlyInRanked: false,
-                rankedSessionStartedAt: FieldValue.delete(),
-              };
+              userUpdates.rating = initialRating;
+              userUpdates.isPlaced = true;
+              userUpdates.placementMatchesPlayed = 6;
+              userUpdates.totalPlacementScore = totalScore;
+              userUpdates.reputation = onRankedCompleted(Number(userData.reputation ?? 0));
+              userUpdates.currentlyInRanked = false;
+              userUpdates.rankedSessionStartedAt = FieldValue.delete();
 
-              ratingChange = initialRating;
+              ratingChangeResult = initialRating;
 
               if (authorId !== "R8") {
                 const newLeague = getLeagueFromRating(initialRating);
@@ -273,25 +269,19 @@ export const submissionEvaluationEngine = onDocumentCreated(
                 }, {merge: true});
               }
             } else {
-              userUpdates = {
-                ...userUpdates,
-                placementMatchesPlayed: played,
-                totalPlacementScore: totalScore,
-                currentlyInRanked: false,
-                rankedSessionStartedAt: FieldValue.delete(),
-              };
+              userUpdates.placementMatchesPlayed = played;
+              userUpdates.totalPlacementScore = totalScore;
+              userUpdates.currentlyInRanked = false;
+              userUpdates.rankedSessionStartedAt = FieldValue.delete();
             }
           } else {
             const newReputation = onRankedCompleted(
               Number(userData.reputation ?? 0)
             );
 
-            userUpdates = {
-              ...userUpdates,
-              reputation: newReputation,
-              currentlyInRanked: false,
-              rankedSessionStartedAt: FieldValue.delete(),
-            };
+            userUpdates.reputation = newReputation;
+            userUpdates.currentlyInRanked = false;
+            userUpdates.rankedSessionStartedAt = FieldValue.delete();
           }
         }
 
@@ -302,7 +292,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
             feedback: result.feedback,
             meritEarned,
             meritToHold: holdReward,
-            ratingChange,
+            ratingChange: ratingChangeResult,
             resultStatus: "EVALUATED",
           },
           status: "EVALUATED",
@@ -326,13 +316,13 @@ export const submissionEvaluationEngine = onDocumentCreated(
       if (playmode === "RANKED") {
         const authorUserSnap = await db.collection("users").doc(authorId).get();
         const authorName = authorUserSnap.data()?.name ?? "Unknown";
-        const currentRating = Number(authorUserSnap.data()?.rating ?? 0);
+        const authorRating = Number(authorUserSnap.data()?.rating ?? 0);
 
         tryMatchRankedSubmission(
           snapshot.id,
           authorId,
           result.finalScore,
-          currentRating,
+          authorRating,
           authorName
         ).catch((err) => {
           console.error("tryMatchRankedSubmission failed:", err);
@@ -348,8 +338,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
         status: "FAILED",
         evaluationError: error instanceof Error ? error.message : "Unknown failure",
       });
-      const authorId = data.authorId;
-      if (authorId && data.playmode === "RANKED") {
+      if (authorId && playmode === "RANKED") {
         try {
           await db.collection("users").doc(authorId).update({
             currentlyInRanked: false,

@@ -56,6 +56,7 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
         .get();
 
       const apiKey = OPENAI_API_KEY.value();
+
       const evaluated: EvaluatedSubmission[] = [];
 
       for (const doc of submissionsSnapshot.docs) {
@@ -66,7 +67,8 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
             apiKey,
             content: data.content ?? "",
             gamemode: after.gamemode ?? "STANDARD",
-            requiredWords: Array.isArray(after.requiredWords) ? after.requiredWords : [],
+            requiredWords: Array.isArray(after.requiredWords) ?
+              after.requiredWords : [],
             themeName: after.themeName ?? null,
             topicName: after.topicName ?? null,
           });
@@ -122,7 +124,7 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
             newStreak = (lastDay === yesterdayInt) ? currentStreak + 1 : 1;
           }
 
-          const userUpdates: Record<string, any> = {
+          const userUpdates: Record<string, unknown> = {
             merit: newMerit,
             meritHold: FieldValue.increment(hold),
             submissionsCount: FieldValue.increment(1),
@@ -131,7 +133,7 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
             tournamentsPlayed: FieldValue.increment(1),
             totalMeritEarned: FieldValue.increment(reward),
             lastSubmissionDay: today,
-            currentStreak: newStreak
+            currentStreak: newStreak,
           };
 
           if (rank === 1) {
