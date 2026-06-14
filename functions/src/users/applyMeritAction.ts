@@ -170,13 +170,19 @@ export const applyMeritAction = onCall(
         const startOfTodayMs = new Date();
         startOfTodayMs.setUTCHours(0, 0, 0, 0);
 
-        const todayRankedSnap = await db.collection("submissions")
-          .where("authorId", "==", uid)
-          .where("playmode", "==", "RANKED")
-          .where("timestamp", ">=", startOfTodayMs.getTime())
-          .get();
+        let submissionsToday = 0;
+        try {
+          const todayRankedSnap = await db.collection("submissions")
+            .where("authorId", "==", uid)
+            .where("playmode", "==", "RANKED")
+            .where("timestamp", ">=", startOfTodayMs.getTime())
+            .get();
+          submissionsToday = todayRankedSnap.size;
+        } catch (indexErr) {
+          console.warn("applyMeritAction: could not fetch daily ranked count (composite index may be missing):", indexErr);
+        }
 
-        if (todayRankedSnap.size >= 5) { // check daily ranked submission limit 5
+        if (submissionsToday >= 5) {
           throw new HttpsError(
             "failed-precondition",
             "Daily ranked limit reached. The system allows 5 ranked entries per day. Return tomorrow."

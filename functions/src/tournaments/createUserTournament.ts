@@ -66,20 +66,22 @@ export const createUserTournament = onCall(
       const creatorName = user?.name ?? "Unknown Host";
       const creatorImageURL = user?.profileImageURL ?? "";
 
-      if (currentMerit < prizePool) {
-        throw new HttpsError("failed-precondition", "Not enough Merit.");
-      }
-
       const projection = calculateTournamentProjection({
         prizePool,
         maxPlayers,
       });
 
+      const totalCost = prizePool + projection.systemFee;
+
+      if (currentMerit < totalCost) {
+        throw new HttpsError("failed-precondition", "Insufficient Merit to cover Prize Pool and System Fee.");
+      }
+
       const now = Date.now();
       const enrollmentDeadline = now + (12 * 60 * 60 * 1000);
       const submissionDeadline = enrollmentDeadline + (24 * 60 * 60 * 1000);
 
-      const newBalance = currentMerit - prizePool;
+      const newBalance = currentMerit - totalCost;
 
       tx.update(userRef, {
         merit: newBalance,
@@ -122,7 +124,7 @@ export const createUserTournament = onCall(
 
       const txRef = userRef.collection("meritTransactions").doc();
       tx.set(txRef, {
-        amount: -prizePool,
+        amount: -totalCost,
         reason: "CREATE_TOURNAMENT",
         timestamp: now,
         balanceAfter: newBalance,

@@ -144,12 +144,16 @@ export const submissionEvaluationEngine = onDocumentCreated(
       const startOfTodayMs = new Date();
       startOfTodayMs.setUTCHours(0, 0, 0, 0);
 
-      const todaySubmissionsSnap = await db.collection("submissions")
-        .where("authorId", "==", authorId)
-        .where("timestamp", ">=", startOfTodayMs.getTime())
-        .get();
-
-      const submissionsToday = todaySubmissionsSnap.size;
+      let submissionsToday = 0;
+      try {
+        const todaySubmissionsSnap = await db.collection("submissions")
+          .where("authorId", "==", authorId)
+          .where("timestamp", ">=", startOfTodayMs.getTime())
+          .get();
+        submissionsToday = todaySubmissionsSnap.size;
+      } catch (indexErr) {
+        console.warn("submissionEvaluationEngine: could not fetch daily submission count (composite index may be missing):", indexErr);
+      }
 
       const userSnapForContext = await db.collection("users").doc(authorId).get();
       const userDataForContext = userSnapForContext.data() ?? {};
@@ -492,7 +496,18 @@ async function tryMatchRankedSubmission(
 
       if (myIsPlaced) {
         const newRating = Math.max(0, currentMyRating + myRatingChange);
-        tx.update(submitterRef, {rating: newRating});
+        const myOutcome = isDraw ? "DRAW" : myScoreWins ? "WIN" : "LOSS";
+        const myWinStreak = Number(submitterData?.rankedWinStreak ?? 0);
+        const myLossStreak = Number(submitterData?.rankedLossStreak ?? 0);
+
+        const newMyWinStreak = myOutcome === "WIN" ? myWinStreak + 1 : 0;
+        const newMyLossStreak = myOutcome === "LOSS" ? myLossStreak + 1 : 0;
+
+        tx.update(submitterRef, {
+          rating: newRating,
+          rankedWinStreak: newMyWinStreak,
+          rankedLossStreak: newMyLossStreak,
+        });
 
         if (authorId !== "R8") {
           const oldLeague = getLeagueFromRating(currentMyRating);
@@ -511,7 +526,18 @@ async function tryMatchRankedSubmission(
 
       if (candidateIsPlaced) {
         const newRating = Math.max(0, currentTheirRating + theirRatingChange);
-        tx.update(candidateAuthorRef, {rating: newRating});
+        const theirOutcome = isDraw ? "DRAW" : myScoreWins ? "LOSS" : "WIN";
+        const theirWinStreak = Number(candidateData?.rankedWinStreak ?? 0);
+        const theirLossStreak = Number(candidateData?.rankedLossStreak ?? 0);
+
+        const newTheirWinStreak = theirOutcome === "WIN" ? theirWinStreak + 1 : 0;
+        const newTheirLossStreak = theirOutcome === "LOSS" ? theirLossStreak + 1 : 0;
+
+        tx.update(candidateAuthorRef, {
+          rating: newRating,
+          rankedWinStreak: newTheirWinStreak,
+          rankedLossStreak: newTheirLossStreak,
+        });
 
         if (candidate.authorId !== "R8") {
           const oldLeague = getLeagueFromRating(currentTheirRating);
