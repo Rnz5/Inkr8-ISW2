@@ -37,6 +37,7 @@ import com.inkr8.data.TournamentLeaderboardEntry
 import com.inkr8.data.TournamentStatus
 import com.inkr8.data.Users
 import com.inkr8.economy.TournamentRewardCalculator
+import com.inkr8.ui.theme.Inkr8Theme
 import com.inkr8.utils.FormatUtils
 import com.inkr8.utils.TimeUtils
 import java.text.NumberFormat
