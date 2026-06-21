@@ -23,3 +23,5 @@ export * from "./users/rankedSessionCleaner";
 export * from "./tips/tipProcessor";
 
 export * from "./stats/dailyStatsSnapshot";
+export * from "./stats/weeklyStatsSnapshot";
+export * from "./stats/monthlyStatsSnapshot";
