@@ -7,6 +7,7 @@ type EvaluatedSubmission = {
   authorId: string;
   score: number;
   feedback: string;
+  source: string;
   submissionRef: FirebaseFirestore.DocumentReference;
 };
 
@@ -74,13 +75,14 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
           });
         } catch (err) {
           console.error(`Evaluation failed for submission ${doc.id}:`, err);
-          result = {finalScore: 0, feedback: "Evaluation unavailable."};
+          result = {finalScore: 0, feedback: "Evaluation unavailable.", source: "mock"};
         }
 
         evaluated.push({
           authorId: data.authorId,
           score: result.finalScore,
           feedback: result.feedback,
+          source: result.source || "mock",
           submissionRef: doc.ref,
         });
       }
@@ -152,6 +154,7 @@ export const tournamentEvaluationEngine = onDocumentUpdated(
               ratingChange: 0,
               rankLeaderboard: rank,
               resultStatus: "EVALUATED",
+              source: entry.source,
             },
             status: "EVALUATED",
           });

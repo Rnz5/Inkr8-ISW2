@@ -45,7 +45,6 @@ export const weeklyStatsSnapshot = onSchedule(
       let totalMeritEarned = 0;
       let totalMeritSpent = 0;
       let tournamentsCompleted = 0;
-      const activeUsersUnion = new Set<string>();
       const themeAverages: Record<string, { totalAvg: number; days: number }> = {};
 
       recordsSnap.forEach((doc) => {

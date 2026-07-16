@@ -175,6 +175,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
       console.log("submissionEvaluationEngine: evaluation completed", {
         submissionId: snapshot.id,
         finalScore: result.finalScore,
+        source: result.source,
       });
 
       const userRef = db.collection("users").doc(authorId);
@@ -298,6 +299,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
             meritToHold: holdReward,
             ratingChange: ratingChangeResult,
             resultStatus: "EVALUATED",
+            source: result.source || "real",
           },
           status: "EVALUATED",
           matchStatus: playmode === "RANKED" ? "PENDING" : "UNMATCHED",
