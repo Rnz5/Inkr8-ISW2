@@ -53,7 +53,7 @@ export const applyMeritAction = onCall(
       const userSnap = await tx.get(userRef);
 
       if (!userSnap.exists) {
-        throw new HttpsError("not-found", "User not found.");
+        throw new Error("User not found."); // Caught by transaction and converted to HttpsError if needed
       }
 
       const user = userSnap.data();
@@ -72,7 +72,7 @@ export const applyMeritAction = onCall(
         const expansionAmount = 10000;
 
         if (currentMerit < cost) {
-          throw new HttpsError("failed-precondition", "Insufficient Merit for expansion.");
+          throw new Error("Insufficient Merit for expansion.");
         }
 
         meritDelta = -cost;
@@ -89,7 +89,7 @@ export const applyMeritAction = onCall(
         const cost = 25;
 
         if (currentMerit < cost) {
-          throw new HttpsError("failed-precondition", "Not enough Merit.");
+          throw new Error("Not enough Merit.");
         }
 
         meritDelta = -cost;
@@ -105,7 +105,7 @@ export const applyMeritAction = onCall(
         const cost = 500;
 
         if (currentMerit < cost) {
-          throw new HttpsError("failed-precondition", "Not enough Merit.");
+          throw new Error("Not enough Merit.");
         }
 
         meritDelta = -cost;
@@ -120,36 +120,31 @@ export const applyMeritAction = onCall(
       case "SAVE_SUBMISSION": {
         const submissionId = request.data?.submissionId;
         if (!submissionId) {
-          throw new HttpsError("invalid-argument", "Missing submissionId.");
+          throw new Error("Missing submissionId.");
         }
 
-
-        const savedSubsQuery = db.collection("submissions")
-          .where("authorId", "==", uid)
-          .where("isSaved", "==", true);
-        const savedSubsSnap = await tx.get(savedSubsQuery);
-        const savedCount = savedSubsSnap.size;
-
+        // Optimization: Use cached count instead of transactional query to avoid timeouts
+        const savedCount = user?.savedSubmissionsCount ?? 0;
         const cost = 2000 + Math.floor(savedCount / 3) * 200;
 
         if (currentMerit < cost) {
-          throw new HttpsError("failed-precondition", "Not enough Merit.");
+          throw new Error("Not enough Merit.");
         }
 
         const subRef = db.collection("submissions").doc(submissionId);
         const subSnap = await tx.get(subRef);
 
         if (!subSnap.exists) {
-          throw new HttpsError("not-found", "Submission not found.");
+          throw new Error("Submission not found.");
         }
 
         const subData = subSnap.data();
         if (subData?.authorId !== uid) {
-          throw new HttpsError("permission-denied", "You are not the author.");
+          throw new Error("You are not the author.");
         }
 
         if (subData?.isSaved === true) {
-          throw new HttpsError("already-exists", "Submission is already saved.");
+          throw new Error("Submission is already saved.");
         }
 
         meritDelta = -cost;
@@ -170,23 +165,22 @@ export const applyMeritAction = onCall(
         const startOfTodayMs = new Date();
         startOfTodayMs.setUTCHours(0, 0, 0, 0);
 
+        // Transactional queries are expensive. ENTER_RANKED limit check
+        // could be further optimized by moving it to a daily counter on the user doc,
+        // but for now we keep it and ensure it's the only query.
         let submissionsToday = 0;
         try {
-          const todayRankedSnap = await db.collection("submissions")
+          const todayRankedSnap = await tx.get(db.collection("submissions")
             .where("authorId", "==", uid)
             .where("playmode", "==", "RANKED")
-            .where("timestamp", ">=", startOfTodayMs.getTime())
-            .get();
+            .where("timestamp", ">=", startOfTodayMs.getTime()));
           submissionsToday = todayRankedSnap.size;
         } catch (indexErr) {
-          console.warn("applyMeritAction: could not fetch daily ranked count (composite index may be missing):", indexErr);
+          console.warn("applyMeritAction: daily ranked count query failed", indexErr);
         }
 
         if (submissionsToday >= 5) {
-          throw new HttpsError(
-            "failed-precondition",
-            "Daily ranked limit reached. The system allows 5 ranked entries per day. Return tomorrow."
-          );
+          throw new Error("Daily ranked limit reached (5). Return tomorrow.");
         }
 
         if (user?.currentlyInRanked) {
@@ -202,7 +196,7 @@ export const applyMeritAction = onCall(
         );
 
         if (currentMerit < cost) {
-          throw new HttpsError("failed-precondition", "Not enough Merit.");
+          throw new Error("Not enough Merit.");
         }
 
         const rankedSessionStartedAt = Date.now();
@@ -222,7 +216,7 @@ export const applyMeritAction = onCall(
 
       case "ABANDON_RANKED": {
         if (!user?.currentlyInRanked) {
-          throw new HttpsError("failed-precondition", "No active ranked session to abandon.");
+          throw new Error("No active ranked session to abandon.");
         }
 
         updatedFields = {
@@ -243,25 +237,22 @@ export const applyMeritAction = onCall(
 
         const validationError = validateUsername(rawNewUsername);
         if (validationError) {
-          throw new HttpsError("invalid-argument", validationError);
+          throw new Error(validationError);
         }
 
         const oldUsername = String(user?.name ?? "").trim();
         const normalizedOldUsername = oldUsername.toLowerCase();
 
         if (!oldUsername) {
-          throw new HttpsError("failed-precondition",
-            "Current username not found.");
+          throw new Error("Current username not found.");
         }
 
         if (normalizedOldUsername === normalizedNewUsername) {
-          throw new HttpsError("failed-precondition",
-            "That is already your username.");
+          throw new Error("That is already your username.");
         }
 
         if (currentMerit < cost) {
-          throw new HttpsError("failed-precondition",
-            "Not enough Merit.");
+          throw new Error("Not enough Merit.");
         }
 
         const oldUsernameRef = db.collection("usernames")
@@ -271,8 +262,7 @@ export const applyMeritAction = onCall(
         const newUsernameSnap = await tx.get(newUsernameRef);
 
         if (newUsernameSnap.exists) {
-          throw new HttpsError("already-exists",
-            "That username is already taken.");
+          throw new Error("That username is already taken.");
         }
 
         tx.delete(oldUsernameRef);
@@ -296,14 +286,11 @@ export const applyMeritAction = onCall(
 
       case "REWARD_PRACTICE":
       case "REWARD_RANKED": {
-        throw new HttpsError(
-          "failed-precondition",
-          "This action must be applied by a trusted backend flow."
-        );
+        throw new Error("Action must be applied by backend flow.");
       }
 
       default:
-        throw new HttpsError("invalid-argument", "Unsupported action.");
+        throw new Error("Unsupported action.");
       }
 
       if (meritDelta !== 0) {
@@ -315,6 +302,8 @@ export const applyMeritAction = onCall(
           balanceAfter: currentMerit + meritDelta,
         });
       }
+    }).catch((err) => {
+      throw new HttpsError("failed-precondition", err.message);
     });
 
     return {

@@ -21,22 +21,75 @@ function getStreakMultiplier(streak: number): number {
   return 1.0;
 }
 
-
 function calculateDynamicRatingChange(
   myRating: number,
   opponentRating: number,
   outcome: "WIN" | "LOSS" | "DRAW"
 ): number {
-  const ratingGap = opponentRating - myRating; // Positive if opponent is stronger
-  const gapAdjustment = Math.max(-2, Math.min(2, ratingGap * 0.1));
+  const ratingGap = opponentRating - myRating;
+
+  const gapAdjustment = Math.max(-5, Math.min(5, ratingGap * 0.05));
 
   if (outcome === "WIN") {
-    return Math.max(1, Math.round(4 + gapAdjustment));
+    let winChange = Math.round(4 + gapAdjustment);
+
+    if (myRating >= 180) {
+      winChange = Math.min(winChange, 2);
+    } else if (myRating >= 150) {
+      winChange = Math.min(winChange, 3);
+    }
+
+    return Math.max(1, winChange);
   } else if (outcome === "LOSS") {
     return Math.min(-1, Math.round(-6 + gapAdjustment));
   } else {
     return 1;
   }
+}
+
+// quality check to filter out nonsense or highly repetitive content >:(
+function isContentLowQuality(content: string): { isLowQuality: boolean; reason?: string } {
+  const trimmed = content.trim();
+  if (trimmed.length < 50) return {isLowQuality: true, reason: "Content too short (min 50 chars)"};
+
+  const words = trimmed.split(/\s+/).filter((w) => w.length > 0);
+
+  if (words.some((w) => w.length > 35)) {
+    return {isLowQuality: true, reason: "Nonsense detected (excessive word length)"};
+  }
+
+  if (words.length >= 10) {
+    const uniqueWords = new Set(words.map((w) => w.toLowerCase()));
+    if (uniqueWords.size / words.length < 0.35) {
+      return {isLowQuality: true, reason: "Repetitive content detected"};
+    }
+  }
+
+  const letters = trimmed.replace(/[^a-zA-Z]/g, "");
+  if (letters.length > 30) {
+    const vowels = letters.match(/[aeiouAEIOU]/g) || [];
+    const vowelRatio = vowels.length / letters.length;
+    if (vowelRatio < 0.15 || vowelRatio > 0.8) {
+      return {isLowQuality: true, reason: "Unnatural character distribution (nonsense)"};
+    }
+
+    const uniqueLetters = new Set(letters.toLowerCase().split(""));
+    if (uniqueLetters.size < 8 && letters.length > 60) {
+      return {isLowQuality: true, reason: "Low character diversity (nonsense)"};
+    }
+  }
+
+  return {isLowQuality: false};
+}
+
+function meritToLiquid(current: number, earned: number, cap: number): number {
+  if (current + earned > cap) return Math.max(0, cap - current);
+  return earned;
+}
+
+function meritToHold(current: number, earned: number, cap: number): number {
+  const liquid = meritToLiquid(current, earned, cap);
+  return earned - liquid;
 }
 
 export const submissionEvaluationEngine = onDocumentCreated(
@@ -179,6 +232,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
       });
 
       const userRef = db.collection("users").doc(authorId);
+      let leagueToIncrement: string | null = null;
 
       await db.runTransaction(async (tx) => {
         const userSnap = await tx.get(userRef);
@@ -265,13 +319,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
               ratingChangeResult = initialRating;
 
               if (authorId !== "R8") {
-                const newLeague = getLeagueFromRating(initialRating);
-                const statsRef = db.collection("metadata").doc("rankings");
-                tx.set(statsRef, {
-                  leagueCounts: {
-                    [newLeague]: FieldValue.increment(1),
-                  },
-                }, {merge: true});
+                leagueToIncrement = getLeagueFromRating(initialRating);
               }
             } else {
               userUpdates.placementMatchesPlayed = played;
@@ -319,6 +367,15 @@ export const submissionEvaluationEngine = onDocumentCreated(
         }
       });
 
+      // Optimization: Update global stats outside the transaction to prevent contention/timeouts
+      if (leagueToIncrement) {
+        db.collection("metadata").doc("rankings").set({
+          leagueCounts: {
+            [leagueToIncrement]: FieldValue.increment(1),
+          },
+        }, {merge: true}).catch((err) => console.error("Global stats update failed:", err));
+      }
+
       if (playmode === "RANKED") {
         const authorUserSnap = await db.collection("users").doc(authorId).get();
         const authorName = authorUserSnap.data()?.name ?? "Unknown";
@@ -358,52 +415,6 @@ export const submissionEvaluationEngine = onDocumentCreated(
     }
   }
 );
-
-
-// quality check to filter out nonsense or highly repetitive content >:(
-function isContentLowQuality(content: string): { isLowQuality: boolean; reason?: string } {
-  const trimmed = content.trim();
-  if (trimmed.length < 50) return {isLowQuality: true, reason: "Content too short (min 50 chars)"};
-
-  const words = trimmed.split(/\s+/).filter((w) => w.length > 0);
-
-  if (words.some((w) => w.length > 35)) {
-    return {isLowQuality: true, reason: "Nonsense detected (excessive word length)"};
-  }
-
-  if (words.length >= 10) {
-    const uniqueWords = new Set(words.map((w) => w.toLowerCase()));
-    if (uniqueWords.size / words.length < 0.35) {
-      return {isLowQuality: true, reason: "Repetitive content detected"};
-    }
-  }
-
-  const letters = trimmed.replace(/[^a-zA-Z]/g, "");
-  if (letters.length > 30) {
-    const vowels = letters.match(/[aeiouAEIOU]/g) || [];
-    const vowelRatio = vowels.length / letters.length;
-    if (vowelRatio < 0.15 || vowelRatio > 0.8) {
-      return {isLowQuality: true, reason: "Unnatural character distribution (nonsense)"};
-    }
-
-    const uniqueLetters = new Set(letters.toLowerCase().split(""));
-    if (uniqueLetters.size < 8 && letters.length > 60) {
-      return {isLowQuality: true, reason: "Low character diversity (nonsense)"};
-    }
-  }
-
-  return {isLowQuality: false};
-}
-
-function meritToLiquid(current: number, earned: number, cap: number): number {
-  if (current + earned > cap) return Math.max(0, cap - current);
-  return earned;
-}
-
-function meritToHold(current: number, earned: number, cap: number): number {
-  const liquid = meritToLiquid(current, earned, cap);
-  return earned - liquid;
-}
 
 async function tryMatchRankedSubmission(
   submissionId: string,
@@ -445,6 +456,8 @@ async function tryMatchRankedSubmission(
     const isDraw = authorScore === candidateScore;
 
     const candidateName = candidateUserSnap.data()?.name ?? "Unknown";
+
+    const leagueAdjustments: Record<string, number> = {};
 
     await db.runTransaction(async (tx) => {
       const submitterSnap = await tx.get(submitterRef);
@@ -515,13 +528,8 @@ async function tryMatchRankedSubmission(
           const oldLeague = getLeagueFromRating(currentMyRating);
           const newLeague = getLeagueFromRating(newRating);
           if (oldLeague !== newLeague) {
-            const statsRef = db.collection("metadata").doc("rankings");
-            tx.set(statsRef, {
-              leagueCounts: {
-                [oldLeague]: FieldValue.increment(-1),
-                [newLeague]: FieldValue.increment(1),
-              },
-            }, {merge: true});
+            leagueAdjustments[oldLeague] = (leagueAdjustments[oldLeague] || 0) - 1;
+            leagueAdjustments[newLeague] = (leagueAdjustments[newLeague] || 0) + 1;
           }
         }
       }
@@ -545,17 +553,22 @@ async function tryMatchRankedSubmission(
           const oldLeague = getLeagueFromRating(currentTheirRating);
           const newLeague = getLeagueFromRating(newRating);
           if (oldLeague !== newLeague) {
-            const statsRef = db.collection("metadata").doc("rankings");
-            tx.set(statsRef, {
-              leagueCounts: {
-                [oldLeague]: FieldValue.increment(-1),
-                [newLeague]: FieldValue.increment(1),
-              },
-            }, {merge: true});
+            leagueAdjustments[oldLeague] = (leagueAdjustments[oldLeague] || 0) - 1;
+            leagueAdjustments[newLeague] = (leagueAdjustments[newLeague] || 0) + 1;
           }
         }
       }
     });
+
+    // Optimization: Update global stats outside the transaction
+    if (Object.keys(leagueAdjustments).length > 0) {
+      const statsUpdate: Record<string, unknown> = {};
+      Object.entries(leagueAdjustments).forEach(([league, increment]) => {
+        statsUpdate[`leagueCounts.${league}`] = FieldValue.increment(increment);
+      });
+      db.collection("metadata").doc("rankings").update(statsUpdate)
+        .catch((err) => console.error("Match-driven global stats update failed:", err));
+    }
 
     return;
   }
