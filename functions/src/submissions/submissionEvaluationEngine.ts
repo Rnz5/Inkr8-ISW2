@@ -296,7 +296,8 @@ export const submissionEvaluationEngine = onDocumentCreated(
         if (playmode === "RANKED" || playmode === "TOURNAMENT") {
           const recentScores: number[] = Array.isArray(userData.recentScores) ? userData.recentScores : [];
           recentScores.push(result.finalScore);
-          userUpdates.recentScores = recentScores.slice(-20);
+          // Fix #5: Cap recentScores at 50 entries to prevent document bloat and ensure fast loading.
+          userUpdates.recentScores = recentScores.slice(-50);
         }
 
         if (playmode === "RANKED") {
