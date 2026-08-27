@@ -105,6 +105,16 @@
       ]
     },
     {
+      "collectionGroup": "submissions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "evaluation.rankLeaderboard",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
       "collectionGroup": "topics",
       "queryScope": "COLLECTION",
       "fields": [
