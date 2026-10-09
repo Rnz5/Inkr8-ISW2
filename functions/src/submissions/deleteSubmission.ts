@@ -12,6 +12,8 @@ export const deleteSubmission = onCall({region: "us-central1"}, async (request) 
   }
   const ref = db.collection("submissions").doc(id);
   return db.runTransaction(async (tx) => {
+    const user = await tx.get(db.collection("users").doc(request.auth!.uid));
+    if (user.get("accountClosed") === true) throw new HttpsError("permission-denied", "El acceso de esta cuenta está cerrado.");
     const submission = await tx.get(ref);
     if (!submission.exists) return {deleted: true};
     const data = submission.data()!;

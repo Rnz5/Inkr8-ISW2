@@ -137,3 +137,5 @@
 delivery/** -text
 testing-blocks/local-refactor-audit/audit-spec.json -text
 app/src/main/res/** -text
+"app/src/main/java/com/inkr8/screens/Settings.kt" -text
+"functions/src/users/accountAccess.ts" -text

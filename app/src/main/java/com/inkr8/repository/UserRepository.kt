@@ -184,27 +184,10 @@ class UserRepository(
         onSuccess: () -> Unit,
         onError: (Exception) -> Unit
     ) {
-        val userRef = usersCollection.document(userId)
-
-        firestore.runTransaction { transaction ->
-
-            val snapshot = transaction.get(userRef)
-            if (!snapshot.exists()) throw Exception("User not found")
-
-            val username = snapshot.getString("name") ?: ""
-            val normalized = username.lowercase()
-
-            val usernameRef = firestore.collection(SystemConfig.USERNAMES_COLLECTION).document(normalized)
-
-            transaction.delete(usernameRef)
-
-            transaction.delete(userRef)
-
-        }.addOnSuccessListener {
-            onSuccess()
-        }.addOnFailureListener {
-            onError(Exception(it.message ?: "Failed to delete account"))
-        }
+        functions.getHttpsCallable("closeAccount")
+            .call(hashMapOf("userId" to userId))
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onError(Exception(it.message ?: "Failed to close account access")) }
     }
 
     fun applyMeritAction(

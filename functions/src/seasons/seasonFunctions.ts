@@ -2,6 +2,7 @@ import {onCall, HttpsError} from "firebase-functions/v2/https";
 import {onDocumentCreated, onDocumentUpdated} from "firebase-functions/v2/firestore";
 import {onSchedule} from "firebase-functions/v2/scheduler";
 import {db} from "../firebase/admin";
+import {assertAccountOpen} from "../users/accountAccess";
 import {recordSeasonSubmission, syncSeasonSubmission, utcSeason, positioned, closeSeason, seasonActivation} from "./seasonLedger";
 
 export const seasonSubmissionCreated = onDocumentCreated({document: "submissions/{submissionId}", region: "us-central1", retry: true}, async (event) => {
@@ -27,11 +28,13 @@ async function ranking(id: string) {
 }
 export const getSeasonRanking = onCall({region: "us-central1"}, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "You must be signed in.");
+  await assertAccountOpen(request.auth.uid);
   try {seasonActivation(); return await ranking(utcSeason(Date.now()).id);}
   catch (_) {throw new HttpsError("failed-precondition", "No se pudo cargar el ranking de la temporada");}
 });
 export const getSeasonHistory = onCall({region: "us-central1"}, async (request) => {
   if (!request.auth) throw new HttpsError("unauthenticated", "You must be signed in.");
+  await assertAccountOpen(request.auth.uid);
   try {
     seasonActivation(); const finished = await db.collection("seasons").where("status", "==", "CLOSED").get();
     const history = [];

@@ -55,6 +55,7 @@ export const applyMeritAction = onCall(
       }
 
       const user = userSnap.data();
+      if (user?.accountClosed === true) throw new HttpsError("permission-denied", "El acceso de esta cuenta está cerrado.");
       const currentMerit = user?.merit ?? 0;
       const meritCap = user?.meritCap ?? 50000;
       const rankedWinStreak = user?.rankedWinStreak ?? 0;
@@ -275,6 +276,7 @@ export const applyMeritAction = onCall(
         });
       }
     }).catch((err) => {
+      if (err instanceof HttpsError) throw err;
       throw new HttpsError("failed-precondition", err.message);
     });
 

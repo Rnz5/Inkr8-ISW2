@@ -42,6 +42,8 @@ export const activatePhilosopherStatus = onCall(
         throw new HttpsError("not-found", "User profile not found.");
       }
 
+      if (userSnap.get("accountClosed") === true) throw new HttpsError("permission-denied", "El acceso de esta cuenta está cerrado.");
+
       const isValid = await verifyPurchaseWithGoogle(purchaseToken, productId);
 
       if (!isValid) {
