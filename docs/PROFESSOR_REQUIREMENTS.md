@@ -1,5 +1,8 @@
 # Requisitos del profesor
 
+**DEC-AI-AUTH-001 — permiso particular comunicado por Marco, 06/10/2026:** Marco aclara que el código original fue hecho manualmente y que el profesor autorizó al agente a realizar la refactorización, sin nuevas ediciones manuales del estudiante. Esta dirección posterior elimina el bloqueo operativo de autoría manual que se aplicaba a A05–A07 y sus conexiones/correcciones acordadas sobre el código existente. Codex puede implementarlas y comprobarlas autónomamente dentro del alcance vigente; registrar cada cambio como refactorización conservadora o corrección funcional, con autoría real del agente. La aprobación de reglas de negocio aún abiertas y los requisitos de evidencia/entrega no se inventan. Los apartados anteriores que exigían aporte manual para continuar la refactorización quedan como antecedentes superados; las copias originales de P1 no se reescriben.
+
+
 Fecha: 3 de octubre de 2026. Síntesis de consulta; las fuentes oficiales prevalecen sobre este documento. Identificadores, procedencia y copias: [SOURCE_INDEX.md](SOURCE_INDEX.md).
 
 Esta documentación inicial fue autorizada por Marco en U4. No acredita cumplimiento del curso ni autoriza implementar arquitectura, lógica crítica o integración mediante IA. El protocolo de trabajo local es una propuesta operativa; no se presenta como política ratificada por el grupo.

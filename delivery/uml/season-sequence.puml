@@ -1,0 +1,35 @@
+@startuml
+!pragma layout smetana
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+title Temporadas por confirmacion y liquidacion
+database Firestore as DB
+participant seasonFunctions as F
+participant seasonLedger as L
+participant rankedMatching as M
+participant seasonClosure as C
+participant SeasonRepository as R
+DB -> F : seasonSubmissionCreated(snapshot)
+F -> L : recordSeasonSubmission(snapshot)
+L -> DB : TX acuse una vez por ID y createTime UTC
+note over L,DB : elegible si colocado y posterior a activacion; sin backfill
+DB -> M : entrada Ranked evaluada
+M -> DB : TX pareja reciproca y delta real con clamp
+DB -> F : seasonSubmissionUpdated(after)
+F -> L : syncSeasonSubmission(snapshot)
+L -> DB : TX liquidar una vez, rating neto y Merit ya ganado
+C -> L : closeSeason(id, now)
+L -> DB : verificar pendientes y acuses de creacion
+alt pendientes o creacion aun sin acuse
+ L --> C : false, conserva periodo abierto
+else todo resuelto despues del limite UTC
+ L -> DB : TX CLOSED y closedAt estable
+ L --> C : true
+end
+R -> F : getSeasonRanking / getSeasonHistory con Auth
+F -> DB : Admin SDK, historial propio
+F --> R : rating, posicion y Merit estacionales
+note over R,DB : lectura directa cliente de colecciones administradas denegada
+@enduml

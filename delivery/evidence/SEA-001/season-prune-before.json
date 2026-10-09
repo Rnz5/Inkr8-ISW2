@@ -1,0 +1,104 @@
+{
+  "rows": [
+    {
+      "name": "UTC month boundary, start inclusive/end exclusive",
+      "passed": true,
+      "actual": [
+        "2026-01",
+        "2026-02"
+      ]
+    },
+    {
+      "name": "No historical automatic assignment",
+      "passed": true,
+      "actual": false
+    },
+    {
+      "name": "Confirmed server creation time, not client timestamp",
+      "passed": true,
+      "actual": "2026-10"
+    },
+    {
+      "name": "Concurrent/repeated creation enrolls once",
+      "passed": true,
+      "actual": 2
+    },
+    {
+      "name": "General rating/placement/Merit unchanged at enrollment",
+      "passed": true,
+      "actual": {
+        "name": "Placed",
+        "isPlaced": true,
+        "rating": 100,
+        "merit": 1000,
+        "meritHold": 25,
+        "rankedWinStreak": 3,
+        "placementMatchesPlayed": 6
+      }
+    },
+    {
+      "name": "Evaluated without match remains pending",
+      "passed": true,
+      "actual": 2
+    },
+    {
+      "name": "Cannot close with pending match, including 48h ghost",
+      "passed": true,
+      "actual": false
+    },
+    {
+      "name": "Settlement exactly once, failed adds no reward",
+      "passed": true,
+      "actual": {
+        "rating": 5,
+        "merit": 457,
+        "count": 2,
+        "pending": 0
+      }
+    },
+    {
+      "name": "Closure waits for undelivered creation acknowledgement",
+      "passed": true,
+      "actual": false
+    },
+    {
+      "name": "Unplaced acknowledged without enrolling",
+      "passed": true,
+      "actual": false
+    },
+    {
+      "name": "Practice excluded",
+      "passed": true,
+      "actual": false
+    },
+    {
+      "name": "Descending season delta/shared rank",
+      "passed": true,
+      "actual": [
+        [
+          5,
+          1
+        ],
+        [
+          5,
+          1
+        ],
+        [
+          -1,
+          3
+        ]
+      ]
+    },
+    {
+      "name": "Ghost preserved -4 displayed delta with real zero clamp; seasonal actual movement is zero",
+      "passed": true,
+      "actual": [
+        -4,
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "failed": "Ordinary archive pruning preserves unresolved season submission\n\nfalse !== true\n"
+}

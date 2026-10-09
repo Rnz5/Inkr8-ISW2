@@ -1,0 +1,71 @@
+@startuml
+!pragma layout smetana
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+title Inkr8 clases y contratos seleccionados
+class AppViewModel {
+ currentScreen : Screen
+ isPersistingSubmission : Boolean
+ confirmedSubmissionId : String?
+ loadingWaitGeneration : Long
+ submitWriting(submission, onPersisted, onError)
+ retryLoadingResult()
+ startWriting(gamemode, playMode)
+}
+class Submissions {
+ id : String
+ authorId : String
+ gamemode : String
+ playmode : String
+ status : SubmissionStatus
+ evaluation : Evaluation?
+ matchStatus : String
+ matchResult : MatchResult?
+}
+class Evaluation {
+ finalScore : Double
+ feedback : String
+ meritEarned : Long
+ ratingChange : Long
+}
+class MatchResult {
+ opponentId : String
+ outcome : String
+ ratingChange : Long
+}
+class Users {
+ id : String
+ rating : Long
+ merit : Long
+ isPlaced : Boolean
+ currentlyInRanked : Boolean
+}
+class FirestoreSubmissionRepository {
+ addSubmission(submission, onSuccess, onError)
+ listenToSubmission(submissionId, onUpdate, onError)
+ getSubmission(submissionId, onSuccess, onError)
+}
+class DraftManager {
+ getExerciseKey(userId, gamemode, playmode, themeId, topicId)
+ getScopedDraftKey(exerciseKey, words)
+ recordRevision(context, key)
+ confirmRevision(context, key, revision)
+}
+note bottom of DraftManager : Kotlin object
+class SeasonRepository {
+ ranking()
+ history()
+}
+AppViewModel --> FirestoreSubmissionRepository
+AppViewModel --> Users
+AppViewModel --> Submissions
+Submissions *-- "0..1" Evaluation
+Submissions *-- "0..1" MatchResult
+Submissions --> Users : authorId como dato
+note bottom of Submissions
+ Vista selectiva; authorId no es una FK impuesta por Firestore.
+ Escritura gamemodeName; lector prioriza gamemode si existe.
+end note
+@enduml

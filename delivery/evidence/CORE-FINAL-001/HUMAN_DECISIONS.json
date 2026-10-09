@@ -1,0 +1,21 @@
+{
+  "source": "Marco, explicit latest prompt in this chat, recorded 06/10/2026",
+  "decisions": {
+    "DEC-DRAFT-REV-001": [
+      "Writing remains editable while A persists",
+      "Success clears only the exact unchanged revision, including A->B->A protection",
+      "Block second submission during persistence; release on success/failure"
+    ],
+    "DEC-DRAFT-SCOPE-001": [
+      "Authenticated UID and existing modality/exercise context, including assigned words",
+      "Stable recompositions/re-entry; preserve unverifiable legacy entries without attribution"
+    ],
+    "DEC-WAIT-RETRY-001": [
+      "Notify query error/delay; manual read of same confirmed ID",
+      "Fresh wait generation, no new write/evaluation/cost/effects",
+      "Keep 3s interval and >90s threshold; log without text/secrets; recover available results"
+    ]
+  },
+  "code_review_tests_author": "Codex",
+  "authorization": "DEC-AI-AUTH-001"
+}

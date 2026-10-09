@@ -1,0 +1,245 @@
+{
+  "recorded": "2026-10-07T00:08:56.417098-05:00",
+  "author": "Codex",
+  "Android": {
+    "unique_methods": 37,
+    "passed": 37,
+    "latest_results": {
+      "com.inkr8.lab.LabFunctionalScopeTest#ownerProfileRetainsMeritAndHasNoRetiredPresentation": {
+        "status": 0,
+        "run": "selector-and-modes-final"
+      },
+      "com.inkr8.lab.LabFunctionalScopeTest#authenticatedSeasonCallableShowsOwnRankAndSelectableHistory": {
+        "status": 0,
+        "run": "ui-corrections-final"
+      },
+      "com.inkr8.lab.LabFunctionalScopeTest#rankedPresentationRetainsPaidEntryWithoutTournamentFeed": {
+        "status": 0,
+        "run": "selector-and-modes-final"
+      },
+      "com.inkr8.lab.LabModeCompatibilityTest#everyRepositoryReaderPreservesModeAndPlaymode": {
+        "status": 0,
+        "run": "full-core-flows"
+      },
+      "com.inkr8.lab.LabModeCompatibilityTest#standardRootReachesLocalEvaluatorAndResults": {
+        "status": 0,
+        "run": "selector-and-modes-final"
+      },
+      "com.inkr8.lab.LabModeCompatibilityTest#invalidPayloadFallbacksCharacterization": {
+        "status": 0,
+        "run": "full-core-flows"
+      },
+      "com.inkr8.lab.LabModeCompatibilityTest#onTopicRootReachesLocalEvaluatorAndResults": {
+        "status": 0,
+        "run": "selector-and-modes-final"
+      },
+      "com.inkr8.lab.LabIntegratedFlowTest#practicePersistsEvaluatesAndShowsActualResults": {
+        "status": 0,
+        "run": "full-core-flows"
+      },
+      "com.inkr8.lab.LabIntegratedFlowTest#laterAutomaticMatchUpdatesAlreadyDisplayedSameResult": {
+        "status": 0,
+        "run": "full-core-flows"
+      },
+      "com.inkr8.lab.LabIntegratedFlowTest#rankedCommitsReciprocalMatchAndShowsFinalRating": {
+        "status": 0,
+        "run": "full-core-flows"
+      },
+      "com.inkr8.lab.LabFunctionalScopeTest#rankedOnTopicFailureKeepsChoiceAndDoesNotCharge": {
+        "status": 0,
+        "run": "ui-corrections-final"
+      },
+      "com.inkr8.lab.LabFunctionalScopeTest#explicitStandardEntryUsesRealCallableThenWritingAndResults": {
+        "status": 0,
+        "run": "selector-success-final"
+      },
+      "com.inkr8.lab.LabScreenTest#placementRetainsContinueAndOmitsLeaguePresentation": {
+        "status": 0,
+        "run": "ui-corrections-final"
+      },
+      "com.inkr8.lab.LabScreenTest#editorUsesInclusiveLimitsAndWhitespaceCount": {
+        "status": 0,
+        "run": "ui-corrections-final"
+      },
+      "com.inkr8.lab.LabRootFlowTest#pendingPreservesEditorAndDraft_throughAppRoot": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabRootFlowTest#confirmedPersistenceClearsDraftAndRestoredEditor_throughAppRoot": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabRootFlowTest#rejectedPersistencePreservesEditorAndDraft_throughAppRoot": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#actualPendingWriteAllowsEditBlocksSecondAndKeepsBOnSuccess": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#uncachedAssignmentFromRealRepositoryIsStableOnReentry": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#failedAndRepeatedCallbacksPreserveEditedRevision": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#realPendingReentryMustNotResurrectConfirmedUnchangedDraft": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#accountAndExerciseSwitchRestoreOnlyTheirOwnDraft": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#metadataRefreshAndRecompositionKeepExistingExerciseRevision": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#secondSendBlockedUntilFailureThenNewUuidAllowed": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#unchangedRemountedEditorClearsOnOriginalConfirmation": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#remountedEditorCannotBeClearedByOldPendingConfirmation": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#legacyDraftNotClaimedAndNoAnonymousScope": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#emptyNewRevisionIsAlsoProtected": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#aToBToAPreservesRevisionDespiteEqualText": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#repeatedConfirmationCannotClearPostSuccessEdit": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabDraftContractTest#assignedWordIdentityAndMetadataSurviveReentry": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabRetryTest#realQueryErrorNotifiesRetryReadsSameIdAndRecoversAvailableResult": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabRetryTest#retryGenerationRejectsOldCallbacksAndOtherDocument": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabRetryTest#returningToWritingInvalidatesPreviousWaitBeforeNewPersistence": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabRetryTest#retriedFailedTerminalStillReturnsHomeAndCannotRetryFromHome": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabRetryTest#timeoutAtOriginal93SecondsThenRetryRecoversLateResultWithoutWrites": {
+        "status": 0,
+        "run": "core-draft-wait-regressions"
+      },
+      "com.inkr8.lab.LabFunctionalScopeTest#rankedOnTopicSuccessUsesExistingThemeTopicAndPaidEntry": {
+        "status": 0,
+        "run": "selector-success-final"
+      }
+    },
+    "historical_failed_runs_preserved": {
+      "functional-scope-first": {
+        "com.inkr8.lab.LabFunctionalScopeTest#authenticatedSeasonCallableShowsOwnRankAndSelectableHistory": {
+          "status": -2,
+          "run": "functional-scope-first"
+        }
+      },
+      "functional-scope-callable-retry": {
+        "com.inkr8.lab.LabFunctionalScopeTest#authenticatedSeasonCallableShowsOwnRankAndSelectableHistory": {
+          "status": -2,
+          "run": "functional-scope-callable-retry"
+        }
+      },
+      "functional-scope-history-scroll-fixed": {
+        "com.inkr8.lab.LabFunctionalScopeTest#authenticatedSeasonCallableShowsOwnRankAndSelectableHistory": {
+          "status": -2,
+          "run": "functional-scope-history-scroll-fixed"
+        }
+      },
+      "full-core-flows": {
+        "com.inkr8.lab.LabModeCompatibilityTest#standardRootReachesLocalEvaluatorAndResults": {
+          "status": -2,
+          "run": "full-core-flows"
+        }
+      },
+      "selector-and-modes-final": {
+        "com.inkr8.lab.LabFunctionalScopeTest#rankedOnTopicFailureKeepsChoiceAndDoesNotCharge": {
+          "status": -2,
+          "run": "selector-and-modes-final"
+        },
+        "com.inkr8.lab.LabFunctionalScopeTest#authenticatedSeasonCallableShowsOwnRankAndSelectableHistory": {
+          "status": -2,
+          "run": "selector-and-modes-final"
+        }
+      }
+    },
+    "counts_do_not_add_repetitions": true
+  },
+  "unit_tests": {
+    "unique": 19,
+    "cases": {
+      "com.inkr8.characterization.ProductCoreContractTest#keyPreservesCaseAndSeparators": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#failedPredicateDoesNotTreatNotEvaluableAsFailure": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#practiceKeyUsesOnlySuppliedModeFields": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#timeoutIsFalseAtNinetySeconds": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#emptyTournamentIdIsNotNullFallback": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#evaluatedPredicateUsesAuthenticEnum": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#firstTimedOutPollCounterIsThirtyOne": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#unescapedSeparatorsCanAliasInputs": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#scopedWordAndTopicIdentityUsesExistingOrderedData": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#standardAndOnTopicKeysAreDistinct": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#scopedOwnerAndExerciseKeysAreStableAndDistinct": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#nullAndLiteralNoneAlias": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#rankedAndPracticeKeysAreDistinct": "PASS",
+      "com.inkr8.characterization.ProductCoreContractTest#timeoutIsTrueAfterNinetySeconds": "PASS",
+      "com.inkr8.evaluation.ProductWritingAdmissionTest#actualModesPreserveBlankAndInclusiveBounds": "PASS",
+      "com.inkr8.evaluation.ProductWritingAdmissionTest#composeDerivedStateObservesDeferredCountAndText": "PASS",
+      "com.inkr8.evaluation.ProductWritingAdmissionTest#composeBlankStateDoesNotObserveOrReadCount": "PASS",
+      "com.inkr8.evaluation.ProductWritingAdmissionTest#countReadOrderMatchesBeforeOnActualModes": "PASS",
+      "com.inkr8.ExampleUnitTest#addition_isCorrect": "PASS"
+    }
+  },
+  "retirement_sdk": {
+    "before": "4 PASS / 6 FAIL, retained",
+    "after": 10
+  },
+  "season_sdk": {
+    "unique": 21,
+    "latest": "season-prune-after.json",
+    "strict_red": "season-prune-before.json",
+    "previous_20_preserved": true
+  },
+  "automatic_season_delivery": {
+    "checks": 1,
+    "settled_documents": 6
+  },
+  "retained_core_sdk": {
+    "ranked": 11,
+    "ghost": 2,
+    "lifecycle": 1
+  },
+  "doubles": [
+    "R8 HTTP fixed80; no external provider",
+    "A05/A06 regression evaluation delivery no-op, restored after phase",
+    "controlled callback/barrier/clock/result fixtures as each test declares",
+    "local anonymous Auth SDK, no Google OAuth"
+  ],
+  "static_audit": "281 static PASS, prior expectations preserved; separate from functional checks"
+}

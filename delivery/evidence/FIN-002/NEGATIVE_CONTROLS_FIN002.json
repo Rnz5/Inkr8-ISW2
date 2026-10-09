@@ -1,0 +1,24 @@
+{
+  "controls": [
+    {
+      "name": "initializer",
+      "detected": true,
+      "exit_code": 1,
+      "source_mutation": "Only isolated candidate changed; no oracle update"
+    },
+    {
+      "name": "purchase-log",
+      "detected": true,
+      "exit_code": 1,
+      "source_mutation": "Only isolated candidate changed; no oracle update"
+    },
+    {
+      "name": "delete-guard",
+      "detected": true,
+      "exit_code": 1,
+      "source_mutation": "Only isolated candidate changed; no oracle update"
+    }
+  ],
+  "old_results_preserved": true,
+  "baseline_unchanged": "7d879c22030527e1d5f5003ad84b76b750d3b29e"
+}

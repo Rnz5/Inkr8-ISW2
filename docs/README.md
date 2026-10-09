@@ -1,5 +1,49 @@
 # Documentación de trabajo de Inkr8
 
+**Vigente FIN-002 — 09/10/2026:** cierre y entrega revisable documentados en
+[FINAL_DELIVERY.md](FINAL_DELIVERY.md), con 7 Android PASS, reglas nuevas
+propuestas y límites externos/académicos explícitos. Los estados inferiores son
+antecedentes preservados; no revocan DEC-AI-AUTH-001, las decisiones respondidas
+ni el permiso actual de publicar rama/PR, sin fusión o despliegue.
+
+**Vigente:** [cierre funcional RET-006/SEA-001](FUNCTIONAL_CLOSURE.md): retiradas,
+elección Ranked y temporadas implementadas/pruebas locales; límites externos
+explícitos. Se conserva evidencia histórica A01–A07 y DEC-AI-AUTH-001.
+
+**Vigente CORE-FINAL-001 — 06/10/2026:** cierre técnico del núcleo A01–A07 en los
+contratos explícitos y laboratorio autorizado. Revisión exacta del texto,
+bloqueo de persistencia, borradores por UID/ejercicio/palabras y reintento sólo de
+consulta del ID confirmado implementados por Codex. 46 métodos Android únicos y
+19 unit tests PASS; 11 Ranked +2 ghost +1 lifecycle SDK PASS; fórmulas intactas.
+Reentrada/metadata y espera anterior corregidas; fallos de soporte conservados.
+R8/eventos/barreras dobles declarados; no producto completo ni aceptación externa.
+[Tabla final, criterios, diffs, APK y comandos](CORE_FINAL_AUDIT.md).
+Los pendientes anteriores de estos contratos son antecedentes superados; los
+frentes de temporadas, retiradas completas, validación externa y academia siguen.
+
+**DEC-AI-AUTH-001 — permiso particular comunicado por Marco, 06/10/2026:** Marco aclara que el código original fue hecho manualmente y que el profesor autorizó al agente a realizar la refactorización, sin nuevas ediciones manuales del estudiante. Esta dirección posterior elimina el bloqueo operativo de autoría manual que se aplicaba a A05–A07 y sus conexiones/correcciones acordadas sobre el código existente. Codex puede implementarlas y comprobarlas autónomamente dentro del alcance vigente; registrar cada cambio como refactorización conservadora o corrección funcional, con autoría real del agente. La aprobación de reglas de negocio aún abiertas y los requisitos de evidencia/entrega no se inventan. Los apartados anteriores que exigían aporte manual para continuar la refactorización quedan como antecedentes superados; las copias originales de P1 no se reescriben.
+
+
+**VER-001 — 05/10/2026:** revisión separada de IMPL-007–009 sin defecto nuevo de extracción; [ejecución y límites](EXECUTION_READINESS.md). Productor rating typechecked y call-sites compilados con TS 7.0.2 disponible: 1.156 pares/2.312 deltas sin diferencias; control UNKNOWN rechazado TS2345. Gradle/JDK del arnés operativos; Android/Functions/Firebase/R8 siguen sin fuentes/configuración auténticas. [Lista única para el equipo](ORIGINAL_ENVIRONMENT_REQUEST.md). Decisión humana: conservar texto/borrador hasta persistencia confirmada; conexión de confirmación UI pendiente según P1 §2.7. Espera: orientación general recibida, sin regla nueva asumida; asociación cuenta/ejercicio y Ranked pendientes. Sin nuevas suites JVM/auditor repetidos ni cierre integral.
+
+
+
+**Vigente — IMPL-007–009 / AUD-002, 05/10/2026:** extracciones mecánicas locales de admisión, decisiones escalares de espera y fórmula de rating; [registro y límites](MECHANICAL_CORE_REFACTOR.md). Pruebas pertinentes antes/después: Writing 20→28 PASS, espera 15→15, rating 21→21; auditor 135 PASS y cuatro controles negativos rechazados. Corrección explícita: P1 no exige copiar código para cualquier extracción. Todo código/pruebas es Codex; aporte humano = encargo/límites/autorización, sin atribuir elección arquitectónica o implementación estudiantil. A05–A07 sólo parcialmente abordados; entorno/integración/decisiones funcionales pendientes. Los estados anteriores que siguen son históricos.
+
+
+
+**Recuperación local IMPL-006 — 04/10/2026:** 20 recursos Android originales restaurados con blobs verificados y 72/72 archivos compartidos idénticos. [Registro](IMPLEMENTATION_LOG.md). Builds/configuración Firebase/R8 y aportes estudiantiles A05–A07 pendientes; no producto integral o aceptación acreditados.
+
+**Continuación local IMPL-005 — 04/10/2026:** caracterización previa acotada de A05–A07. [Registro](IMPLEMENTATION_LOG.md), [dependencias](CONSERVATIVE_BLOCK_PLAN.md). Los cambios centrales A05–A07 mantienen la consulta estudiantil pendiente; no se declara aceptación integral ni autoría humana de los aportes Codex.
+
+**Bloque local A04 — 04/10/2026:** [IMPL-004](IMPLEMENTATION_LOG.md), separación de puntuación y feedback de Results; sintaxis y equivalencia de bloques fuente comprobadas; sin ejecución Compose. [Plan pendiente](CONSERVATIVE_BLOCK_PLAN.md). IMPL-001/002 preservados; revisión/intervención estudiantil y entorno integral pendientes, sin publicación ni cierre de refactorización.
+
+**Bloque local A03 — 04/10/2026:** [IMPL-003](IMPLEMENTATION_LOG.md), separación de componentes informativos de Writing; 20 PASS antes/después en fragmentos y conservación de fuentes. [Plan pendiente](CONSERVATIVE_BLOCK_PLAN.md). IMPL-001/002 preservados; revisión/intervención estudiantil y entorno integral pendientes, sin publicación ni cierre de refactorización.
+
+**Continuación local A02 — 04/10/2026:** [IMPL-002](IMPLEMENTATION_LOG.md), Writing reutiliza dos Regex tras 20 PASS antes/después sobre fragmentos auténticos extraídos; la pantalla Compose/integración no se verificó. IMPL-001 y evidencia histórica preservados. Asistencia IA, revisión estudiantil y Q pendientes; sin publicación.
+
+**Etapa local vigente — 04/10/2026, chat 13, U19/DEC-26:** [IMPL-001](IMPLEMENTATION_LOG.md) aplicado sobre 7d879c2 en rama local codex/refactorizacion-por-bloques. Dos Regex reutilizadas en ValidationUtils; 38 PASS antes y 38 PASS después en JVM aislado (22 históricos + 16 nuevos). Sin publicación, retiradas/temporadas ejecutadas, producto integral, revisión estudiantil o autoría/pruebas individuales acreditadas. Los encargos y restricciones documentales descritos más abajo son antecedentes; esta autorización sólo amplía el trabajo local indicado. Q-R/Q-T/Q-D/Q-C siguen abiertos.
+
 **Versión inicial:** 0.1 · 03/10/2026 · creación U4 y publicación documental U5 autorizadas por Marco.
 
 Esta base organiza contexto, fuentes, decisiones y pendientes del proyecto académico de Ingeniería de Software II. Está preparada para el repositorio oficial; no constituye arquitectura definitiva, aceptación de reglas pendientes ni aprobación grupal del protocolo. Las síntesis fueron elaboradas con apoyo de IA.
@@ -41,3 +85,5 @@ No se creó otro chat automáticamente. La publicación documental no autoriza l
 ## Mantenimiento
 
 Actualizar la síntesis correspondiente con cada nueva decisión/evidencia y conservar fuente y fecha conocida. No inventar aprobación grupal, revisión humana, contribuciones individuales ni resultados. Registrar los cambios autorizados sin repetir preguntas que ya estén resueltas.
+
+[Registro nuevo de implementación por bloques](IMPLEMENTATION_LOG.md): alcance, diff, pruebas y límites de IMPL-001; evidencia histórica preservada.

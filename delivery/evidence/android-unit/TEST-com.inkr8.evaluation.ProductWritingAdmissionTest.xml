@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.inkr8.evaluation.ProductWritingAdmissionTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-10-07T05:02:23.994Z" hostname="DESKTOP-2DTEK1G" time="0.094">
+  <properties/>
+  <testcase name="actualModesPreserveBlankAndInclusiveBounds" classname="com.inkr8.evaluation.ProductWritingAdmissionTest" time="0.005"/>
+  <testcase name="composeDerivedStateObservesDeferredCountAndText" classname="com.inkr8.evaluation.ProductWritingAdmissionTest" time="0.082"/>
+  <testcase name="composeBlankStateDoesNotObserveOrReadCount" classname="com.inkr8.evaluation.ProductWritingAdmissionTest" time="0.003"/>
+  <testcase name="countReadOrderMatchesBeforeOnActualModes" classname="com.inkr8.evaluation.ProductWritingAdmissionTest" time="0.003"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

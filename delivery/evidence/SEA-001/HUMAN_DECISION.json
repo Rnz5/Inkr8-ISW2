@@ -1,0 +1,17 @@
+{
+  "id": "DEC-SEASON-001",
+  "source": "Marco response to grouped question in current chat",
+  "reply_verbatim": "me gusta tu propuesta",
+  "accepted_proposal": {
+    "period": "calendar month UTC, start inclusive/end exclusive",
+    "participants": "placed users through Ranked",
+    "rating": "variation of general rating from season entry, no rating/placement reset",
+    "order": "descending, shared position on ties",
+    "membership": "confirmed persistence, not evaluation date",
+    "closure": "after resolving assigned pending submissions, including existing 48h ghost",
+    "history": "final position/rating and already-recorded earned Merit, no new rewards",
+    "legacy": "no automatic assignment/backfill"
+  },
+  "author": "Codex implementation; Marco approval of functional proposal, not code/manual review",
+  "authorization": "DEC-AI-AUTH-001"
+}

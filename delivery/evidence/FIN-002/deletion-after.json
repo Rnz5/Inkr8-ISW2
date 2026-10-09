@@ -1,0 +1,74 @@
+{
+  "passed": 15,
+  "failed": 1,
+  "rows": [
+    {
+      "name": "Client cannot erase Ranked before seasonal acknowledgement",
+      "pass": true
+    },
+    {
+      "name": "Pending owner deletion rejected without effects",
+      "pass": true
+    },
+    {
+      "name": "Unmatched evaluated Ranked retained",
+      "pass": true
+    },
+    {
+      "name": "Missing assignment retained before delayed creation delivery",
+      "pass": true
+    },
+    {
+      "name": "Eligible unsettled terminal Ranked retained",
+      "pass": true
+    },
+    {
+      "name": "Failed Ranked also needs seasonal acknowledgement",
+      "pass": true
+    },
+    {
+      "name": "Cross-user callable deletion denied",
+      "pass": true
+    },
+    {
+      "name": "Unauthenticated callable deletion denied",
+      "pass": true
+    },
+    {
+      "name": "Terminal Practice deletion contract retained",
+      "pass": true
+    },
+    {
+      "name": "Negative eligibility acknowledgement permits ordinary deletion",
+      "pass": true
+    },
+    {
+      "name": "Settled deletion preserves historical assignment and effects",
+      "pass": true
+    },
+    {
+      "name": "Repeated missing-document delete remains idempotent",
+      "pass": true
+    },
+    {
+      "name": "Concurrent deletes do not repeat rewards or rewrite assignment",
+      "pass": true
+    },
+    {
+      "name": "Pre-activation history retains ordinary delete contract without backfill",
+      "pass": true
+    },
+    {
+      "name": "Configured invalid activation fails safely",
+      "pass": true
+    },
+    {
+      "name": "Real callable HTTP/Auth permits acknowledged deletion",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n404 !== 200\n"
+    }
+  ],
+  "transport": "REST real Auth tokens; green also uses real Admin transactions in named demo database and one real callable HTTP/Auth. No tokens recorded.",
+  "phase": "green",
+  "limits": "Named DB cases call genuine handler .run with explicit auth/clock fixtures. Red checks only REST deletion. Not cloud or scheduler."
+}

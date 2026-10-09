@@ -1,0 +1,55 @@
+{
+  "methods": [
+    {
+      "method": "paidRankedStandardWithRestrictedRules",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "profileAndOwnSeasonHistoryWithAdminCollectionsDenied",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "practiceStandardWithRestrictedRules",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "practiceOnTopicWithRestrictedRules",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "paidRankedOnTopicWithRestrictedRules",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "realPermissionRejectionPreservesDraftAndText",
+      "pass": true,
+      "status": 0
+    }
+  ],
+  "passed": 6,
+  "failed": 0,
+  "project": "demo-inkr8-local",
+  "APK_sha256": "ef840de0e51c55c09a4d890b7660ddf3d3ada23107a9dac55ce72affc52f0aef",
+  "rules_sha256": "66e2e89fde3954f638f75e80e77bd9067720e790c970ccc8ee1d9ae0d57c0e5f",
+  "author": "Codex",
+  "classification": "Synchronization and invalid fixture correction, no production alteration",
+  "history": "Actual response/history target waited; direct client admin read denied; callable real HTTP with demo Auth",
+  "rejection": "Original text below 50-word Standard minimum led to Incomplete, not attempted persistence. Fixture now meets original admission; all preservation assertions retained. Genuine SDK permission denial, no submission created.",
+  "permission_denials_observed": 4,
+  "doubles": [
+    "R8 HTTP transport fixed80",
+    "anonymous local Auth, no Google OAuth",
+    "Admin bootstrap/history/catalog/failed paid-session fixtures",
+    "empty assigned-word fixture for these six flows; recognition covered separately",
+    "MainActivity/Ads replaced only in laboratory"
+  ],
+  "limits": [
+    "No external provider/cloud/scheduler validation",
+    "No student execution/review attributed"
+  ]
+}

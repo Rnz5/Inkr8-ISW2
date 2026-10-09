@@ -1,0 +1,156 @@
+{
+  "source_sha256": "850154d81778fabb8899d4de2a4b4945598802e15fb3d5b966a31a46657d682c",
+  "source_url": "https://docs.google.com/spreadsheets/d/1ZPy_KY9p2CkyQn_44FUVzm20EdgURywA/edit",
+  "rows": [
+    {
+      "source": "H1_BACKLOG_2026-10-04.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "A109": "3.0",
+        "B109": "3.27",
+        "C109": "M",
+        "D109": "Como usuario competitivo, \nquiero visualizar el ranking de la temporada actual \npara conocer mi posición dentro del periodo competitivo \nvigente. ",
+        "E109": "Dado que existe una temporada activa, \ncuando ingreso a la sección de rankings estacionales, \nentonces el sistema muestra la clasificación ordenada por rating de temporada y resalta mi posición actual. ",
+        "F109": "Diseñar pantalla de ranking estacional",
+        "G109": "Implementar en Jetpack Compose la interfaz encargada de mostrar la clasificación competitiva correspondiente a la temporada activa.",
+        "H109": "Jean Carlo de Jesús Rado Delgado"
+      }
+    },
+    {
+      "source": "H1_BACKLOG_2026-10-04.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "F110": "Desarrollar endpoint de consulta de ranking estacional",
+        "G110": "Crear la Cloud Function encargada de recuperar la clasificación ordenada de la temporada vigente.",
+        "H110": "Pedro Ivan Pacheco Castro"
+      }
+    },
+    {
+      "source": "H1_BACKLOG_2026-10-04.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "E111": "Dado que existe una temporada activa, \ncuando el sistema no puede recuperar el ranking estacional, \nentonces muestra el mensaje “No se pudo cargar el ranking de la temporada”. ",
+        "F111": "Implementar cálculo de rating estacional",
+        "G111": "Desarrollar la lógica encargada de calcular y ordenar las posiciones de los jugadores durante una temporada específica.",
+        "H111": "Marco Antonio Bocanegra Carrión"
+      }
+    },
+    {
+      "source": "H1_BACKLOG_2026-10-04.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "A113": "3.0",
+        "B113": "3.28",
+        "C113": "M",
+        "D113": "Como usuario competitivo,\nquiero consultar temporadas anteriores \npara revisar mis resultados históricos y comparar mi \ndesempeño entre temporadas. ",
+        "E113": "Dado que existen temporadas finalizadas registradas,\ncuando selecciono una temporada anterior,\nentonces el sistema muestra mi posición final, rating de cierre y recompensas obtenidas en esa temporada. ",
+        "F113": "Diseñar pantalla de historial de temporadas",
+        "G113": "Implementar en Jetpack Compose la interfaz encargada de mostrar las temporadas finalizadas disponibles para consulta.",
+        "H113": "Pedro Ivan Pacheco Castro"
+      }
+    },
+    {
+      "source": "H1_BACKLOG_2026-10-04.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "F114": "Desarrollar endpoint de consulta de historial estacional",
+        "G114": "Crear la Cloud Function encargada de recuperar información histórica de temporadas finalizadas.",
+        "H114": "Piero Sebastián León del Villar"
+      }
+    },
+    {
+      "source": "H1_BACKLOG_2026-10-04.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "E115": "Dado que existen temporadas finalizadas registradas, \ncuando ocurre un fallo al recuperar el historial de temporadas, \nentonces el sistema muestra el mensaje “No se pudo cargar el historial de temporadas”. ",
+        "F115": "Implementar almacenamiento histórico de temporadas",
+        "G115": "Diseñar las estructuras necesarias para conservar información histórica de rankings, ratings y recompensas estacionales.",
+        "H115": "Pedro Ivan Pacheco Castro"
+      }
+    },
+    {
+      "source": "H1_BACKLOG_2026-10-04.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "F116": "Implementar visualización de resultados históricos",
+        "G116": "Desarrollar la lógica necesaria para presentar posición final, rating de cierre y recompensas obtenidas en temporadas anteriores.",
+        "H116": "Jean Carlo de Jesús Rado Delgado"
+      }
+    },
+    {
+      "source": "current-backlog.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "A109": "3.0",
+        "B109": "3.27",
+        "C109": "M",
+        "D109": "Como usuario competitivo, \nquiero visualizar el ranking de la temporada actual \npara conocer mi posición dentro del periodo competitivo \nvigente. ",
+        "E109": "Dado que existe una temporada activa, \ncuando ingreso a la sección de rankings estacionales, \nentonces el sistema muestra la clasificación ordenada por rating de temporada y resalta mi posición actual. ",
+        "F109": "Diseñar pantalla de ranking estacional",
+        "G109": "Implementar en Jetpack Compose la interfaz encargada de mostrar la clasificación competitiva correspondiente a la temporada activa.",
+        "H109": "Jean Carlo de Jesús Rado Delgado"
+      }
+    },
+    {
+      "source": "current-backlog.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "F110": "Desarrollar endpoint de consulta de ranking estacional",
+        "G110": "Crear la Cloud Function encargada de recuperar la clasificación ordenada de la temporada vigente.",
+        "H110": "Pedro Ivan Pacheco Castro"
+      }
+    },
+    {
+      "source": "current-backlog.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "E111": "Dado que existe una temporada activa, \ncuando el sistema no puede recuperar el ranking estacional, \nentonces muestra el mensaje “No se pudo cargar el ranking de la temporada”. ",
+        "F111": "Implementar cálculo de rating estacional",
+        "G111": "Desarrollar la lógica encargada de calcular y ordenar las posiciones de los jugadores durante una temporada específica.",
+        "H111": "Marco Antonio Bocanegra Carrión"
+      }
+    },
+    {
+      "source": "current-backlog.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "A113": "3.0",
+        "B113": "3.28",
+        "C113": "M",
+        "D113": "Como usuario competitivo,\nquiero consultar temporadas anteriores \npara revisar mis resultados históricos y comparar mi \ndesempeño entre temporadas. ",
+        "E113": "Dado que existen temporadas finalizadas registradas,\ncuando selecciono una temporada anterior,\nentonces el sistema muestra mi posición final, rating de cierre y recompensas obtenidas en esa temporada. ",
+        "F113": "Diseñar pantalla de historial de temporadas",
+        "G113": "Implementar en Jetpack Compose la interfaz encargada de mostrar las temporadas finalizadas disponibles para consulta.",
+        "H113": "Pedro Ivan Pacheco Castro"
+      }
+    },
+    {
+      "source": "current-backlog.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "F114": "Desarrollar endpoint de consulta de historial estacional",
+        "G114": "Crear la Cloud Function encargada de recuperar información histórica de temporadas finalizadas.",
+        "H114": "Piero Sebastián León del Villar"
+      }
+    },
+    {
+      "source": "current-backlog.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "E115": "Dado que existen temporadas finalizadas registradas, \ncuando ocurre un fallo al recuperar el historial de temporadas, \nentonces el sistema muestra el mensaje “No se pudo cargar el historial de temporadas”. ",
+        "F115": "Implementar almacenamiento histórico de temporadas",
+        "G115": "Diseñar las estructuras necesarias para conservar información histórica de rankings, ratings y recompensas estacionales.",
+        "H115": "Pedro Ivan Pacheco Castro"
+      }
+    },
+    {
+      "source": "current-backlog.xlsx",
+      "sheet": "Épica Competir en la aplicación",
+      "cells": {
+        "F116": "Implementar visualización de resultados históricos",
+        "G116": "Desarrollar la lógica necesaria para presentar posición final, rating de cierre y recompensas obtenidas en temporadas anteriores.",
+        "H116": "Jean Carlo de Jesús Rado Delgado"
+      }
+    }
+  ]
+}

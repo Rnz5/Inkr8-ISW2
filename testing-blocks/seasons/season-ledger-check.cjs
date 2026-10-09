@@ -1,0 +1,38 @@
+// Real SDK/transactions; explicit UTC boundary values and future closure clock fixtures.
+const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
+const [root,prefix,output]=process.argv.slice(2);assert.equal(process.env.GCLOUD_PROJECT,'demo-inkr8-local');assert.equal(process.env.FIRESTORE_EMULATOR_HOST,'127.0.0.1:8080');global.fetch=async()=>{throw Error('External forbidden');};
+const adapter=require(path.join(root,'lib/firebase/admin.js'));adapter.db=require('firebase-admin/firestore').getFirestore('seasons-'+prefix);adapter.FieldValue=require('firebase-admin/firestore').FieldValue;
+const {db}=adapter,ledger=require(path.join(root,'lib/seasons/seasonLedger.js')),api=require(path.join(root,'lib/seasons/seasonFunctions.js'));
+const rows=[];function check(name,actual,expected){assert.deepEqual(actual,expected,name);rows.push({name,passed:true,actual});}
+async function entry(id,uid='placed',extra={}){const r=db.collection('submissions').doc(id);await r.set({authorId:uid,playmode:'RANKED',status:'PENDING',timestamp:0,...extra});return r;}
+(async()=>{
+ check('UTC month boundary, start inclusive/end exclusive',[ledger.utcSeason(Date.parse('2026-01-31T23:59:59.999Z')).id,ledger.utcSeason(Date.parse('2026-02-01T00:00:00.000Z')).id],['2026-01','2026-02']);
+ const u=db.collection('users').doc('placed');await u.set({name:'Placed',isPlaced:true,rating:100,merit:1000,meritHold:25,rankedWinStreak:3,placementMatchesPlayed:6});const original=(await u.get()).data();
+ const old=await entry('historical');process.env.SEASON_ACTIVATED_AT_MS=String(Date.now()+5000);await ledger.recordSeasonSubmission(await old.get());check('No historical automatic assignment',(await db.collection('seasonAssignments').doc(old.id).get()).exists,false);
+ process.env.SEASON_ACTIVATED_AT_MS=String(Date.now());await new Promise(r=>setTimeout(r,10));const a=await entry('a'),b=await entry('b');const seasonId=ledger.utcSeason((await a.get()).createTime.toMillis()).id;const season=db.collection('seasons').doc(seasonId),member=season.collection('members').doc(u.id);
+ await Promise.all([ledger.recordSeasonSubmission(await a.get()),ledger.recordSeasonSubmission(await a.get()),ledger.recordSeasonSubmission(await b.get())]);
+ check('Confirmed server creation time, not client timestamp', (await db.collection('seasonAssignments').doc(a.id).get()).get('seasonId'),seasonId);check('Concurrent/repeated creation enrolls once',(await season.get()).get('pendingCount'),2);
+ check('General rating/placement/Merit unchanged at enrollment',(await u.get()).data(),original);
+ await a.update({status:'EVALUATED',matchStatus:'PENDING',evaluation:{meritEarned:457}});await ledger.syncSeasonSubmission(await a.get());check('Evaluated without match remains pending',(await season.get()).get('pendingCount'),2);
+ const end=(await season.get()).get('end');check('Cannot close with pending match, including 48h ghost',await ledger.closeSeason(seasonId,end+1),false);
+ await a.update({matchStatus:'MATCHED',seasonRatingChange:5,evaluation:{meritEarned:457,ratingChange:5}});await Promise.all([ledger.syncSeasonSubmission(await a.get()),ledger.syncSeasonSubmission(await a.get())]);
+ await b.update({status:'FAILED'});await ledger.syncSeasonSubmission(await b.get());const m=(await member.get()).data();check('Settlement exactly once, failed adds no reward',{rating:m.rating,merit:m.meritEarned,count:m.submissionCount,pending:(await season.get()).get('pendingCount')},{rating:5,merit:457,count:2,pending:0});
+ await db.collection('users').doc('unplaced').set({isPlaced:false,rating:0});const delayed=await entry('delayed','unplaced');check('Closure waits for undelivered creation acknowledgement',await ledger.closeSeason(seasonId,end+1),false);await ledger.recordSeasonSubmission(await delayed.get());check('Unplaced acknowledged without enrolling',(await db.collection('seasonAssignments').doc(delayed.id).get()).get('eligible'),false);
+ const practice=await entry('practice','placed',{playmode:'PRACTICE'});await ledger.recordSeasonSubmission(await practice.get());check('Practice excluded',(await db.collection('seasonAssignments').doc(practice.id).get()).exists,false);
+ await season.collection('members').doc('tie').set({userId:'tie',name:'Tie',rating:5,meritEarned:20});await season.collection('members').doc('lower').set({userId:'lower',name:'Lower',rating:-1,meritEarned:0});
+ const rank=await api.getSeasonRanking.run({auth:{uid:'placed'},data:{}});check('Descending season delta/shared rank',rank.members.map(x=>[x.rating,x.position]),[[5,1],[5,1],[-1,3]]);
+ const clampUser=db.collection('users').doc('clamp');await clampUser.set({name:'Clamp',isPlaced:true,rating:0,recentScores:[]});const ghostRef=await entry('ghost-clamp','clamp',{status:'EVALUATED',matchStatus:'PENDING',timestamp:Date.now()-49*3600000,evaluation:{finalScore:0,meritEarned:457}});await ledger.recordSeasonSubmission(await ghostRef.get());await require(path.join(root,'lib/submissions/ghostMatchProcessor.js')).ghostMatchProcessor.run({});await ledger.syncSeasonSubmission(await ghostRef.get());
+ check('Ghost preserved -4 displayed delta with real zero clamp; seasonal actual movement is zero',[(await ghostRef.get()).get('evaluation.ratingChange'),(await ghostRef.get()).get('seasonRatingChange'),(await clampUser.get()).get('rating'),(await season.collection('members').doc('clamp').get()).get('rating')],[-4,0,0,0]);
+ const pruneUser='prune-placed';await db.collection('users').doc(pruneUser).set({isPlaced:true,rating:100});const prunePending=await entry('prune-pending',pruneUser,{isSaved:false,timestamp:1,status:'EVALUATED',matchStatus:'PENDING'});await ledger.recordSeasonSubmission(await prunePending.get());
+ for(let i=0;i<10;i++)await entry('prune-newer-'+i,pruneUser,{isSaved:false,playmode:'PRACTICE',timestamp:100+i});
+ await require(path.join(root,'lib/submissions/pruneOldSubmissions.js')).pruneOldSubmissions(pruneUser);
+ check('Ordinary archive pruning preserves unresolved season submission',(await prunePending.get()).exists,true);
+ await prunePending.update({status:'FAILED'});await ledger.syncSeasonSubmission(await prunePending.get());
+ check('Closure after settlement',await ledger.closeSeason(seasonId,end+1),true);check('Repeated closure idempotent',await ledger.closeSeason(seasonId,end+2),true);
+ const closed=(await season.get()).data();await Promise.all([ledger.closeSeason(seasonId,end+3),ledger.closeSeason(seasonId,end+4),api.seasonClosure.run({})]);check('Concurrent closure never reopens or rewrites a closed season',(await season.get()).data(),closed);
+ const history=await api.getSeasonHistory.run({auth:{uid:'placed'},data:{}});check('Own final history, no new reward',history.history.map(x=>[x.position,x.rating,x.meritEarned]),[[1,5,457]]);
+ await ledger.syncSeasonSubmission(await a.get());check('Final history immutable after repeated terminal callback',(await api.getSeasonHistory.run({auth:{uid:'placed'},data:{}})).history,history.history);
+ check('Season bookkeeping never changes general rating/placement/Merit',(await u.get()).data(),original);
+ let unauth=false;try{await api.getSeasonRanking.run({data:{}});}catch(e){unauth=e.code==='unauthenticated';}check('Ranking authenticated',unauth,true);
+ fs.writeFileSync(output,JSON.stringify({rows,passed:rows.length,realSDK:true,doubles:['future closure clock, while creation timestamps are real server metadata','explicit terminal/result fixtures; no R8 call'],new_configuration:'SEASON_ACTIVATED_AT_MS, not original configuration'},null,2)+'\n');console.log(JSON.stringify({passed:rows.length}));await db.terminate();
+})().catch(e=>{fs.writeFileSync(output,JSON.stringify({rows,failed:e.message},null,2)+'\n');console.error(e);process.exitCode=1;});

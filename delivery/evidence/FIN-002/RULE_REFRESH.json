@@ -1,0 +1,6 @@
+{
+  "project": "demo-inkr8-local",
+  "new_proposal_sha256": "e9ecb0cecde6f510f53a421612f103928989d6ecc3797230a4d0530f4b773ba9",
+  "real_emulator_rule_load": "HTTP200",
+  "external_deployment": false
+}

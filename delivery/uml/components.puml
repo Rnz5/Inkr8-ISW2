@@ -1,0 +1,55 @@
+@startuml
+!pragma layout smetana
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+title Inkr8 responsabilidades y dependencias finales
+package Android {
+ [AppRoot] as Root
+ [Writing y WritingEditor] as W
+ [WritingComponents] as WC
+ [AppViewModel] as VM
+ [Results y ResultsComponents] as RS
+ [SeasonsScreen] as SS
+ [DraftManager] as DM
+ [SubmissionFactory y admision] as SF
+ [Repositorios Firebase] as R
+}
+package Functions {
+ [submissionEvaluationEngine] as E
+ [rankedMatching] as M
+ [calculateDynamicRatingChange] as C
+ [applyMeritAction] as A
+ [seasonLedger] as L
+ [seasonFunctions] as F
+ [evaluateWithR8 autentico] as R8
+}
+database Firestore as DB
+Root --> W
+Root --> VM
+Root --> RS
+Root --> SS
+W --> WC
+W --> DM
+W --> SF
+VM --> R
+SS --> R
+R --> DB : SDK concreto
+R --> A : callable
+R --> F : callables autenticados
+DB --> E : evento creado
+E --> R8
+E --> M
+M --> C
+E --> DB : evaluacion atomica
+M --> DB : pareja reciproca atomica
+A --> DB : transaccion economica
+DB --> F : creado y actualizado
+F --> L
+L --> DB : acuse y liquidacion atomicos
+note bottom of VM
+ No se afirma DIP integral.
+ Identidad y generacion pertenecen al VM.
+end note
+@enduml
