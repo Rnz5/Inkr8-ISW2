@@ -704,3 +704,20 @@ conservados;3 mutaciones aisladas detectadas. No son287 pruebas funcionales.
 La propuesta deniega el cierre de cuenta anterior; Settings recibe error.
 Restituir un cierre seguro exige política/ciclo Auth confiables. **No se acredita
 que el equipo haya retirado o excluido esa función del alcance.**
+
+
+## Publicación FIN-002
+
+**Publicación revisable FIN-002:** [PR #2 en borrador](https://github.com/Rnz5/Inkr8-ISW2/pull/2)
+hacia master; [rama](https://github.com/Rnz5/Inkr8-ISW2/tree/codex/refactorizacion-por-bloques).
+Código/pruebas/UML/informe: Codex; publicación con cuenta autorizada MACOABC.
+7 Android,39 permisos,6 nombre,14 operación,16 borrado y2 log PASS;287 contrastes
+estáticos separados. Copia limpia con autocrlf=true conserva recursos auténticos y
+89 artefactos. Se corrigió versionado de bytes, sin modificar oráculos anteriores.
+Sin merge/deploy/datos reales; dependencias externas/académicas en FINAL_DELIVERY.
+
+Checkout previo y bundle privados conservados. Fuentes/propuesta/entrega agrupadas
+en commits reales de Codex; no sprints o revisión estudiantil inventados. Dos fallos
+de copia limpia por CRLF/LF quedaron rojos y se corrigieron con atributos y bytes
+auténticos, sin redefinir hashes/aserciones. GitHub informa PR abierto en borrador,
+base master, sin conflicto en la comprobación previa a este registro.

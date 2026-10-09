@@ -365,6 +365,36 @@
       "public_file": "delivery/evidence/android-unit-final/TEST-com.inkr8.ExampleUnitTest.xml",
       "sha256_original": "d5d3d125c440fe091e362b297bf71e705423701b8efe87613af1cf93c8469973",
       "sha256_copy": "d5d3d125c440fe091e362b297bf71e705423701b8efe87613af1cf93c8469973"
+    },
+    {
+      "source_record": "FIN-002/PUBLICATION_REVIEW.json",
+      "public_file": "delivery/evidence/FIN-002/PUBLICATION_REVIEW.json",
+      "sha256_original": "ad63bd63f60b57b140a3be0e6a035fbdf25d0735382cec6fc04ab2ab588bbd09",
+      "sha256_copy": "ad63bd63f60b57b140a3be0e6a035fbdf25d0735382cec6fc04ab2ab588bbd09"
+    },
+    {
+      "source_record": "FIN-002/PRESERVATION_VERIFIED.json",
+      "public_file": "delivery/evidence/FIN-002/PRESERVATION_VERIFIED.json",
+      "sha256_original": "54d937c49a2e5051730d24100b70b3118356aa8965f53d9cd4f5e80c5de3f559",
+      "sha256_copy": "54d937c49a2e5051730d24100b70b3118356aa8965f53d9cd4f5e80c5de3f559"
+    },
+    {
+      "source_record": "FIN-002/FRESH_CHECKOUT_BYTE_DIFFERENCES.json",
+      "public_file": "delivery/evidence/FIN-002/FRESH_CHECKOUT_BYTE_DIFFERENCES.json",
+      "sha256_original": "566ee7636eaf8b5978383358cfca74cf1281abf1d95d0d7e78e2d95366e4f308",
+      "sha256_copy": "566ee7636eaf8b5978383358cfca74cf1281abf1d95d0d7e78e2d95366e4f308"
+    },
+    {
+      "source_record": "FIN-002/audit-fresh-checkout/audit.json",
+      "public_file": "delivery/evidence/FIN-002/audit-fresh-checkout/audit.json",
+      "sha256_original": "f283b648b1eb8ce0bd452dfab055de13704d69d48e56678c4bbc8d353ef1da3b",
+      "sha256_copy": "f283b648b1eb8ce0bd452dfab055de13704d69d48e56678c4bbc8d353ef1da3b"
+    },
+    {
+      "source_record": "FIN-002/audit-fresh-checkout-complete/audit.json",
+      "public_file": "delivery/evidence/FIN-002/audit-fresh-checkout-complete/audit.json",
+      "sha256_original": "a5713822f8c5a61bc476ee572e23d8bb983a967c1ce84dd9b14d8b2498c32df7",
+      "sha256_copy": "a5713822f8c5a61bc476ee572e23d8bb983a967c1ce84dd9b14d8b2498c32df7"
     }
   ],
   "history": "Private originals/snapshots/logs intact; selection is not entirety or new repeated coverage",

@@ -165,3 +165,12 @@ No código productivo nuevo; soporte/fixtures corregidos. Borrador anticipado,
 resolución por B, idempotencia/carrera y payload gamemode siguen como defectos o
 contratos pendientes. Ranked/rating/Merit permanecen. [Resultados, APK, límites y
 aportes concretos](ANDROID_EXECUTION.md). No cierre integral ni autoría estudiantil.
+
+
+### Publicación ejecutada FIN-002
+
+Procedencia: prompt de Marco de09/10/2026 autoriza rama/PR, sin merge/deploy.
+Ejecutado por Codex: commits de Codex <codex@local.invalid>, push normal a rama
+codex/refactorizacion-por-bloques, PR2 abierto en borrador hacia master con cuenta
+autenticada MACOABC. Esto no acredita revisión/aceptación del equipo ni una
+aprobación nueva de reglas Firestore/cierre de cuenta. No se modificó master.

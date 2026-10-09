@@ -150,3 +150,21 @@ Borrado:16 casos SDK/REST/HTTP PASS; consumidor Android callable confirmado.
 El APK final corresponde al guardado protegido, reglas nuevas y resultado7 PASS.
 La UI Settings de cierre de cuenta recibe denegación; su ciclo seguro/política no
 están resueltos ni se presentan como retirada humana aprobada.
+
+## Publicación y paquete
+
+[PR2 en borrador](https://github.com/Rnz5/Inkr8-ISW2/pull/2) y
+[rama publicada](https://github.com/Rnz5/Inkr8-ISW2/tree/codex/refactorizacion-por-bloques).
+Para el auditor que usa Git, clonar la rama completa (incluye baseline):
+
+```powershell
+git clone --branch codex/refactorizacion-por-bloques https://github.com/Rnz5/Inkr8-ISW2.git Inkr8-review
+cd Inkr8-review
+python testing-blocks/local-refactor-audit/verify_local_refactor.py --repo . --report-dir C:/inkr8-audit-nuevo
+```
+
+El ZIP exportado contiene fuentes actuales/entregables, sin `.git`; para ese auditor
+usar el clon anterior. Su `PACKAGE-EXPORT.json` identifica commit y hash de cada
+archivo. No incluye credenciales originales, ZIP/documents privados, exports de
+emuladores, node_modules/lib/build ni JAR de PlantUML. APK abre host local sin
+instrumentación; las siete sondas requieren AndroidTest y emuladores demo.

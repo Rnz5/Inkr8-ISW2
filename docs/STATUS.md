@@ -1,5 +1,13 @@
 # Estado de trabajo de Inkr8
 
+**Publicación revisable FIN-002:** [PR #2 en borrador](https://github.com/Rnz5/Inkr8-ISW2/pull/2)
+hacia master; [rama](https://github.com/Rnz5/Inkr8-ISW2/tree/codex/refactorizacion-por-bloques).
+Código/pruebas/UML/informe: Codex; publicación con cuenta autorizada MACOABC.
+7 Android,39 permisos,6 nombre,14 operación,16 borrado y2 log PASS;287 contrastes
+estáticos separados. Copia limpia con autocrlf=true conserva recursos auténticos y
+89 artefactos. Se corrigió versionado de bytes, sin modificar oráculos anteriores.
+Sin merge/deploy/datos reales; dependencias externas/académicas en FINAL_DELIVERY.
+
 **Vigente FIN-002 — 09/10/2026:** cierre y entrega revisable documentados en
 [FINAL_DELIVERY.md](FINAL_DELIVERY.md), con 7 Android PASS, reglas nuevas
 propuestas y límites externos/académicos explícitos. Los estados inferiores son
