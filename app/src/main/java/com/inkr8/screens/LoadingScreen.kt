@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.sp
 fun LoadingScreen(
     elapsedSeconds: Int = 0,
     isTimeout: Boolean = false,
+    queryError: String? = null,
+    onRetry: (() -> Unit)? = null,
     onReturnHome: () -> Unit = {}
 ) {
     Box(
@@ -25,7 +27,7 @@ fun LoadingScreen(
             .background(MaterialTheme.colorScheme.background),
         contentAlignment = Alignment.Center
     ) {
-        if (!isTimeout) {
+        if (!isTimeout && queryError == null) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
                 Spacer(modifier = Modifier.height(24.dp))
@@ -51,7 +53,7 @@ fun LoadingScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    "JUDGMENT DELAYED",
+                    if (isTimeout) "JUDGMENT DELAYED" else "RESULT CHECK UNAVAILABLE",
                     color = MaterialTheme.colorScheme.primary,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Black,
@@ -59,12 +61,18 @@ fun LoadingScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
-                    "The assessment is taking longer than expected. Your entry is recorded, but the results may take a moment to manifest in your history.",
+                    queryError ?: "The assessment is taking longer than expected. Your entry is recorded, but the results may take a moment to manifest in your history.",
                     color = Color.Gray,
                     textAlign = TextAlign.Center,
                     lineHeight = 20.sp
                 )
                 Spacer(modifier = Modifier.height(32.dp))
+                onRetry?.let { retry ->
+                    Button(onClick = retry, modifier = Modifier.height(48.dp).fillMaxWidth()) {
+                        Text("Retry result check", fontWeight = FontWeight.Bold)
+                    }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
                 Button(
                     onClick = onReturnHome,
                     colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),

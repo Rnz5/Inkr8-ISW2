@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.inkr8.R
 import com.inkr8.data.Users
-import com.inkr8.rating.League
 
 @Composable
 fun UserHeaderCard(
@@ -28,8 +27,6 @@ fun UserHeaderCard(
     pantheonPosition: Int?,
     onClick: () -> Unit
 ) {
-    val league = League.fromRating(user.rating)
-    
     val pfpModel: Any = when {
         user.id == "R8" -> R.drawable.r8pfp
         user.profileImageURL.isNotEmpty() -> user.profileImageURL
@@ -75,22 +72,7 @@ fun UserHeaderCard(
                     )
                     
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text(
-                            text = if (pantheonPosition != null) "Pantheon #$pantheonPosition" else league.displayName.uppercase(),
-                            style = MaterialTheme.typography.labelSmall,
-                            color = if (pantheonPosition != null || user.isPhilosopher) MaterialTheme.colorScheme.primary else Color.Gray,
-                            fontWeight = FontWeight.Bold,
-                            letterSpacing = 1.sp
-                        )
-                        
                         if (user.isPhilosopher) {
-                            Spacer(modifier = Modifier.width(6.6.dp))
-                            Text(
-                                text = "•",
-                                color = Color.DarkGray,
-                                fontSize = 10.sp
-                            )
-                            Spacer(modifier = Modifier.width(6.6.dp))
                             Text(
                                 text = "Philosopher",
                                 style = MaterialTheme.typography.labelSmall,

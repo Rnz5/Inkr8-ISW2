@@ -47,16 +47,6 @@ fun PlacementRevealScreen(
         showButton = true
     }
 
-    val verdict = when (league) {
-        League.SCRIBE -> "After 6 matches, the system has reached a conclusion. You are a Scribe. The entry level. Prove it wrong."
-        League.STYLIST -> "After 6 matches, the system has reached a conclusion. You are a Stylist. Competent. Not yet memorable."
-        League.AUTHOR -> "After 6 matches, the system has reached a conclusion. You are an Author. For now."
-        League.NOVELIST -> "After 6 matches, the system has reached a conclusion. You are a Novelist. The system is paying attention."
-        League.LAUREATE -> "After 6 matches, the system has reached a conclusion. You are a Laureate. Few reach this. R8 is skeptical it will last."
-        League.LUMINARY -> "After 6 matches, the system has reached a conclusion. You are a Luminary. This is rare. Do not waste it."
-        League.PANTHEON -> "After 6 matches, the system has reached a conclusion. You are Pantheon. The pinnacle. The system has nothing left to teach you."
-    }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -76,28 +66,6 @@ fun PlacementRevealScreen(
             )
 
             Spacer(modifier = Modifier.height(40.dp))
-
-            Text(
-                text = league.displayName.uppercase(),
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 52.sp,
-                fontWeight = FontWeight.Black,
-                letterSpacing = 6.sp,
-                modifier = Modifier.alpha(leagueAlpha)
-            )
-
-            Spacer(modifier = Modifier.height(32.dp))
-
-            Text(
-                text = verdict,
-                color = Color.Gray,
-                fontSize = 14.sp,
-                textAlign = TextAlign.Center,
-                lineHeight = 22.sp,
-                modifier = Modifier.alpha(verdictAlpha)
-            )
-
-            Spacer(modifier = Modifier.height(56.dp))
 
             if (showButton) {
                 Button(

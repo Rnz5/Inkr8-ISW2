@@ -35,6 +35,7 @@ fun AppRoot(
     onSessionEnded: () -> Unit
 ) {
     val viewModel: AppViewModel = viewModel(
+        key = initialUser.id,
         factory = AppViewModelFactory(initialUser)
     )
     
@@ -81,8 +82,14 @@ fun AppRoot(
             gamemode = viewModel.currentGamemode ?: StandardWriting,
             playMode = viewModel.currentPlayMode,
             tournamentContext = if (viewModel.currentPlayMode is PlayMode.Tournament) viewModel.selectedTournament else null,
-            onAddSubmission = { submission ->
-                viewModel.submitWriting(submission) { error ->
+            userId = viewModel.currentUser.id,
+            isPersisting = viewModel.isPersistingSubmission,
+            onAddSubmission = { submission, onPersisted, onFailure ->
+                viewModel.submitWriting(
+                    submission = submission,
+                    onPersisted = onPersisted
+                ) { error ->
+                    onFailure()
                     Toast.makeText(context, error, Toast.LENGTH_SHORT).show()
                 }
             },
@@ -314,6 +321,8 @@ fun AppRoot(
         Screen.loading -> LoadingScreen(
             elapsedSeconds = viewModel.loadingElapsedSeconds,
             isTimeout = viewModel.loadingTimeout,
+            queryError = viewModel.loadingQueryError,
+            onRetry = { viewModel.retryLoadingResult() },
             onReturnHome = { viewModel.navigateTo(Screen.home) }
         )
 

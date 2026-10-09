@@ -57,6 +57,13 @@ class AppViewModel(
     var loadingTimeout by mutableStateOf(false)
     var loadingElapsedSeconds by mutableIntStateOf(0)
     private var loadingPollJob: Job? = null
+    private var loadingWaitGeneration = 0L
+    private var confirmedSubmissionId: String? = null
+    var loadingQueryError by mutableStateOf<String?>(null)
+        private set
+    var isPersistingSubmission by mutableStateOf(false)
+        private set
+    private var persistenceGeneration = 0L
 
     // Tournament details & results state
     var tournamentLeaderboard by mutableStateOf<List<TournamentLeaderboardEntry>>(emptyList())
@@ -100,6 +107,17 @@ class AppViewModel(
     }
 
     fun startWriting(gamemode: Gamemode, playMode: PlayMode, tournament: Tournament?) {
+        // Leaving the old result context invalidates its queued responses immediately.
+        loadingWaitGeneration++
+        loadingResultListener?.remove()
+        loadingResultListener = null
+        loadingPollJob?.cancel()
+        loadingPollJob = null
+        confirmedSubmissionId = null
+        loadingQueryError = null
+        loadingResolved = false
+        loadingTimeout = false
+        loadingElapsedSeconds = 0
         currentGamemode = gamemode
         currentPlayMode = playMode
         selectedTournament = tournament
@@ -137,7 +155,22 @@ class AppViewModel(
         }
     }
 
-    fun submitWriting(submission: Submissions, onError: (String) -> Unit) {
+    fun submitWriting(
+        submission: Submissions,
+        onPersisted: () -> Unit = {},
+        onError: (String) -> Unit
+    ) {
+        if (isPersistingSubmission) {
+            onError("An entry is still being saved. Please wait for confirmation.")
+            return
+        }
+        isPersistingSubmission = true
+        val generation = ++persistenceGeneration
+        fun finishPersistence(): Boolean {
+            if (generation != persistenceGeneration || !isPersistingSubmission) return false
+            isPersistingSubmission = false
+            return true
+        }
         val finalSubmission = submission.copy(
             authorId = currentUser.id,
             status = SubmissionStatus.PENDING,
@@ -149,6 +182,7 @@ class AppViewModel(
         if (isTournament) {
             val tId = activeTournamentId
             if (tId == null) {
+                finishPersistence()
                 onError("Tournament ID is missing. Please restart the entry.")
                 return
             }
@@ -157,19 +191,27 @@ class AppViewModel(
                 userId = currentUser.id,
                 submission = finalSubmission,
                 onSuccess = {
-                    navigateTo(Screen.tournamentDetails)
+                    if (finishPersistence()) {
+                        onPersisted()
+                        navigateTo(Screen.tournamentDetails)
+                    }
                 },
-                onError = { e -> onError(e.message ?: "Tournament submission failed") }
+                onError = { e -> if (finishPersistence()) onError(e.message ?: "Tournament submission failed") }
             )
         } else {
             submissionRepository.addSubmission(
                 submission = finalSubmission,
                 onSuccess = {
-                    startLoadingResult()
+                    if (finishPersistence()) {
+                        onPersisted()
+                        startLoadingResult(finalSubmission.id)
+                    }
                 },
                 onError = { e ->
-                    userRepository.finishRankedSession(currentUser.id)
-                    onError(e.message ?: "Submission failed")
+                    if (finishPersistence()) {
+                        userRepository.finishRankedSession(currentUser.id)
+                        onError(e.message ?: "Submission failed")
+                    }
                 }
             )
         }
@@ -275,44 +317,78 @@ class AppViewModel(
         )
     }
 
-    private fun startLoadingResult() {
+    private fun startLoadingResult(submissionId: String) {
+        val waitGeneration = ++loadingWaitGeneration
         loadingResolved = false
         loadingTimeout = false
         loadingElapsedSeconds = 0
+        loadingQueryError = null
+        confirmedSubmissionId = submissionId
         navigateTo(Screen.loading)
         
         loadingResultListener?.remove()
-        loadingResultListener = submissionRepository.getLastSubmissionRealtime(
+        loadingResultListener = submissionRepository.listenToSubmission(
+            submissionId = submissionId,
             onUpdate = { submission ->
-                handleSubmissionUpdate(submission)
+                handleSubmissionUpdate(submission, submissionId, waitGeneration)
             },
-            onError = { it.printStackTrace() }
+            onError = { handleLoadingQueryError(submissionId, waitGeneration) }
         )
 
         loadingPollJob?.cancel()
         loadingPollJob = viewModelScope.launch {
             var pollCount = 0
-            while (!loadingResolved && !loadingTimeout) {
+            while (waitGeneration == loadingWaitGeneration && !loadingResolved && !loadingTimeout) {
                 delay(3000)
+                if (waitGeneration != loadingWaitGeneration) break
                 pollCount++
-                loadingElapsedSeconds = pollCount * 3
-                if (loadingElapsedSeconds > 90) {
+                loadingElapsedSeconds = resultWaitElapsedSeconds(pollCount)
+                if (hasResultWaitTimedOut(loadingElapsedSeconds)) {
                     loadingTimeout = true
                     break
                 }
-                submissionRepository.getLastSubmission(
+                submissionRepository.getSubmission(
+                    submissionId = submissionId,
                     onSuccess = { submission ->
-                        submission?.let { handleSubmissionUpdate(it) }
+                        submission?.let { handleSubmissionUpdate(it, submissionId, waitGeneration) }
                     },
-                    onError = { it.printStackTrace() }
+                    onError = { handleLoadingQueryError(submissionId, waitGeneration) }
                 )
             }
         }
     }
 
-    private fun handleSubmissionUpdate(submission: Submissions) {
+    private fun handleLoadingQueryError(submissionId: String, waitGeneration: Long) {
+        if (waitGeneration != loadingWaitGeneration || confirmedSubmissionId != submissionId ||
+            currentScreen != Screen.loading || loadingResolved || loadingTimeout) return
+        loadingQueryError = "We could not check your result. Your entry is saved. Retry checking the same entry."
+        Log.w("ResultWait", "query_error submissionId=$submissionId generation=$waitGeneration")
+    }
+
+    fun retryLoadingResult() {
+        val id = confirmedSubmissionId ?: return
+        if (currentScreen != Screen.loading || loadingResolved || (!loadingTimeout && loadingQueryError == null)) return
+        startLoadingResult(id)
+        val generation = loadingWaitGeneration
+        Log.i("ResultWait", "query_retry submissionId=$id generation=$generation")
+        submissionRepository.getSubmission(
+            submissionId = id,
+            onSuccess = { it?.let { submission -> handleSubmissionUpdate(submission, id, generation) } },
+            onError = { handleLoadingQueryError(id, generation) }
+        )
+    }
+
+    private fun handleSubmissionUpdate(submission: Submissions, submissionId: String, waitGeneration: Long) {
+        if (waitGeneration != loadingWaitGeneration || submission.id != submissionId) return
+        if (loadingResolved && !loadingTimeout && currentScreen == Screen.results &&
+            latestSubmission?.id == submissionId && isEvaluatedResult(submission.status) &&
+            submission.playmode == "RANKED" &&
+            (submission.matchStatus == "MATCHED" || submission.matchStatus == "GHOST")) {
+            latestSubmission = submission
+            return
+        }
         if (!loadingResolved && !loadingTimeout) {
-            if (submission.status == SubmissionStatus.EVALUATED) {
+            if (isEvaluatedResult(submission.status)) {
                 loadingResolved = true
                 latestSubmission = submission
                 
@@ -320,7 +396,7 @@ class AppViewModel(
                 previousUserIsPlaced = currentUser.isPlaced
                 navigateTo(if (justGotPlaced) Screen.placementReveal else Screen.results)
                 
-            } else if (submission.status == SubmissionStatus.FAILED) {
+            } else if (isFailedResult(submission.status)) {
                 loadingResolved = true
                 navigateTo(Screen.home)
             }
@@ -458,6 +534,7 @@ class AppViewModel(
     }
 
     override fun onCleared() {
+        loadingWaitGeneration++
         submissionsListener?.remove()
         tournamentListener?.remove()
         enrollmentListener?.remove()

@@ -30,35 +30,38 @@ export const ghostMatchProcessor = onSchedule(
       const myScore = Number(data.evaluation?.finalScore ?? 0);
 
       const userRef = db.collection("users").doc(authorId);
-      const userSnap = await userRef.get();
-      if (!userSnap.exists) continue;
-
-      const userData = userSnap.data() ?? {};
-      const recentScores: number[] = Array.isArray(userData.recentScores) ? userData.recentScores : [];
-      const isPlaced = userData.isPlaced === true;
-
-      let ghostRatingChange = 0;
-      let outcome = "DRAW";
-      let opponentScore = BENCHMARK_SCORE;
-
-      if (recentScores.length >= 3) {
-        opponentScore = recentScores.slice(-10).reduce((a, b) => a + b, 0) / Math.min(recentScores.length, 10);
-      }
-
-      if (myScore > opponentScore + 2) {
-        ghostRatingChange = 2;
-        outcome = "WIN";
-      } else if (myScore < opponentScore - 2) {
-        ghostRatingChange = -4;
-        outcome = "LOSS";
-      } else {
-        ghostRatingChange = 1;
-        outcome = "DRAW";
-      }
-
-      const currentRating = Number(userData.rating ?? 0);
-
       await db.runTransaction(async (tx) => {
+        const currentSubmission = await tx.get(doc.ref);
+        if (currentSubmission.get("status") !== "EVALUATED" ||
+            currentSubmission.get("matchStatus") !== "PENDING") return;
+        const userSnap = await tx.get(userRef);
+        if (!userSnap.exists) return;
+
+        const userData = userSnap.data() ?? {};
+        const recentScores: number[] = Array.isArray(userData.recentScores) ? userData.recentScores : [];
+        const isPlaced = userData.isPlaced === true;
+
+        let ghostRatingChange = 0;
+        let outcome = "DRAW";
+        let opponentScore = BENCHMARK_SCORE;
+
+        if (recentScores.length >= 3) {
+          opponentScore = recentScores.slice(-10).reduce((a, b) => a + b, 0) / Math.min(recentScores.length, 10);
+        }
+
+        if (myScore > opponentScore + 2) {
+          ghostRatingChange = 2;
+          outcome = "WIN";
+        } else if (myScore < opponentScore - 2) {
+          ghostRatingChange = -4;
+          outcome = "LOSS";
+        } else {
+          ghostRatingChange = 1;
+          outcome = "DRAW";
+        }
+
+        const currentRating = Number(userData.rating ?? 0);
+
         tx.update(doc.ref, {
           "matchStatus": "GHOST",
           "matchResult": {

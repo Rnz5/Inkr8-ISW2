@@ -22,7 +22,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.inkr8.data.*
+import com.inkr8.AuthManager
 import com.inkr8.evaluation.SubmissionFactory
+import com.inkr8.evaluation.isWritingAdmitted
 import com.inkr8.repository.WordRepository
 import com.inkr8.ui.theme.Inkr8Theme
 import kotlinx.coroutines.launch
@@ -33,12 +35,17 @@ import com.inkr8.utils.ValidationUtils
 import com.inkr8.utils.DraftManager
 import kotlinx.coroutines.delay
 
+private val writingWhitespacePattern = "\\s+".toRegex()
+private val writingWordBoundaryPattern = Regex("\\W+")
+
 @Composable
 fun Writing(
     gamemode: Gamemode,
     playMode: PlayMode,
     tournamentContext: Tournament? = null,
-    onAddSubmission: (Submissions) -> Unit,
+    userId: String = AuthManager.currentUser()?.uid.orEmpty(),
+    isPersisting: Boolean = false,
+    onAddSubmission: (Submissions, () -> Unit, () -> Unit) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateToResults: () -> Unit
 ) {
@@ -47,19 +54,34 @@ fun Writing(
     val analyticsContext = LocalContext.current
     val firebaseAnalytics = remember { FirebaseAnalytics.getInstance(analyticsContext) }
 
-    val draftKey = remember(gamemode, playMode, tournamentContext) {
-        val gModeStr = when(gamemode) {
-            is StandardWriting -> "STANDARD"
-            is OnTopicWriting -> "ON_TOPIC"
-        }
-        val pModeStr = when(playMode) {
-            PlayMode.Practice -> "PRACTICE"
-            PlayMode.Ranked -> "RANKED"
-            is PlayMode.Tournament -> "TOURNAMENT"
-        }
-        DraftManager.getDraftKey(gModeStr, pModeStr, tournamentContext?.id)
+    val exerciseKey = remember(userId, gamemode, playMode, tournamentContext) {
+        DraftManager.getExerciseKey(
+            userId, if (gamemode is OnTopicWriting) "ON_TOPIC" else "STANDARD",
+            when (playMode) { PlayMode.Practice -> "PRACTICE"; PlayMode.Ranked -> "RANKED"; is PlayMode.Tournament -> "TOURNAMENT" },
+            tournamentContext?.id ?: (playMode as? PlayMode.Tournament)?.tournamentId,
+            (gamemode as? OnTopicWriting)?.theme?.id, (gamemode as? OnTopicWriting)?.topic?.id
+        )
     }
-
+    // Existing IDs determine lifetime; refreshed descriptions/tournament metadata
+    // must not reset an editor whose authenticated exercise is unchanged.
+    val exerciseIdentity: Any = exerciseKey ?: listOf(gamemode, playMode, tournamentContext?.id)
+    var selectedWords by remember(exerciseIdentity) {
+        mutableStateOf(exerciseKey?.let { DraftManager.getExerciseWords(context, it) })
+    }
+    LaunchedEffect(exerciseIdentity) {
+        if (selectedWords == null) {
+            val words = when {
+                playMode is PlayMode.Tournament && tournamentContext != null ->
+                    wordRepository.getWordsByTexts(tournamentContext.requiredWords)
+                else -> {
+                    val required = gamemode.requiredWords ?: 0
+                    if (required > 0) wordRepository.getRandomWords(required.toLong()) else emptyList()
+                }
+            }
+            exerciseKey?.let { DraftManager.saveExerciseWords(context, it, words) }
+            selectedWords = words
+        }
+    }
     LaunchedEffect(gamemode, playMode) {
         firebaseAnalytics.logEvent("writing_started") {
             param("gamemode", when (gamemode) {
@@ -74,63 +96,78 @@ fun Writing(
         }
     }
 
-    var selectedWords by remember { mutableStateOf<List<Words>>(emptyList()) }
+    val words = selectedWords
+    if (words == null) {
+        InitialLoadingScreen()
+        return
+    }
+    val draftKey = exerciseKey?.let { DraftManager.getScopedDraftKey(it, words) }
+    key(exerciseIdentity, draftKey) {
+        WritingEditor(gamemode, playMode, words, draftKey, exerciseKey, isPersisting,
+            onAddSubmission, onNavigateBack)
+    }
+}
+
+@Composable
+private fun WritingEditor(
+    gamemode: Gamemode, playMode: PlayMode, selectedWords: List<Words>,
+    draftKey: String?, exerciseKey: String?, isPersisting: Boolean,
+    onAddSubmission: (Submissions, () -> Unit, () -> Unit) -> Unit,
+    onNavigateBack: () -> Unit
+) {
+    val context = LocalContext.current
+    val firebaseAnalytics = remember { FirebaseAnalytics.getInstance(context) }
     var selectedWordForDialog by remember { mutableStateOf<Words?>(null) }
     var selectedThemeForDialog by remember { mutableStateOf<Theme?>(null) }
     var selectedTopicForDialog by remember { mutableStateOf<Topic?>(null) }
-    
-    // Initialize userText from Draft
-    var userText by remember { 
-        mutableStateOf(DraftManager.getDraft(context, draftKey)) 
-    }
-    
-    // Periodic Auto-save
-    LaunchedEffect(userText) {
-        if (userText.isNotBlank()) {
-            delay(3000) // Debounce/Delay save to avoid excessive IO
-            DraftManager.saveDraft(context, draftKey, userText)
+    var userText by remember { mutableStateOf(draftKey?.let { DraftManager.getDraft(context, it) }.orEmpty()) }
+    var revision by remember { mutableLongStateOf(draftKey?.let { DraftManager.getRevision(context, it) } ?: 0L) }
+    var pendingId by remember { mutableStateOf<String?>(null) }
+
+    fun saveCurrentRevision() {
+        draftKey?.let {
+            if (DraftManager.getRevision(context, it) == revision &&
+                DraftManager.getConfirmedRevision(context, it) != revision) DraftManager.saveDraft(context, it, userText)
         }
     }
-    
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(gamemode, playMode, tournamentContext) {
-        selectedWords = when {
-            playMode is PlayMode.Tournament && tournamentContext != null -> {
-                wordRepository.getWordsByTexts(tournamentContext.requiredWords)
-            }
-            else -> {
-                val required = gamemode.requiredWords ?: 0
-                if (required > 0) {
-                    wordRepository.getRandomWords(required.toLong())
-                } else {
-                    emptyList()
+    LaunchedEffect(userText) {
+        if (userText.isNotBlank()) {
+            delay(3000) // Preserve normal debounce; pending edits and leaving flush immediately.
+            saveCurrentRevision()
+        }
+    }
+    DisposableEffect(draftKey) {
+        val stopObserving = draftKey?.let { key ->
+            DraftManager.observeConfirmation(context, key) { confirmed ->
+                if (revision == confirmed && DraftManager.getRevision(context, key) == confirmed) {
+                    userText = ""
+                    pendingId = null
                 }
             }
         }
+        onDispose {
+            stopObserving?.invoke()
+            if (userText.isNotBlank()) saveCurrentRevision()
+        }
     }
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     val wordCount by remember {
         derivedStateOf {
-            if (userText.isBlank()) 0 else userText.trim().split("\\s+".toRegex()).size
+            if (userText.isBlank()) 0 else userText.trim().split(writingWhitespacePattern).size
         }
     }
 
     val normalizedUserWords by remember {
         derivedStateOf {
-            userText.lowercase().split(Regex("\\W+")).filter { it.isNotBlank() }.toSet()
+            userText.lowercase().split(writingWordBoundaryPattern).filter { it.isNotBlank() }.toSet()
         }
     }
 
     val canSubmit by remember {
         derivedStateOf {
-            if (userText.isBlank()) false
-            else {
-                val meetsMinWords = gamemode.minWords?.let { wordCount >= it } ?: true
-                val meetsMaxWords = gamemode.maxWords?.let { wordCount <= it } ?: true
-                meetsMinWords && meetsMaxWords
-            }
+            isWritingAdmitted(userText, gamemode) { wordCount }
         }
     }
 
@@ -258,7 +295,13 @@ fun Writing(
             ) {
                 TextField(
                     value = userText,
-                    onValueChange = { userText = it },
+                    onValueChange = {
+                        if (it != userText) {
+                            userText = it
+                            revision = draftKey?.let { key -> DraftManager.recordRevision(context, key) } ?: (revision + 1L)
+                            if (pendingId != null || isPersisting || it.isBlank()) saveCurrentRevision()
+                        }
+                    },
                     placeholder = { 
                         Text(
                             "Start writing...",
@@ -309,7 +352,7 @@ fun Writing(
                 
                 Button(
                     onClick = {
-                        if (canSubmit) {
+                        if (canSubmit && pendingId == null && !isPersisting) {
                             val qualityCheck = ValidationUtils.isContentLowQuality(userText)
                             if (qualityCheck.first) {
                                 scope.launch {
@@ -339,14 +382,31 @@ fun Writing(
                                 themeId = if (gamemode is OnTopicWriting) gamemode.theme.id else null,
                             )
                             
-                            // Clear Draft on successful submission
-                            DraftManager.clearDraft(context, draftKey)
-
-                            onAddSubmission(submission)
-                            userText = ""
+                            val sentRevision = revision
+                            val sentText = userText
+                            pendingId = submission.id
+                            saveCurrentRevision()
+                            onAddSubmission(submission, {
+                                if (pendingId == submission.id) {
+                                    pendingId = null
+                                    val storedRevision = draftKey?.let { DraftManager.getRevision(context, it) } ?: revision
+                                    if (revision == sentRevision && storedRevision == sentRevision && userText == sentText) {
+                                        draftKey?.let { DraftManager.confirmRevision(context, it, sentRevision) }
+                                        userText = ""
+                                        exerciseKey?.let { DraftManager.releaseExercise(context, it) }
+                                    } else {
+                                        saveCurrentRevision()
+                                    }
+                                }
+                            }, {
+                                if (pendingId == submission.id) {
+                                    pendingId = null
+                                    saveCurrentRevision()
+                                }
+                            })
                         }
                     },
-                    enabled = canSubmit,
+                    enabled = canSubmit && pendingId == null && !isPersisting,
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (canSubmit) Color.White else Color.White.copy(alpha = 0.1f),
@@ -367,192 +427,6 @@ fun Writing(
     }
 }
 
-@Composable
-fun DirectiveCard(
-    theme: Theme,
-    topic: Topic,
-    onThemeClick: () -> Unit,
-    onTopicClick: () -> Unit
-) {
-    Column(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(16.dp)).background(MaterialTheme.colorScheme.surface).border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
-    ) {
-        Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = "Directive",
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelSmall,
-                letterSpacing = 2.sp,
-                fontWeight = FontWeight.Black
-            )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            Row(
-                modifier = Modifier.fillMaxWidth().clickable { onThemeClick() }.padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Theme", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Text(theme.name, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.ExtraBold)
-                }
-                Box(
-                    modifier = Modifier.size(18.dp).border(1.dp, Color.DarkGray, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("i", color = Color.DarkGray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            HorizontalDivider(color = Color.White.copy(alpha = 0.05f))
-            Spacer(modifier = Modifier.height(12.dp))
-
-            Row(
-                modifier = Modifier.fillMaxWidth().clickable { onTopicClick() }.padding(vertical = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text("Topic", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Text(topic.name, color = Color.White, fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
-                Box(
-                    modifier = Modifier.size(18.dp).border(1.dp, Color.DarkGray, CircleShape),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text("i", color = Color.DarkGray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                }
-            }
-        }
-    }
-}
-
-@Composable
-fun LexiconChip(
-    word: Words,
-    isUsed: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier.clip(RoundedCornerShape(8.dp)).background(if (isUsed) MaterialTheme.colorScheme.primary.copy(alpha = 0.1f) else Color.White.copy(alpha = 0.05f))
-            .border(
-                1.dp, 
-                if (isUsed) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else Color.White.copy(alpha = 0.1f), 
-                RoundedCornerShape(8.dp)
-            ).clickable { onClick() }.padding(horizontal = 12.dp, vertical = 10.dp)
-    ) {
-        Text(
-            text = word.word,
-            color = if (isUsed) MaterialTheme.colorScheme.primary else Color.LightGray,
-            fontWeight = if (isUsed) FontWeight.Black else FontWeight.Medium,
-            fontSize = 13.sp,
-            letterSpacing = 0.5.sp
-        )
-    }
-}
-
-@Composable
-fun WordInfoDialog(word: Words, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surface,
-        title = {
-            Column {
-                Text(
-                    text = word.word,
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Black,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Text(text = word.type.lowercase(), style = MaterialTheme.typography.bodySmall, color = Color.Gray)
-            }
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Column {
-                    Text("Definition", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Text(word.definition, color = Color.White, style = MaterialTheme.typography.bodyMedium)
-                }
-                Column {
-                    Text("Example", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Text("\"${word.sentence}\"", color = Color.LightGray, style = MaterialTheme.typography.bodyMedium)
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Dismiss", color = Color.White, fontWeight = FontWeight.Bold)
-            }
-        }
-    )
-}
-
-@Composable
-fun ThemeInfoDialog(theme: Theme, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surface,
-        title = {
-            Text(
-                text = theme.name,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Black,
-                color = MaterialTheme.colorScheme.primary
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Column {
-                    Text("Directive", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Text(theme.description, color = Color.White, style = MaterialTheme.typography.bodyMedium)
-                }
-                Column {
-                    Text("Complexity", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Text(theme.difficulty, color = Color.White, fontWeight = FontWeight.Bold)
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Dismiss", color = Color.White, fontWeight = FontWeight.Bold)
-            }
-        }
-    )
-}
-
-@Composable
-fun TopicInfoDialog(topic: Topic, onDismiss: () -> Unit) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surface,
-        title = {
-            Text(
-                text = topic.name,
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Black,
-                color = Color.White
-            )
-        },
-        text = {
-            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                Column {
-                    Text("Specification", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Text(topic.description, color = Color.White, style = MaterialTheme.typography.bodyMedium)
-                }
-                Column {
-                    Text("Complexity", color = Color.Gray, fontSize = 10.sp, fontWeight = FontWeight.Bold)
-                    Text(topic.difficulty, color = Color.White, fontWeight = FontWeight.Bold)
-                }
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Dismiss", color = Color.White, fontWeight = FontWeight.Bold)
-            }
-        }
-    )
-}
-
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun WritingPreview() {
@@ -560,7 +434,7 @@ fun WritingPreview() {
         Writing(
             gamemode = StandardWriting,
             playMode = PlayMode.Practice,
-            onAddSubmission = {},
+            onAddSubmission = { _, _, _ -> },
             onNavigateBack = {},
             onNavigateToResults = {}
         )

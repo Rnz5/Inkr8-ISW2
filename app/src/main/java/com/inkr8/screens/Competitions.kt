@@ -33,7 +33,6 @@ import com.inkr8.repository.TopicRepository
 import com.inkr8.repository.UserRepository
 import com.inkr8.ui.theme.Inkr8Theme
 import com.inkr8.utils.SystemConfig
-import com.inkr8.utils.TournamentCard
 import com.inkr8.utils.UserHeaderCard
 
 @Composable
@@ -167,12 +166,6 @@ fun Competitions(
                                         letterSpacing = 0.5.sp
                                     )
                                 }
-                                IconButton(
-                                    onClick = onNavigateToLeaderboard,
-                                    modifier = Modifier.background(Color.White.copy(alpha = 0.05f), CircleShape).size(32.dp)
-                                ) {
-                                    Text("L", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Black, fontSize = 12.sp)
-                                }
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -184,13 +177,6 @@ fun Competitions(
                             ) {
                                 Column {
                                     if (user.isPlaced) {
-                                        Text(
-                                            text = league.displayName.uppercase(),
-                                            color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            fontSize = 12.sp,
-                                            letterSpacing = 1.sp
-                                        )
                                         Text(
                                             text = "Rating: ${user.rating}",
                                             color = Color.Gray,
@@ -335,83 +321,6 @@ fun Competitions(
                 }
             }
 
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                ) {
-                    Row(
-                        modifier = Modifier.padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Host Tournament",
-                                fontWeight = FontWeight.Black,
-                                color = Color.White,
-                                fontSize = 16.sp
-                            )
-                            Text(
-                                text = "Establish your own directive. Set the stakes. Find the elite.",
-                                color = Color.Gray,
-                                style = MaterialTheme.typography.bodySmall,
-                                fontSize = 11.sp,
-                                lineHeight = 16.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Button(
-                            onClick = onNavigateToCreateTournament,
-                            shape = CircleShape,
-                            contentPadding = PaddingValues(0.dp),
-                            modifier = Modifier.size(44.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = Color.Black)
-                        ) {
-                            Text("+", fontWeight = FontWeight.Black, fontSize = 20.sp)
-                        }
-                    }
-                }
-            }
-
-            item {
-                Text(
-                    text = "Active Tournaments",
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.labelSmall,
-                    letterSpacing = 2.sp,
-                    fontWeight = FontWeight.Black,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            if (tournaments.isEmpty()) {
-                item {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().height(100.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("R8 is cooking something...", color = Color.DarkGray, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-            } else {
-                items(tournaments, key = { it.id }) { tournament ->
-                    TournamentCard(
-                        tournament = tournament,
-                        creatorDisplayName = tournament.creatorName.ifBlank {
-                            if (tournament.creatorId == "R8") "R8" else "Unknown"
-                        },
-                        onClick = {
-                            firebaseAnalytics.logEvent("tournament_details_viewed") {
-                                param("tournament_id", tournament.id)
-                            }
-                            onNavigateToTournamentDetails(tournament)
-                        },
-                        onHostClick = { onNavigateToUserProfile(tournament.creatorId) }
-                    )
-                }
-            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))

@@ -2,8 +2,9 @@ package com.inkr8.mappers
 
 import com.inkr8.data.*
 import com.inkr8.repository.FirestoreSubmission
+import com.google.firebase.firestore.DocumentSnapshot
 
-fun FirestoreSubmission.toDomain(): Submissions {
+fun FirestoreSubmission.toDomain(gamemode: String? = null): Submissions {
     return Submissions(
         id = id,
         authorId = authorId,
@@ -12,7 +13,7 @@ fun FirestoreSubmission.toDomain(): Submissions {
         wordCount = wordCount,
         characterCount = characterCount,
         wordsUsed = wordsUsed,
-        gamemode = gamemodeName,
+        gamemode = gamemode ?: gamemodeName,
         playmode = playmode,
         topicId = topicId,
         themeId = themeId,
@@ -60,3 +61,10 @@ fun Submissions.toFirestore(): FirestoreSubmission {
         }
     )
 }
+
+// Read compatibility belongs at the snapshot boundary; the DTO writer stays unchanged.
+// Non-string/null primary fields keep Android's old gamemodeName behavior.
+fun DocumentSnapshot.toSubmission(): Submissions? =
+    toObject(FirestoreSubmission::class.java)?.copy(id = id)?.toDomain(
+        gamemode = get("gamemode") as? String
+    )

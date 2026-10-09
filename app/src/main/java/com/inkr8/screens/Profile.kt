@@ -28,8 +28,6 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.inkr8.R
 import com.inkr8.data.Users
-import com.inkr8.economy.EconomyConfig
-import com.inkr8.rating.League
 import com.inkr8.ui.theme.Inkr8Theme
 import com.inkr8.utils.FormatUtils
 
@@ -46,32 +44,7 @@ fun Profile(
     onPurchaseReputation: (onSuccess: () -> Unit) -> Unit,
     onTip: (Long) -> Unit = {}
 ) {
-    val league = League.fromRating(user.rating)
     val scrollState = rememberScrollState()
-    var showTipDialog by remember { mutableStateOf(false) }
-    var isReputationRevealed by remember { mutableStateOf(false) }
-
-    val cooldownMs = 24 * 60 * 60 * 1000L
-    val now = System.currentTimeMillis()
-    val isCooldownActive = lastTippedTimestamp != null && (now - lastTippedTimestamp < cooldownMs)
-    
-    val remainingCooldownText = if (isCooldownActive && lastTippedTimestamp != null) {
-        val remaining = cooldownMs - (now - lastTippedTimestamp)
-        val hours = remaining / (1000 * 60 * 60)
-        "COOLDOWN ${hours}H"
-    } else null
-
-    if (showTipDialog) {
-        TipAmountDialog(
-            recipientName = user.name,
-            onDismiss = { showTipDialog = false },
-            onSelectAmount = { amount ->
-                showTipDialog = false
-                onTip(amount)
-            }
-        )
-    }
-
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -262,16 +235,14 @@ fun Profile(
                     horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    StatItem("Rating", user.rating.toString(), if(pantheonPosition != null) "PANTHEON #$pantheonPosition" else league.displayName.uppercase())
-                    Box(modifier = Modifier.width(1.dp).height(30.dp).background(Color.White.copy(alpha = 0.05f)))
-                    StatItem("Reputation", if(isReputationRevealed) user.reputation.toString() else "LOCKED", "BEHAVIORAL")
+                    StatItem("Rating", user.rating.toString(), "")
                 }
             } else {
                 Box(
                     modifier = Modifier.fillMaxWidth().padding(16.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    StatItem("Rating", user.rating.toString(), if(pantheonPosition != null) "PANTHEON #$pantheonPosition" else league.displayName.uppercase())
+                    StatItem("Rating", user.rating.toString(), "")
                 }
             }
         }
@@ -282,8 +253,6 @@ fun Profile(
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             BattleStatSmall(Modifier.weight(1f), "Submissions", user.submissionsCount.toString())
-            BattleStatSmall(Modifier.weight(1f), "Tournaments", user.tournamentsPlayed.toString())
-            BattleStatSmall(Modifier.weight(1f), "Victories", user.tournamentsWon.toString())
             BattleStatSmall(Modifier.weight(1f), "Best Score", FormatUtils.formatPercentage(user.bestScore))
         }
         
@@ -351,56 +320,6 @@ fun Profile(
                 )
             }
 
-            SectionTitle("Behavioral Protocols")
-            Box(modifier = Modifier.padding(horizontal = 20.dp)) {
-                if (isReputationRevealed) {
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-                    ) {
-                        Text(
-                            text = "Reputation is fully integrated with system standing. Low standing increases entry fees and limits access to tournaments.",
-                            color = Color.Gray,
-                            fontSize = 11.sp,
-                            modifier = Modifier.padding(16.dp),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                } else {
-                    Button(
-                        onClick = { onPurchaseReputation { isReputationRevealed = true } },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.White.copy(alpha = 0.05f)),
-                        border = androidx.compose.foundation.BorderStroke(1.dp, Color.White.copy(alpha = 0.1f))
-                    ) {
-                        Text("Reveal Reputation • ${FormatUtils.formatMerit(EconomyConfig.PURCHASE_REPUTATION_VIEW.toLong())} Merit", color = Color.White, fontWeight = FontWeight.Black, fontSize = 11.sp)
-                    }
-                }
-            }
-        } else {
-            if (pantheonPosition != null) {
-                SectionTitle("System Interaction")
-                Column(
-                    modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Button(
-                        onClick = { if (!isCooldownActive) showTipDialog = true },
-                        enabled = !isCooldownActive,
-                        modifier = Modifier.fillMaxWidth().height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = if (isCooldownActive) Color.White.copy(alpha = 0.05f) else Color.White,
-                            contentColor = if (isCooldownActive) Color.Gray else Color.Black,
-                            disabledContainerColor = Color.White.copy(alpha = 0.05f),
-                            disabledContentColor = Color.Gray
-                        )
-                    ) {
-                        Text(remainingCooldownText ?: "Tip ${user.name}", fontWeight = FontWeight.Black, fontSize = 14.sp)
-                    }
-                }
-            }
         }
         
         Spacer(modifier = Modifier.height(48.dp))
@@ -538,48 +457,6 @@ fun SectionTitle(title: String) {
         modifier = Modifier.padding(start = 24.dp, top = 32.dp, bottom = 12.dp),
         color = Color.DarkGray
     )
-}
-
-@Composable
-private fun TipAmountDialog(
-    recipientName: String,
-    onDismiss: () -> Unit,
-    onSelectAmount: (Long) -> Unit
-) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        containerColor = MaterialTheme.colorScheme.surface,
-        title = { Text("Tip $recipientName", color = Color.White, fontWeight = FontWeight.Bold) },
-        text = {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp, Alignment.CenterHorizontally)
-            ) {
-                TipOptionButton(100L, onSelectAmount)
-                TipOptionButton(150L, onSelectAmount)
-                TipOptionButton(200L, onSelectAmount)
-            }
-        },
-        confirmButton = {},
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Cancel", color = Color.Gray)
-            }
-        }
-    )
-}
-
-@Composable
-private fun TipOptionButton(amount: Long, onClick: (Long) -> Unit) {
-    Button(
-        onClick = { onClick(amount) },
-        colors = ButtonDefaults.buttonColors(containerColor = Color.White, contentColor = Color.Black),
-        shape = RoundedCornerShape(8.dp),
-        modifier = Modifier.width(80.dp),
-        contentPadding = PaddingValues(0.dp)
-    ) {
-        Text(FormatUtils.formatMerit(amount), fontWeight = FontWeight.Black)
-    }
 }
 
 @Preview(showBackground = true, showSystemUi = true)
