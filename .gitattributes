@@ -136,3 +136,4 @@
 # Delivery manifests refer to exact bytes, including textual evidence.
 delivery/** -text
 testing-blocks/local-refactor-audit/audit-spec.json -text
+app/src/main/res/** -text
