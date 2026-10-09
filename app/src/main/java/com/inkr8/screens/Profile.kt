@@ -35,14 +35,11 @@ import com.inkr8.utils.FormatUtils
 fun Profile(
     user: Users,
     isOwner: Boolean,
-    pantheonPosition: Int?,
-    lastTippedTimestamp: Long? = null,
     onNavigateBack: () -> Unit,
     onNavigateToSubmissions: () -> Unit,
     onNavigateToSavedSubmissions: () -> Unit,
     onNavigateToSettings: () -> Unit,
-    onPurchaseReputation: (onSuccess: () -> Unit) -> Unit,
-    onTip: (Long) -> Unit = {}
+    onNavigateToSeasons: () -> Unit = {}
 ) {
     val scrollState = rememberScrollState()
     Column(
@@ -257,7 +254,7 @@ fun Profile(
         }
         
         Text(
-            text = "Only counts Ranked and Tournaments scores",
+            text = "Competitive scores",
             color = Color.DarkGray,
             fontSize = 7.sp,
             fontWeight = FontWeight.Bold,
@@ -302,6 +299,14 @@ fun Profile(
                 modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
+                ProfileActionButton(
+                    title = "Temporadas",
+                    subtitle = "Ranking actual e historial",
+                    onClick = onNavigateToSeasons,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary
+                )
+
                 ProfileActionButton(
                     title = "Archive Entries",
                     subtitle = "Review and refine your history",
@@ -465,13 +470,11 @@ fun ProfilePreview() {
     Inkr8Theme {
         Profile(
             user = Users(name = "MintCake", merit = 45000, meritCap = 50000, meritHold = 1250, isPhilosopher = true, reputation = 450),
-            pantheonPosition = 4,
             isOwner = false,
             onNavigateBack = {},
             onNavigateToSubmissions = {},
             onNavigateToSavedSubmissions = {},
-            onNavigateToSettings = {},
-            onPurchaseReputation = {}
+            onNavigateToSettings = {}
         )
     }
 }

@@ -21,7 +21,19 @@ export async function pruneOldSubmissions(authorId: string) {
       return;
     }
 
-    const docsToDelete = snapshot.docs.slice(MAX_ARCHIVE_SIZE);
+    const docsToDelete = [];
+    const activation = Number(process.env.SEASON_ACTIVATED_AT_MS);
+    for (const doc of snapshot.docs.slice(MAX_ARCHIVE_SIZE)) {
+      if (activation > 0 && doc.get("playmode") === "RANKED" &&
+          doc.createTime.toMillis() >= activation) {
+        const assignment = await dbRef.collection("seasonAssignments").doc(doc.id).get();
+        // Keep confirmed entries until creation delivery and seasonal settlement finish.
+        // Historical archive policy remains unchanged before feature activation.
+        if (!assignment.exists || (assignment.get("eligible") === true &&
+            assignment.get("terminal") !== true)) continue;
+      }
+      docsToDelete.push(doc);
+    }
 
     const batch = dbRef.batch();
     docsToDelete.forEach((doc) => {

@@ -44,7 +44,6 @@ export const weeklyStatsSnapshot = onSchedule(
       let totalScoreWeighted = 0;
       let totalMeritEarned = 0;
       let totalMeritSpent = 0;
-      let tournamentsCompleted = 0;
       const themeAverages: Record<string, { totalAvg: number; days: number }> = {};
 
       recordsSnap.forEach((doc) => {
@@ -57,7 +56,6 @@ export const weeklyStatsSnapshot = onSchedule(
         practiceSubmissions += data.practiceSubmissions ?? 0;
         totalMeritEarned += data.totalMeritEarned ?? 0;
         totalMeritSpent += data.totalMeritSpent ?? 0;
-        tournamentsCompleted += data.tournamentsCompleted ?? 0;
 
         if (typeof data.averageScore === "number" && data.totalSubmissions > 0) {
           totalScoreWeighted += data.averageScore * data.totalSubmissions;
@@ -94,7 +92,6 @@ export const weeklyStatsSnapshot = onSchedule(
         totalMeritEarned,
         totalMeritSpent,
         netMeritChange,
-        tournamentsCompleted,
         hardestTheme,
         createdAt: Date.now(),
       };

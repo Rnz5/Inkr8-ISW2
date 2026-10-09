@@ -42,7 +42,6 @@ private val writingWordBoundaryPattern = Regex("\\W+")
 fun Writing(
     gamemode: Gamemode,
     playMode: PlayMode,
-    tournamentContext: Tournament? = null,
     userId: String = AuthManager.currentUser()?.uid.orEmpty(),
     isPersisting: Boolean = false,
     onAddSubmission: (Submissions, () -> Unit, () -> Unit) -> Unit,
@@ -54,30 +53,24 @@ fun Writing(
     val analyticsContext = LocalContext.current
     val firebaseAnalytics = remember { FirebaseAnalytics.getInstance(analyticsContext) }
 
-    val exerciseKey = remember(userId, gamemode, playMode, tournamentContext) {
+    val exerciseKey = remember(userId, gamemode, playMode) {
         DraftManager.getExerciseKey(
             userId, if (gamemode is OnTopicWriting) "ON_TOPIC" else "STANDARD",
-            when (playMode) { PlayMode.Practice -> "PRACTICE"; PlayMode.Ranked -> "RANKED"; is PlayMode.Tournament -> "TOURNAMENT" },
-            tournamentContext?.id ?: (playMode as? PlayMode.Tournament)?.tournamentId,
+            when (playMode) { PlayMode.Practice -> "PRACTICE"; PlayMode.Ranked -> "RANKED" },
+            null,
             (gamemode as? OnTopicWriting)?.theme?.id, (gamemode as? OnTopicWriting)?.topic?.id
         )
     }
-    // Existing IDs determine lifetime; refreshed descriptions/tournament metadata
+    // Existing IDs determine lifetime; refreshed descriptions
     // must not reset an editor whose authenticated exercise is unchanged.
-    val exerciseIdentity: Any = exerciseKey ?: listOf(gamemode, playMode, tournamentContext?.id)
+    val exerciseIdentity: Any = exerciseKey ?: listOf(gamemode, playMode)
     var selectedWords by remember(exerciseIdentity) {
         mutableStateOf(exerciseKey?.let { DraftManager.getExerciseWords(context, it) })
     }
     LaunchedEffect(exerciseIdentity) {
         if (selectedWords == null) {
-            val words = when {
-                playMode is PlayMode.Tournament && tournamentContext != null ->
-                    wordRepository.getWordsByTexts(tournamentContext.requiredWords)
-                else -> {
-                    val required = gamemode.requiredWords ?: 0
-                    if (required > 0) wordRepository.getRandomWords(required.toLong()) else emptyList()
-                }
-            }
+            val required = gamemode.requiredWords ?: 0
+            val words = if (required > 0) wordRepository.getRandomWords(required.toLong()) else emptyList()
             exerciseKey?.let { DraftManager.saveExerciseWords(context, it, words) }
             selectedWords = words
         }
@@ -91,7 +84,6 @@ fun Writing(
             param("playmode", when (playMode) {
                 PlayMode.Practice -> "PRACTICE"
                 PlayMode.Ranked -> "RANKED"
-                is PlayMode.Tournament -> "TOURNAMENT"
             })
         }
     }
@@ -211,7 +203,6 @@ private fun WritingEditor(
                     val modeTitle = when(playMode) {
                         is PlayMode.Practice -> "PRACTICE"
                         is PlayMode.Ranked -> "RANKED ARENA"
-                        is PlayMode.Tournament -> "TOURNAMENT"
                     }
                     Text(
                         text = modeTitle,
@@ -373,7 +364,6 @@ private fun WritingEditor(
                                 playMode = when (playMode) {
                                     PlayMode.Practice -> "PRACTICE"
                                     PlayMode.Ranked -> "RANKED"
-                                    is PlayMode.Tournament -> "TOURNAMENT"
                                 },
                                 wordsUsed = selectedWords.filter {
                                     normalizedUserWords.contains(it.word.lowercase())

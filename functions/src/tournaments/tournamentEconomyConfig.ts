@@ -1,2 +1,0 @@
-export const SYSTEM_CREATION_FEE_PERCENT = 0.034;
-export const PROFIT_MARGIN_PERCENT = 0.12;

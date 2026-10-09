@@ -2,9 +2,8 @@ import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {db, FieldValue} from "../firebase/admin";
 import {OPENAI_API_KEY, evaluateWithR8} from "../r8/evaluateWithR8";
 import {calculateMerit} from "../utils/meritCalculator";
-import {onRankedCompleted} from "../utils/reputationManager";
 import {pruneOldSubmissions} from "./pruneOldSubmissions";
-import {getLeagueFromRating} from "../utils/leagueManager";
+import {recordSeasonSubmission, syncSeasonSubmission} from "../seasons/seasonLedger";
 import {tryMatchRankedSubmission} from "./rankedMatching";
 
 function getUtcDayInt(): number {
@@ -121,7 +120,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
       const apiKey = OPENAI_API_KEY.value();
 
       if (playmode === "TOURNAMENT") {
-        console.log("submissionEvaluationEngine: skipped, TOURNAMENT playmode handled by tournamentEvaluationEngine", {
+        console.log("submissionEvaluationEngine: skipped, historical TOURNAMENT playmode is retired", {
           submissionId: snapshot.id,
         });
         return;
@@ -149,6 +148,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
       const persistedStatus = persistedSubmission.get("status");
       if (!persistedSubmission.exists || (persistedStatus && persistedStatus !== "PENDING")) return;
 
+      await recordSeasonSubmission(snapshot).catch((err) => console.error("Season registration pending:", err));
       const content = data.content ?? "";
       const qualityCheck = isContentLowQuality(content);
 
@@ -224,10 +224,8 @@ export const submissionEvaluationEngine = onDocumentCreated(
       });
 
       const userRef = db.collection("users").doc(authorId);
-      let leagueToIncrement: string | null = null;
 
       const evaluationCommitted = await db.runTransaction(async (tx) => {
-        leagueToIncrement = null;
         const currentSubmission = await tx.get(submissionRef);
         const currentStatus = currentSubmission.get("status");
         if (!currentSubmission.exists || (currentStatus && currentStatus !== "PENDING")) return false;
@@ -309,15 +307,11 @@ export const submissionEvaluationEngine = onDocumentCreated(
               userUpdates.isPlaced = true;
               userUpdates.placementMatchesPlayed = 6;
               userUpdates.totalPlacementScore = totalScore;
-              userUpdates.reputation = onRankedCompleted(Number(userData.reputation ?? 0));
               userUpdates.currentlyInRanked = false;
               userUpdates.rankedSessionStartedAt = FieldValue.delete();
 
               ratingChangeResult = initialRating;
 
-              if (authorId !== "R8") {
-                leagueToIncrement = getLeagueFromRating(initialRating);
-              }
             } else {
               userUpdates.placementMatchesPlayed = played;
               userUpdates.totalPlacementScore = totalScore;
@@ -325,11 +319,6 @@ export const submissionEvaluationEngine = onDocumentCreated(
               userUpdates.rankedSessionStartedAt = FieldValue.delete();
             }
           } else {
-            const newReputation = onRankedCompleted(
-              Number(userData.reputation ?? 0)
-            );
-
-            userUpdates.reputation = newReputation;
             userUpdates.currentlyInRanked = false;
             userUpdates.rankedSessionStartedAt = FieldValue.delete();
           }
@@ -366,15 +355,6 @@ export const submissionEvaluationEngine = onDocumentCreated(
       });
       if (!evaluationCommitted) return;
 
-      // Optimization: Update global stats outside the transaction to prevent contention/timeouts
-      if (leagueToIncrement) {
-        db.collection("metadata").doc("rankings").set({
-          leagueCounts: {
-            [leagueToIncrement]: FieldValue.increment(1),
-          },
-        }, {merge: true}).catch((err) => console.error("Global stats update failed:", err));
-      }
-
       if (playmode === "RANKED") {
         const authorUserSnap = await db.collection("users").doc(authorId).get();
         const authorName = authorUserSnap.data()?.name ?? "Unknown";
@@ -391,6 +371,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
         });
       }
 
+      await syncSeasonSubmission(await submissionRef.get()).catch((err) => console.error("Season settlement pending:", err));
       pruneOldSubmissions(authorId).catch((err) => {
         console.error("Non-critical background task (pruning) failed:", err);
       });

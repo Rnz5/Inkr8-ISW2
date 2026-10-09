@@ -14,35 +14,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.inkr8.rating.League
 import kotlinx.coroutines.delay
 
 @Composable
 fun PlacementRevealScreen(
-    league: League,
+    rating: Long,
     onContinue: () -> Unit
 ) {
-    var showLeague by remember { mutableStateOf(false) }
-    var showVerdict by remember { mutableStateOf(false) }
     var showButton by remember { mutableStateOf(false) }
-
-    val leagueAlpha by animateFloatAsState(
-        targetValue = if (showLeague) 1f else 0f,
-        animationSpec = tween(durationMillis = 800),
-        label = "leagueAlpha"
-    )
-
-    val verdictAlpha by animateFloatAsState(
-        targetValue = if (showVerdict) 1f else 0f,
-        animationSpec = tween(durationMillis = 600),
-        label = "verdictAlpha"
-    )
-
     LaunchedEffect(Unit) {
         delay(600)
-        showLeague = true
         delay(1200)
-        showVerdict = true
         delay(900)
         showButton = true
     }
@@ -63,6 +45,13 @@ fun PlacementRevealScreen(
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Black,
                 letterSpacing = 3.sp
+            )
+
+            Text(
+                text = "Rating: $rating",
+                color = Color.White,
+                style = MaterialTheme.typography.headlineMedium,
+                fontWeight = FontWeight.Black
             )
 
             Spacer(modifier = Modifier.height(40.dp))

@@ -1,6 +1,5 @@
 import {onSchedule} from "firebase-functions/v2/scheduler";
-import {db, FieldValue} from "../firebase/admin";
-import {getLeagueFromRating} from "../utils/leagueManager";
+import {db} from "../firebase/admin";
 
 export const ghostMatchProcessor = onSchedule(
   {
@@ -63,6 +62,7 @@ export const ghostMatchProcessor = onSchedule(
         const currentRating = Number(userData.rating ?? 0);
 
         tx.update(doc.ref, {
+          "seasonRatingChange": isPlaced ? Math.max(0, currentRating + ghostRatingChange) - currentRating : 0,
           "matchStatus": "GHOST",
           "matchResult": {
             opponentId: "GHOST",
@@ -80,20 +80,7 @@ export const ghostMatchProcessor = onSchedule(
             rating: newRating,
           });
 
-          if (authorId !== "R8") {
-            const oldLeague = getLeagueFromRating(currentRating);
-            const newLeague = getLeagueFromRating(newRating);
 
-            if (oldLeague !== newLeague) {
-              const statsRef = db.collection("metadata").doc("rankings");
-              tx.set(statsRef, {
-                leagueCounts: {
-                  [oldLeague]: FieldValue.increment(-1),
-                  [newLeague]: FieldValue.increment(1),
-                },
-              }, {merge: true});
-            }
-          }
         }
       });
     }

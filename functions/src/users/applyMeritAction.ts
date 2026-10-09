@@ -1,11 +1,9 @@
 import {onCall, HttpsError} from "firebase-functions/v2/https";
 import {db, FieldValue} from "../firebase/admin";
 import {calculateRankedEntryCost} from "../utils/meritCalculator";
-import {onRankedAbandoned} from "../utils/reputationManager";
 
 type MeritAction =
   | "PURCHASE_EXAMPLE_SENTENCE"
-  | "PURCHASE_REPUTATION_VIEW"
   | "ENTER_RANKED"
   | "ABANDON_RANKED"
   | "REWARD_PRACTICE"
@@ -59,9 +57,9 @@ export const applyMeritAction = onCall(
       const user = userSnap.data();
       const currentMerit = user?.merit ?? 0;
       const meritCap = user?.meritCap ?? 50000;
-      let rankedWinStreak = user?.rankedWinStreak ?? 0;
-      let rankedLossStreak = user?.rankedLossStreak ?? 0;
-      let reputation = user?.reputation ?? 0;
+      const rankedWinStreak = user?.rankedWinStreak ?? 0;
+      const rankedLossStreak = user?.rankedLossStreak ?? 0;
+      const reputation = user?.reputation ?? 0;
 
       let meritDelta = 0;
       let reason = "";
@@ -94,22 +92,6 @@ export const applyMeritAction = onCall(
 
         meritDelta = -cost;
         reason = "PURCHASE_EXAMPLE_SENTENCE";
-        updatedFields = {
-          merit: currentMerit - cost,
-        };
-        tx.update(userRef, updatedFields);
-        break;
-      }
-
-      case "PURCHASE_REPUTATION_VIEW": {
-        const cost = 500;
-
-        if (currentMerit < cost) {
-          throw new Error("Not enough Merit.");
-        }
-
-        meritDelta = -cost;
-        reason = "PURCHASE_REPUTATION_VIEW";
         updatedFields = {
           merit: currentMerit - cost,
         };
@@ -183,12 +165,6 @@ export const applyMeritAction = onCall(
           throw new Error("Daily ranked limit reached (5). Return tomorrow.");
         }
 
-        if (user?.currentlyInRanked) {
-          reputation = onRankedAbandoned(reputation);
-          rankedLossStreak += 1;
-          rankedWinStreak = 0;
-        }
-
         const cost = calculateRankedEntryCost(
           rankedWinStreak,
           rankedLossStreak,
@@ -206,7 +182,6 @@ export const applyMeritAction = onCall(
           merit: currentMerit - cost,
           currentlyInRanked: true,
           rankedSessionStartedAt: rankedSessionStartedAt,
-          reputation: reputation,
           rankedLossStreak: rankedLossStreak,
           rankedWinStreak: rankedWinStreak,
         };
@@ -220,9 +195,6 @@ export const applyMeritAction = onCall(
         }
 
         updatedFields = {
-          reputation: onRankedAbandoned(reputation),
-          rankedLossStreak: rankedLossStreak + 1,
-          rankedWinStreak: 0,
           currentlyInRanked: false,
           rankedSessionStartedAt: null,
         };

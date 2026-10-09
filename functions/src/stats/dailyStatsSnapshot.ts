@@ -94,14 +94,6 @@ export const dailyStatsSnapshot = onSchedule(
         }
       });
 
-      const tournamentsSnap = await db.collection("tournaments")
-        .where("status", "==", "COMPLETED")
-        .where("completedAt", ">=", startTime)
-        .where("completedAt", "<", endTime)
-        .get();
-
-      const tournamentsCompleted = tournamentsSnap.size;
-
       const snapshotData = {
         date: dateId,
         totalSubmissions,
@@ -110,7 +102,6 @@ export const dailyStatsSnapshot = onSchedule(
         averageScore,
         totalMeritEarned,
         totalMeritSpent,
-        tournamentsCompleted,
         activeUsers: activeUsersSet.size,
         hardestTheme,
         createdAt: Date.now(),

@@ -1,5 +1,4 @@
-import {db, FieldValue} from "../firebase/admin";
-import {getLeagueFromRating} from "../utils/leagueManager";
+import {db} from "../firebase/admin";
 import {calculateDynamicRatingChange} from "../utils/dynamicRatingChange";
 
 export async function tryMatchRankedSubmission(
@@ -43,7 +42,7 @@ export async function tryMatchRankedSubmission(
 
     const candidateName = candidateUserSnap.data()?.name ?? "Unknown";
 
-    const leagueAdjustments = await db.runTransaction(async (tx) => {
+    const matched = await db.runTransaction(async (tx) => {
       const mySubmissionSnap = await tx.get(mySubmissionRef);
       const candidateSubmissionSnap = await tx.get(candidateRef);
       if (mySubmissionSnap.get("status") !== "EVALUATED" ||
@@ -51,7 +50,6 @@ export async function tryMatchRankedSubmission(
           candidateSubmissionSnap.get("status") !== "EVALUATED" ||
           candidateSubmissionSnap.get("matchStatus") !== "PENDING") return null;
 
-      const leagueAdjustments: Record<string, number> = {};
       const submitterSnap = await tx.get(submitterRef);
       const candidateUserSnapTx = await tx.get(candidateAuthorRef);
 
@@ -78,6 +76,7 @@ export async function tryMatchRankedSubmission(
       );
 
       tx.update(mySubmissionRef, {
+        "seasonRatingChange": myIsPlaced ? Math.max(0, currentMyRating + myRatingChange) - currentMyRating : 0,
         "matchStatus": "MATCHED",
         "matchResult": {
           opponentId: candidate.authorId,
@@ -90,6 +89,7 @@ export async function tryMatchRankedSubmission(
       });
 
       tx.update(candidateRef, {
+        "seasonRatingChange": candidateIsPlaced ? Math.max(0, currentTheirRating + theirRatingChange) - currentTheirRating : 0,
         "matchStatus": "MATCHED",
         "matchResult": {
           opponentId: authorId,
@@ -116,14 +116,6 @@ export async function tryMatchRankedSubmission(
           rankedLossStreak: newMyLossStreak,
         });
 
-        if (authorId !== "R8") {
-          const oldLeague = getLeagueFromRating(currentMyRating);
-          const newLeague = getLeagueFromRating(newRating);
-          if (oldLeague !== newLeague) {
-            leagueAdjustments[oldLeague] = (leagueAdjustments[oldLeague] || 0) - 1;
-            leagueAdjustments[newLeague] = (leagueAdjustments[newLeague] || 0) + 1;
-          }
-        }
       }
 
       if (candidateIsPlaced) {
@@ -141,28 +133,10 @@ export async function tryMatchRankedSubmission(
           rankedLossStreak: newTheirLossStreak,
         });
 
-        if (candidate.authorId !== "R8") {
-          const oldLeague = getLeagueFromRating(currentTheirRating);
-          const newLeague = getLeagueFromRating(newRating);
-          if (oldLeague !== newLeague) {
-            leagueAdjustments[oldLeague] = (leagueAdjustments[oldLeague] || 0) - 1;
-            leagueAdjustments[newLeague] = (leagueAdjustments[newLeague] || 0) + 1;
-          }
-        }
       }
-      return leagueAdjustments;
+      return true;
     });
-    if (leagueAdjustments === null) continue;
-
-    // Optimization: Update global stats outside the transaction
-    if (Object.keys(leagueAdjustments).length > 0) {
-      const statsUpdate: Record<string, unknown> = {};
-      Object.entries(leagueAdjustments).forEach(([league, increment]) => {
-        statsUpdate[`leagueCounts.${league}`] = FieldValue.increment(increment);
-      });
-      db.collection("metadata").doc("rankings").update(statsUpdate)
-        .catch((err) => console.error("Match-driven global stats update failed:", err));
-    }
+    if (matched === null) continue;
 
     return;
   }

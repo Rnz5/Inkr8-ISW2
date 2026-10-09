@@ -24,7 +24,6 @@ import com.inkr8.data.Users
 @Composable
 fun UserHeaderCard(
     user: Users,
-    pantheonPosition: Int?,
     onClick: () -> Unit
 ) {
     val pfpModel: Any = when {

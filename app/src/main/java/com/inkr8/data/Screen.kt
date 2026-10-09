@@ -9,15 +9,11 @@ enum class Screen {
     competitions,
     profile,
     results,
-    leaderboard,
-    tournamentDetails,
-    tournamentResults,
-    userProfile,
     loading,
-    createTournament,
     postSubmissionAd,
     paywall,
     usernameSetup,
     placementReveal,
-    settings
+    settings,
+    seasons
 }
