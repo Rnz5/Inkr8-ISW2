@@ -11,7 +11,7 @@ async function verifyPurchaseWithGoogle(
   // implement actual google play developer API call here post haste
   if (!purchaseToken || !productId) return false;
 
-  console.log(`Verifying purchase: ${productId} with token: ${purchaseToken}`);
+  console.log("Verifying purchase product:", productId);
   return true;
 }
 

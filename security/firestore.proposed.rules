@@ -1,0 +1,91 @@
+// NEW FIN-001 proposal. Authentic Firestore rules were not supplied.
+// Client data never grants rating, Merit, placement or seasonal effects.
+rules_version = '2';
+service cloud.firestore {
+ match /databases/{database}/documents {
+  function owner(uid) { return request.auth != null && request.auth.uid == uid; }
+  function signedIn() { return request.auth != null; }
+  function initialUser(uid) {
+   let d=request.resource.data;
+   return owner(uid) && d.id == uid && d.name == '' && d.merit == 1000 &&
+    d.meritCap == 50000 && d.meritHold == 0 && d.rating == 0 && d.reputation == 0 &&
+    d.bestScore == 0 && d.submissionsCount == 0 && d.savedSubmissionsCount == 0 &&
+    d.profileImageURL == '' && d.bannerImageURL == '' && d.achievements == [] &&
+    d.rankedWinStreak == 0 && d.rankedLossStreak == 0 && d.currentlyInRanked == false &&
+    d.rankedSessionStartedAt == null && d.tournamentsPlayed == 0 && d.tournamentsWon == 0 &&
+    d.totalMeritEarned == 0 && d.tipsReceived == 0 && d.isPhilosopher == false &&
+    d.philosopherSince == null && d.hasChosenUsername == false && d.recentScores == [] &&
+    d.isPlaced == false && d.placementMatchesPlayed == 0 && d.totalPlacementScore == 0 &&
+    d.currentStreak == 0 && d.lastSubmissionDay == 0 && d.hasSeenPlacementReveal == false &&
+    d.joinedDate is int && (d.email == null || d.email is string) &&
+    d.keys().hasOnly(['id','name','email','merit','meritCap','meritHold','rating','reputation',
+     'bestScore','submissionsCount','savedSubmissionsCount','profileImageURL','bannerImageURL',
+     'achievements','joinedDate','rankedWinStreak','rankedLossStreak','currentlyInRanked',
+     'rankedSessionStartedAt','tournamentsPlayed','tournamentsWon','totalMeritEarned','tipsReceived',
+     'isPhilosopher','philosopherSince','hasChosenUsername','recentScores','isPlaced',
+     'placementMatchesPlayed','totalPlacementScore','currentStreak','lastSubmissionDay','hasSeenPlacementReveal']);
+  }
+  function claimName(uid) {
+   let d=request.resource.data;
+   let normalized=d.name.lower();
+   return resource.data.hasChosenUsername == false && d.hasChosenUsername == true &&
+    d.name is string && d.name.size() >= 2 && d.name.size() <= 20 &&
+    getAfter(/databases/$(database)/documents/usernames/$(normalized)).data.userId == uid &&
+    getAfter(/databases/$(database)/documents/usernames/$(normalized)).data.username == d.name &&
+    d.diff(resource.data).affectedKeys().hasOnly(['name','hasChosenUsername']);
+  }
+  match /users/{uid} {
+   allow get: if owner(uid);
+   allow list: if false;
+   allow create: if initialUser(uid);
+   allow update: if owner(uid) && (
+    (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['email']) &&
+     (request.resource.data.email == null || request.resource.data.email is string)) ||
+    (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['hasSeenPlacementReveal']) &&
+     request.resource.data.hasSeenPlacementReveal == true && resource.data.isPlaced == true) ||
+    (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['currentlyInRanked','rankedSessionStartedAt']) &&
+     request.resource.data.currentlyInRanked == false && request.resource.data.rankedSessionStartedAt == null) ||
+    claimName(uid));
+   // Account erasure must use a trusted, separately reviewed lifecycle; no historical deletion.
+   allow delete: if false;
+   match /{nested=**} { allow read, write: if false; }
+  }
+  match /usernames/{name} {
+   allow get: if signedIn();
+   allow list: if false;
+   allow create: if signedIn() && request.resource.data.userId == request.auth.uid &&
+    request.resource.data.normalized == name && request.resource.data.username.lower() == name &&
+    request.resource.data.username.size() >= 2 && request.resource.data.username.size() <= 20 &&
+    request.resource.data.createdAt is int &&
+    request.resource.data.keys().hasOnly(['userId','username','normalized','createdAt']) &&
+    get(/databases/$(database)/documents/users/$(request.auth.uid)).data.hasChosenUsername == false &&
+    getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.name == request.resource.data.username &&
+    getAfter(/databases/$(database)/documents/users/$(request.auth.uid)).data.hasChosenUsername == true;
+   allow update, delete: if false;
+  }
+  match /submissions/{id} {
+   allow read: if owner(resource.data.authorId);
+   allow create: if owner(request.resource.data.authorId) && request.resource.data.id == id &&
+    request.resource.data.status == 'PENDING' && request.resource.data.evaluation == null &&
+    request.resource.data.matchResult == null && request.resource.data.matchStatus == 'UNMATCHED' &&
+    request.resource.data.isSaved == false && request.resource.data.content is string &&
+    request.resource.data.timestamp is int && request.resource.data.wordCount is int &&
+    request.resource.data.characterCount is int && request.resource.data.wordsUsed is list &&
+    request.resource.data.playmode in ['PRACTICE','RANKED'] &&
+    (request.resource.data.playmode != 'RANKED' ||
+      get(/databases/$(database)/documents/users/$(request.auth.uid)).data.currentlyInRanked == true) &&
+    request.resource.data.keys().hasOnly(['id','authorId','content','timestamp','wordCount','characterCount',
+      'wordsUsed','gamemodeName','gamemode','topicId','themeId','evaluation','status','playmode','isSaved','matchResult','matchStatus']);
+   allow update: if false;
+   // A pending entry cannot be erased to escape evaluation/season settlement.
+   allow delete: if owner(resource.data.authorId) && resource.data.status != 'PENDING' &&
+     (resource.data.playmode != 'RANKED' || resource.data.status in ['FAILED','NOT_EVALUABLE'] ||
+      resource.data.matchStatus in ['MATCHED','GHOST']);
+  }
+  match /words/{id} { allow read: if signedIn(); allow write: if false; }
+  match /themes/{id} { allow read: if signedIn(); allow write: if false; }
+  match /topics/{id} { allow read: if signedIn(); allow write: if false; }
+  // Seasons, assignments, members, stats and economic ledgers: Admin SDK / Functions only.
+  match /{document=**} { allow read, write: if false; }
+ }
+}

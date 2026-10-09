@@ -6,7 +6,11 @@ functions.auth.user().onCreate(async (user) => {
   const uid = user.uid;
   const userRef = db.collection("users").doc(uid);
 
-  await userRef.set({
+  // Auth delivery can repeat or arrive after Android created this profile.
+  // Never reset earned balances, placement or the chosen name.
+  await db.runTransaction(async (tx) => {
+    if ((await tx.get(userRef)).exists) return;
+    tx.create(userRef, {
     id: uid,
     name: user.displayName ?? "",
     email: user.email ?? "",
@@ -27,5 +31,6 @@ functions.auth.user().onCreate(async (user) => {
     placementMatchesPlayed: 0,
     totalPlacementScore: 0,
     hasSeenPlacementReveal: false,
+    });
   });
 });
