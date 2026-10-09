@@ -131,3 +131,4 @@
 *.pdf binary
 *.png binary
 *.jar binary
+"functions/src/submissions/deleteSubmission.ts" -text

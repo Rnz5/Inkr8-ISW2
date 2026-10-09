@@ -56,7 +56,9 @@ class FirestoreSubmissionRepository() {
         onSuccess: () -> Unit,
         onError: (Exception) -> Unit
     ) {
-        submissionsCollection.document(submissionId).delete()
+        Firebase.functions
+            .getHttpsCallable("deleteSubmission")
+            .call(hashMapOf("submissionId" to submissionId))
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e -> onError(e) }
     }

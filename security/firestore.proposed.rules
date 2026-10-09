@@ -77,10 +77,10 @@ service cloud.firestore {
     request.resource.data.keys().hasOnly(['id','authorId','content','timestamp','wordCount','characterCount',
       'wordsUsed','gamemodeName','gamemode','topicId','themeId','evaluation','status','playmode','isSaved','matchResult','matchStatus']);
    allow update: if false;
-   // A pending entry cannot be erased to escape evaluation/season settlement.
+   // Ranked deletion is a trusted callable: it checks server createTime and
+   // seasonal ACK/settlement atomically. Practice retains direct terminal delete.
    allow delete: if owner(resource.data.authorId) && resource.data.status != 'PENDING' &&
-     (resource.data.playmode != 'RANKED' || resource.data.status in ['FAILED','NOT_EVALUABLE'] ||
-      resource.data.matchStatus in ['MATCHED','GHOST']);
+     resource.data.playmode != 'RANKED';
   }
   match /words/{id} { allow read: if signedIn(); allow write: if false; }
   match /themes/{id} { allow read: if signedIn(); allow write: if false; }

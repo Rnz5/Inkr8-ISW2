@@ -17,3 +17,5 @@ export * from "./stats/weeklyStatsSnapshot";
 export * from "./stats/monthlyStatsSnapshot";
 
 export * from "./seasons/seasonFunctions";
+
+export * from "./submissions/deleteSubmission";
