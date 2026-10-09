@@ -125,66 +125,11 @@ fun Results(
 
         Spacer(modifier = Modifier.height(20.dp))
 
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(
-                text = FormatUtils.formatPercentage(evaluation.finalScore),
-                fontSize = 76.sp,
-                color = Color.White,
-                fontWeight = FontWeight.Black,
-                letterSpacing = (-3).sp
-            )
-            
-            val appraisal = when {
-                evaluation.finalScore >= 95 -> "GOD TIER. RARE PRECISION."
-                evaluation.finalScore >= 90 -> "ELITE. SYSTEM ACKNOWLEDGED."
-                evaluation.finalScore >= 80 -> "STRONG. ALMOST REFINED."
-                evaluation.finalScore >= 70 -> "COMPETENT. STILL SAFE."
-                evaluation.finalScore >= 60 -> "FINE. COMMON OUTPUT."
-                else -> "WEAK. REWORK EVERYTHING."
-            }
-            
-            Text(
-                text = appraisal,
-                color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.labelMedium,
-                letterSpacing = 1.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+        ResultsScoreSummary(evaluation)
 
         Spacer(modifier = Modifier.height(40.dp))
 
-        Card(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 20.dp),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            border = BorderStroke(1.dp, Color.White.copy(alpha = 0.05f))
-        ) {
-            Column(modifier = Modifier.padding(24.dp)) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = if (evaluation.isMock) "Mock Breakdown" else "R8 Breakdown",
-                        color = Color.Gray,
-                        style = MaterialTheme.typography.labelSmall,
-                        letterSpacing = 2.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                }
-
-                Spacer(modifier = Modifier.height(20.dp))
-
-                Text(
-                    text = feedbackToShow,
-                    color = Color.White,
-                    style = MaterialTheme.typography.bodyLarge,
-                    lineHeight = 26.sp
-                )
-            }
-        }
+        ResultsFeedbackCard(evaluation, feedbackToShow)
 
         Spacer(modifier = Modifier.height(28.dp))
 

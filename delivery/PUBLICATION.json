@@ -1,0 +1,26 @@
+{
+  "PR": {
+    "author": {
+      "id": "U_kgDOCG0zRA",
+      "is_bot": false,
+      "login": "MACOABC",
+      "name": ""
+    },
+    "baseRefName": "master",
+    "headRefName": "codex/refactorizacion-por-bloques",
+    "headRefOid": "de6d56989d9ae26d982e64e757865279e4b2f55e",
+    "isDraft": true,
+    "mergeable": "MERGEABLE",
+    "state": "OPEN",
+    "url": "https://github.com/Rnz5/Inkr8-ISW2/pull/2"
+  },
+  "branch_url": "https://github.com/Rnz5/Inkr8-ISW2/tree/codex/refactorizacion-por-bloques",
+  "tested_production_commit": "2f96c6d43d68673c80a2d794a47d0da6d1933012",
+  "code_tests_delivery_reviewed_commit": "de6d56989d9ae26d982e64e757865279e4b2f55e",
+  "baseline_and_remote_master": "7d879c22030527e1d5f5003ad84b76b750d3b29e",
+  "author_of_code_tests_docs": "Codex <codex@local.invalid>",
+  "GitHub_authenticated_publisher": "MACOABC",
+  "source_of_authorization": "Marco FIN-002 publication prompt, DEC-AI-AUTH-001 and subsequent aplica lo recomendable response for account-access policy",
+  "not_merged_not_deployed_no_real_data_operations": true,
+  "publication_metadata_note": "This record precedes its own metadata commit. Export metadata identifies final commit. No self-referential hash or human review claimed."
+}

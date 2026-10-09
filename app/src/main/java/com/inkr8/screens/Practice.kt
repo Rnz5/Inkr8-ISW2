@@ -29,7 +29,6 @@ import com.inkr8.utils.UserHeaderCard
 @Composable
 fun Practice(
     user: Users,
-    pantheonPosition: Int?,
     onNavigateBack: () -> Unit,
     onNavigateToWriting: (Gamemode) -> Unit,
     onNavigateToProfile: () -> Unit
@@ -57,7 +56,6 @@ fun Practice(
     ) {
         UserHeaderCard(
             user = user,
-            pantheonPosition = pantheonPosition,
             onClick = onNavigateToProfile
         )
 
@@ -231,7 +229,6 @@ fun PracticePreview() {
     Inkr8Theme {
         Practice(
             user = fakeUser,
-            pantheonPosition = null,
             onNavigateBack = {},
             onNavigateToWriting = {},
             onNavigateToProfile = {}

@@ -1,0 +1,34 @@
+[
+  {
+    "tamper": "revision-guard",
+    "private_copy_only": true,
+    "rejected": true,
+    "failed_checks": [
+      "audit_precondition_or_source_structure"
+    ]
+  },
+  {
+    "tamper": "owner-scope",
+    "private_copy_only": true,
+    "rejected": true,
+    "failed_checks": [
+      "audit_precondition_or_source_structure"
+    ]
+  },
+  {
+    "tamper": "retry-identity",
+    "private_copy_only": true,
+    "rejected": true,
+    "failed_checks": [
+      "audit_precondition_or_source_structure"
+    ]
+  },
+  {
+    "tamper": "red-B-assertion",
+    "private_copy_only": true,
+    "rejected": true,
+    "failed_checks": [
+      "product_verification_file:testing-blocks/android-emulator-lab/LabDraftConcurrencyTest.kt"
+    ]
+  }
+]

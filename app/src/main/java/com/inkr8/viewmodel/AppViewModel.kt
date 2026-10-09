@@ -9,7 +9,6 @@ import com.google.firebase.firestore.ListenerRegistration
 import com.inkr8.AdManager
 import com.inkr8.data.*
 import com.inkr8.repository.*
-import com.inkr8.rating.*
 import com.inkr8.utils.SystemConfig
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -19,7 +18,6 @@ import kotlinx.coroutines.launch
 class AppViewModel(
     initialUser: Users,
     private val submissionRepository: FirestoreSubmissionRepository = FirestoreSubmissionRepository(),
-    private val tournamentRepository: FirestoreTournamentRepository = FirestoreTournamentRepository(),
     private val userRepository: UserRepository = UserRepository()
 ) : ViewModel() {
 
@@ -31,17 +29,10 @@ class AppViewModel(
     
     var currentGamemode by mutableStateOf<Gamemode?>(null)
     var currentPlayMode by mutableStateOf<PlayMode>(PlayMode.Practice)
-    var selectedTournament by mutableStateOf<Tournament?>(null)
-    var activeTournamentId by mutableStateOf<String?>(null)
     
     var latestSubmission by mutableStateOf<Submissions?>(null)
     var allSubmissions by mutableStateOf<List<Submissions>>(emptyList())
     var isLoadingSubmissions by mutableStateOf(true)
-    
-    var pantheonPosition by mutableStateOf<Int?>(null)
-    var selectedProfileUserId by mutableStateOf<String?>(null)
-    var viewedUser by mutableStateOf<Users?>(null)
-    var viewedPantheonPosition by mutableStateOf<Int?>(null)
     
     var submissionAdCounter by mutableIntStateOf(0)
     var pendingNavigationAfterAd by mutableStateOf<Screen?>(null)
@@ -57,29 +48,22 @@ class AppViewModel(
     var loadingTimeout by mutableStateOf(false)
     var loadingElapsedSeconds by mutableIntStateOf(0)
     private var loadingPollJob: Job? = null
-
-    // Tournament details & results state
-    var tournamentLeaderboard by mutableStateOf<List<TournamentLeaderboardEntry>>(emptyList())
-    var isTournamentLoading by mutableStateOf(false)
-    var isEnrolledInSelectedTournament by mutableStateOf(false)
-    var isSubmittedToSelectedTournament by mutableStateOf(false)
-    
-    // Tip tracking
-    val tippedInCurrentTournament = mutableStateMapOf<String, Boolean>()
-    val globalTipCooldowns = mutableStateMapOf<String, Long?>()
+    private var loadingWaitGeneration = 0L
+    private var confirmedSubmissionId: String? = null
+    var loadingQueryError by mutableStateOf<String?>(null)
+        private set
+    var isPersistingSubmission by mutableStateOf(false)
+        private set
+    private var persistenceGeneration = 0L
 
     // Listeners
     private var submissionsListener: ListenerRegistration? = null
-    private var tournamentListener: ListenerRegistration? = null
-    private var enrollmentListener: ListenerRegistration? = null
-    private var submissionStatusListener: ListenerRegistration? = null
     private var loadingResultListener: ListenerRegistration? = null
     private var userObserverJob: Job? = null
 
     init {
         observeCurrentUser()
         observeSubmissions()
-        observePantheonStatus()
     }
 
     private fun observeCurrentUser() {
@@ -88,8 +72,7 @@ class AppViewModel(
             userRepository.listenToUser(currentUser.id).collectLatest { updated ->
                 updated?.let { 
                     currentUser = it 
-                    observePantheonStatus()
-                }
+                    }
             }
         }
     }
@@ -99,12 +82,21 @@ class AppViewModel(
         currentScreen = screen
     }
 
-    fun startWriting(gamemode: Gamemode, playMode: PlayMode, tournament: Tournament?) {
+    fun startWriting(gamemode: Gamemode, playMode: PlayMode) {
+        // Leaving the old result context invalidates its queued responses immediately.
+        loadingWaitGeneration++
+        loadingResultListener?.remove()
+        loadingResultListener = null
+        loadingPollJob?.cancel()
+        loadingPollJob = null
+        confirmedSubmissionId = null
+        loadingQueryError = null
+        loadingResolved = false
+        loadingTimeout = false
+        loadingElapsedSeconds = 0
         currentGamemode = gamemode
         currentPlayMode = playMode
-        selectedTournament = tournament
         latestSubmission = null
-        activeTournamentId = tournament?.id
         navigateTo(Screen.writing)
     }
 
@@ -124,55 +116,43 @@ class AppViewModel(
         )
     }
 
-    fun observePantheonStatus() {
-        viewModelScope.launch {
-            if (currentUser.rating >= PantheonManager.MIN_RATING - 20) {
-                userRepository.getTop100Users { top100 ->
-                    val (isPantheon, position) = PantheonManager.checkPantheonStatus(currentUser, top100)
-                    pantheonPosition = if (isPantheon) position else null
-                }
-            } else {
-                pantheonPosition = null
-            }
+    fun submitWriting(
+        submission: Submissions,
+        onPersisted: () -> Unit = {},
+        onError: (String) -> Unit
+    ) {
+        if (isPersistingSubmission) {
+            onError("An entry is still being saved. Please wait for confirmation.")
+            return
         }
-    }
-
-    fun submitWriting(submission: Submissions, onError: (String) -> Unit) {
+        isPersistingSubmission = true
+        val generation = ++persistenceGeneration
+        fun finishPersistence(): Boolean {
+            if (generation != persistenceGeneration || !isPersistingSubmission) return false
+            isPersistingSubmission = false
+            return true
+        }
         val finalSubmission = submission.copy(
             authorId = currentUser.id,
             status = SubmissionStatus.PENDING,
             evaluation = null
         )
 
-        val isTournament = finalSubmission.playmode == "TOURNAMENT"
-
-        if (isTournament) {
-            val tId = activeTournamentId
-            if (tId == null) {
-                onError("Tournament ID is missing. Please restart the entry.")
-                return
-            }
-            tournamentRepository.submitToTournament(
-                tournamentId = tId,
-                userId = currentUser.id,
-                submission = finalSubmission,
-                onSuccess = {
-                    navigateTo(Screen.tournamentDetails)
-                },
-                onError = { e -> onError(e.message ?: "Tournament submission failed") }
-            )
-        } else {
-            submissionRepository.addSubmission(
-                submission = finalSubmission,
-                onSuccess = {
-                    startLoadingResult()
-                },
-                onError = { e ->
+        submissionRepository.addSubmission(
+            submission = finalSubmission,
+            onSuccess = {
+                if (finishPersistence()) {
+                    onPersisted()
+                    startLoadingResult(finalSubmission.id)
+                }
+            },
+            onError = { e ->
+                if (finishPersistence()) {
                     userRepository.finishRankedSession(currentUser.id)
                     onError(e.message ?: "Submission failed")
                 }
-            )
-        }
+            }
+        )
     }
 
     fun saveSubmission(submissionId: String, onError: (String) -> Unit) {
@@ -228,14 +208,6 @@ class AppViewModel(
         return userRepository.validateUsername(name)
     }
 
-    fun createTournament(title: String, gamemode: String, prizePool: Long, maxPlayers: Int, onError: (String) -> Unit) {
-        tournamentRepository.createTournament(
-            title, gamemode, prizePool, maxPlayers,
-            onSuccess = { navigateTo(Screen.home, page = 2) },
-            onError = { e -> onError(e.message ?: "Failed to create tournament") }
-        )
-    }
-
     fun loadLatestSubmission() {
         submissionRepository.getLastSubmission(
             onSuccess = { latestSubmission = it },
@@ -243,76 +215,78 @@ class AppViewModel(
         )
     }
 
-    fun loadViewedUserProfile(userId: String) {
-        selectedProfileUserId = userId
-        userRepository.getUserById(userId) { user ->
-            viewedUser = user
-            if (user != null) {
-                if (user.rating >= PantheonManager.MIN_RATING) {
-                    userRepository.getTop100Users { top100 ->
-                        val (isPantheon, position) = PantheonManager.checkPantheonStatus(user, top100)
-                        viewedPantheonPosition = if (isPantheon) position else null
-                    }
-                } else {
-                    viewedPantheonPosition = null
-                }
-                
-                // Check tip cooldown for Pantheon members
-                userRepository.checkGlobalTipCooldown(currentUser.id, user.id) { timestamp ->
-                    globalTipCooldowns[user.id] = timestamp
-                }
-            }
-        }
-    }
-
-    fun enrollInTournament(tournamentId: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
-        tournamentRepository.enrollInTournament(
-            tournamentId = tournamentId,
-            onSuccess = {
-                onSuccess()
-            },
-            onError = { e -> onError(e.message ?: "Failed to enroll") }
-        )
-    }
-
-    private fun startLoadingResult() {
+    private fun startLoadingResult(submissionId: String) {
+        val waitGeneration = ++loadingWaitGeneration
         loadingResolved = false
         loadingTimeout = false
         loadingElapsedSeconds = 0
+        loadingQueryError = null
+        confirmedSubmissionId = submissionId
         navigateTo(Screen.loading)
         
         loadingResultListener?.remove()
-        loadingResultListener = submissionRepository.getLastSubmissionRealtime(
+        loadingResultListener = submissionRepository.listenToSubmission(
+            submissionId = submissionId,
             onUpdate = { submission ->
-                handleSubmissionUpdate(submission)
+                handleSubmissionUpdate(submission, submissionId, waitGeneration)
             },
-            onError = { it.printStackTrace() }
+            onError = { handleLoadingQueryError(submissionId, waitGeneration) }
         )
 
         loadingPollJob?.cancel()
         loadingPollJob = viewModelScope.launch {
             var pollCount = 0
-            while (!loadingResolved && !loadingTimeout) {
+            while (waitGeneration == loadingWaitGeneration && !loadingResolved && !loadingTimeout) {
                 delay(3000)
+                if (waitGeneration != loadingWaitGeneration) break
                 pollCount++
-                loadingElapsedSeconds = pollCount * 3
-                if (loadingElapsedSeconds > 90) {
+                loadingElapsedSeconds = resultWaitElapsedSeconds(pollCount)
+                if (hasResultWaitTimedOut(loadingElapsedSeconds)) {
                     loadingTimeout = true
                     break
                 }
-                submissionRepository.getLastSubmission(
+                submissionRepository.getSubmission(
+                    submissionId = submissionId,
                     onSuccess = { submission ->
-                        submission?.let { handleSubmissionUpdate(it) }
+                        submission?.let { handleSubmissionUpdate(it, submissionId, waitGeneration) }
                     },
-                    onError = { it.printStackTrace() }
+                    onError = { handleLoadingQueryError(submissionId, waitGeneration) }
                 )
             }
         }
     }
 
-    private fun handleSubmissionUpdate(submission: Submissions) {
+    private fun handleLoadingQueryError(submissionId: String, waitGeneration: Long) {
+        if (waitGeneration != loadingWaitGeneration || confirmedSubmissionId != submissionId ||
+            currentScreen != Screen.loading || loadingResolved || loadingTimeout) return
+        loadingQueryError = "We could not check your result. Your entry is saved. Retry checking the same entry."
+        Log.w("ResultWait", "query_error submissionId=$submissionId generation=$waitGeneration")
+    }
+
+    fun retryLoadingResult() {
+        val id = confirmedSubmissionId ?: return
+        if (currentScreen != Screen.loading || loadingResolved || (!loadingTimeout && loadingQueryError == null)) return
+        startLoadingResult(id)
+        val generation = loadingWaitGeneration
+        Log.i("ResultWait", "query_retry submissionId=$id generation=$generation")
+        submissionRepository.getSubmission(
+            submissionId = id,
+            onSuccess = { it?.let { submission -> handleSubmissionUpdate(submission, id, generation) } },
+            onError = { handleLoadingQueryError(id, generation) }
+        )
+    }
+
+    private fun handleSubmissionUpdate(submission: Submissions, submissionId: String, waitGeneration: Long) {
+        if (waitGeneration != loadingWaitGeneration || submission.id != submissionId) return
+        if (loadingResolved && !loadingTimeout && currentScreen == Screen.results &&
+            latestSubmission?.id == submissionId && isEvaluatedResult(submission.status) &&
+            submission.playmode == "RANKED" &&
+            (submission.matchStatus == "MATCHED" || submission.matchStatus == "GHOST")) {
+            latestSubmission = submission
+            return
+        }
         if (!loadingResolved && !loadingTimeout) {
-            if (submission.status == SubmissionStatus.EVALUATED) {
+            if (isEvaluatedResult(submission.status)) {
                 loadingResolved = true
                 latestSubmission = submission
                 
@@ -320,7 +294,7 @@ class AppViewModel(
                 previousUserIsPlaced = currentUser.isPlaced
                 navigateTo(if (justGotPlaced) Screen.placementReveal else Screen.results)
                 
-            } else if (submission.status == SubmissionStatus.FAILED) {
+            } else if (isFailedResult(submission.status)) {
                 loadingResolved = true
                 navigateTo(Screen.home)
             }
@@ -345,72 +319,6 @@ class AppViewModel(
         }
     }
 
-    fun loadTournamentResults(tournamentId: String) {
-        isTournamentLoading = true
-        tournamentRepository.getLeaderboard(
-            tournamentId = tournamentId,
-            onSuccess = { results ->
-                val authorIds = results.map { it.authorId }
-                userRepository.getUsersByIds(authorIds) { usersMap ->
-                    tournamentLeaderboard = results.map { submission ->
-                        TournamentLeaderboardEntry(
-                            submission = submission,
-                            user = usersMap[submission.authorId]
-                        )
-                    }
-                    isTournamentLoading = false
-                    
-                    // Pre-check tips status for the current user in this tournament
-                    results.forEach { submission ->
-                        tournamentRepository.hasUserTippedInTournament(tournamentId, currentUser.id, submission.authorId) { hasTipped ->
-                            tippedInCurrentTournament[submission.authorId] = hasTipped
-                        }
-                    }
-                }
-            },
-            onError = { e ->
-                e.printStackTrace()
-                tournamentLeaderboard = emptyList()
-                isTournamentLoading = false
-            }
-        )
-    }
-
-    fun startObservingTournament(tournamentId: String) {
-        stopObservingTournament()
-        tournamentListener = tournamentRepository.listenToTournament(
-            tournamentId = tournamentId,
-            onUpdate = { 
-                selectedTournament = it 
-                if (it?.status == TournamentStatus.COMPLETED) {
-                    loadTournamentResults(it.id)
-                }
-            },
-            onError = { it.printStackTrace() }
-        )
-        enrollmentListener = tournamentRepository.listenToEnrollmentStatus(
-            tournamentId = tournamentId,
-            userId = currentUser.id,
-            onUpdate = { isEnrolledInSelectedTournament = it },
-            onError = { it.printStackTrace() }
-        )
-        submissionStatusListener = tournamentRepository.listenToSubmissionStatus(
-            tournamentId = tournamentId,
-            userId = currentUser.id,
-            onUpdate = { isSubmittedToSelectedTournament = it },
-            onError = { it.printStackTrace() }
-        )
-    }
-
-    fun stopObservingTournament() {
-        tournamentListener?.remove()
-        enrollmentListener?.remove()
-        submissionStatusListener?.remove()
-        isEnrolledInSelectedTournament = false
-        isSubmittedToSelectedTournament = false
-        tippedInCurrentTournament.clear()
-    }
-
     fun applyMeritAction(action: String, onSuccess: () -> Unit, onError: (String) -> Unit) {
         userRepository.applyMeritAction(
             action = action,
@@ -418,31 +326,6 @@ class AppViewModel(
                 onSuccess()
             },
             onError = { e -> onError(e.message ?: "Action failed") }
-        )
-    }
-
-    fun sendTip(tournamentId: String, recipientId: String, amount: Long, onError: (String) -> Unit) {
-        tournamentRepository.sendTournamentTip(
-            tournamentId = tournamentId,
-            tipperId = currentUser.id,
-            recipientId = recipientId,
-            amount = amount,
-            onSuccess = {
-                tippedInCurrentTournament[recipientId] = true
-            },
-            onError = { e -> onError(e.message ?: "Tip failed") }
-        )
-    }
-    
-    fun sendGlobalTip(recipientId: String, amount: Long, onError: (String) -> Unit) {
-        userRepository.sendGlobalTip(
-            tipperId = currentUser.id,
-            recipientId = recipientId,
-            amount = amount,
-            onSuccess = {
-                globalTipCooldowns[recipientId] = System.currentTimeMillis()
-            },
-            onError = { e -> onError(e.message ?: "Tip failed") }
         )
     }
 
@@ -458,10 +341,8 @@ class AppViewModel(
     }
 
     override fun onCleared() {
+        loadingWaitGeneration++
         submissionsListener?.remove()
-        tournamentListener?.remove()
-        enrollmentListener?.remove()
-        submissionStatusListener?.remove()
         loadingResultListener?.remove()
         userObserverJob?.cancel()
         loadingPollJob?.cancel()

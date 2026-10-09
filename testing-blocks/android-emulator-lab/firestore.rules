@@ -1,0 +1,16 @@
+// Local test fixture, NOT original production security rules.
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /submissions/{id} {
+      allow read: if request.auth != null &&
+        !exists(/databases/$(database)/documents/labDeniedReads/$(request.auth.uid));
+      allow write: if !id.matches('lab-denied-.*') &&
+        (request.auth == null ||
+          !exists(/databases/$(database)/documents/labDeniedWrites/$(request.auth.uid)));
+    }
+    match /{collection}/{id}/{path=**} {
+      allow read, write: if collection != 'submissions';
+    }
+  }
+}

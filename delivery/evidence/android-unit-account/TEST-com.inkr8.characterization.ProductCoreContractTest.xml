@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.inkr8.characterization.ProductCoreContractTest" tests="14" skipped="0" failures="0" errors="0" timestamp="2026-10-09T16:59:03.838Z" hostname="DESKTOP-2DTEK1G" time="0.094">
+  <properties/>
+  <testcase name="keyPreservesCaseAndSeparators" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.014"/>
+  <testcase name="failedPredicateDoesNotTreatNotEvaluableAsFailure" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.001"/>
+  <testcase name="practiceKeyUsesOnlySuppliedModeFields" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.0"/>
+  <testcase name="timeoutIsFalseAtNinetySeconds" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.0"/>
+  <testcase name="emptyTournamentIdIsNotNullFallback" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.001"/>
+  <testcase name="evaluatedPredicateUsesAuthenticEnum" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.001"/>
+  <testcase name="firstTimedOutPollCounterIsThirtyOne" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.0"/>
+  <testcase name="unescapedSeparatorsCanAliasInputs" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.001"/>
+  <testcase name="scopedWordAndTopicIdentityUsesExistingOrderedData" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.064"/>
+  <testcase name="standardAndOnTopicKeysAreDistinct" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.0"/>
+  <testcase name="scopedOwnerAndExerciseKeysAreStableAndDistinct" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.009"/>
+  <testcase name="nullAndLiteralNoneAlias" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.0"/>
+  <testcase name="rankedAndPracticeKeysAreDistinct" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.001"/>
+  <testcase name="timeoutIsTrueAfterNinetySeconds" classname="com.inkr8.characterization.ProductCoreContractTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

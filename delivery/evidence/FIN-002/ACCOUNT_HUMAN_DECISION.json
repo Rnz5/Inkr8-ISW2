@@ -1,0 +1,14 @@
+{
+  "date_recorded": "2026-10-09 America/Lima",
+  "source": "Marco answer applies recommendation to grouped FIN-002 question call_bcec1c24c0794425b177c3ef4e1d4e6e",
+  "answer_exact": "aplica lo recomendable",
+  "decision": "Close Auth access preserving profile/history/username/economic records; no account data erasure",
+  "classification": "Human functional policy selected; implementation/tests/review Codex",
+  "not_inferred": [
+    "Original Firestore rules delivered",
+    "Authorized external R8/Google test credentials supplied",
+    "Individual evidence/P5 or team review completed"
+  ],
+  "data_contract_new": "Functions-only accountClosed/accountClosedAt; no balance/rating/session fields altered by closure",
+  "partial_failure": "Profile access marker first denies old tokens; retry completes genuine Auth disable/revocation without duplicate data changes"
+}

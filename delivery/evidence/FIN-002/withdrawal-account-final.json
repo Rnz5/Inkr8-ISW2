@@ -1,0 +1,170 @@
+{
+  "rows": [
+    {
+      "name": "No tournament/tip/reputation job exports",
+      "actual": [],
+      "expected": [],
+      "error": null,
+      "passed": true
+    },
+    {
+      "name": "Retired reputation purchase rejected with no debit",
+      "actual": {
+        "rejected": true,
+        "merit": 10000,
+        "transactions": 0
+      },
+      "expected": {
+        "rejected": true,
+        "merit": 10000,
+        "transactions": 0
+      },
+      "error": null,
+      "passed": true
+    },
+    {
+      "name": "Abandon clears session without reputation/streak penalty",
+      "actual": {
+        "rep": 900,
+        "win": 1,
+        "loss": 0,
+        "merit": 10000,
+        "active": false,
+        "started": null
+      },
+      "expected": {
+        "rep": 900,
+        "win": 1,
+        "loss": 0,
+        "merit": 10000,
+        "active": false,
+        "started": null
+      },
+      "error": null,
+      "passed": true
+    },
+    {
+      "name": "Expired session cleanup leaves retained economy and retired data intact",
+      "actual": {
+        "rep": 900,
+        "merit": 10000,
+        "win": 1,
+        "loss": 0,
+        "active": false
+      },
+      "expected": {
+        "rep": 900,
+        "merit": 10000,
+        "win": 1,
+        "loss": 0,
+        "active": false
+      },
+      "error": null,
+      "passed": true
+    },
+    {
+      "name": "Existing Ranked pricing/auth/session/log retained",
+      "actual": {
+        "merit": 9916,
+        "rep": 900,
+        "active": true,
+        "transactions": 1
+      },
+      "expected": {
+        "merit": 9916,
+        "rep": 900,
+        "active": true,
+        "transactions": 1
+      },
+      "error": null,
+      "passed": true
+    },
+    {
+      "name": "Placement formula and Merit reward preserved",
+      "actual": {
+        "placed": true,
+        "rating": 96,
+        "played": 6,
+        "earned": 457,
+        "merit": 10457,
+        "session": false
+      },
+      "expected": {
+        "placed": true,
+        "rating": 96,
+        "played": 6,
+        "earned": 457,
+        "merit": 10457,
+        "session": false
+      },
+      "error": null,
+      "passed": true
+    },
+    {
+      "name": "Ranked completion no reputation update",
+      "actual": 900,
+      "expected": 900,
+      "error": null,
+      "passed": true
+    },
+    {
+      "name": "No league population mutation",
+      "actual": {
+        "leagueCounts": {
+          "SCRIBE": 7,
+          "STYLIST": 9
+        },
+        "historical": "preserve"
+      },
+      "expected": {
+        "leagueCounts": {
+          "SCRIBE": 7,
+          "STYLIST": 9
+        },
+        "historical": "preserve"
+      },
+      "error": null,
+      "passed": true
+    },
+    {
+      "name": "Historical tournament document untouched",
+      "actual": {
+        "status": "COMPLETED",
+        "prizePool": 1234,
+        "participants": [
+          "old"
+        ]
+      },
+      "expected": {
+        "status": "COMPLETED",
+        "prizePool": 1234,
+        "participants": [
+          "old"
+        ]
+      },
+      "error": null,
+      "passed": true
+    },
+    {
+      "name": "Weekly Merit tax unchanged",
+      "actual": {
+        "merit": 9900,
+        "reputation": 900
+      },
+      "expected": {
+        "merit": 9900,
+        "reputation": 900
+      },
+      "error": null,
+      "passed": true
+    }
+  ],
+  "passed": 10,
+  "failed": 0,
+  "doubles": [
+    "R8 function returns 80",
+    "CloudEvents and cron direct invocation"
+  ],
+  "project": "demo-inkr8-local",
+  "realSDK": true
+}

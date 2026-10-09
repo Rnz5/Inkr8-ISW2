@@ -1,0 +1,194 @@
+{
+  "passed": 9,
+  "failed": 30,
+  "rows": [
+    {
+      "name": "owner profile read",
+      "pass": true
+    },
+    {
+      "name": "anonymous denied private profile",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "cross user profile read denied",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "cross user profile write denied",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner cannot forge rating",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner cannot forge merit",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner cannot forge meritCap",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner cannot forge meritHold",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner cannot forge isPlaced",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner cannot forge reputation",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner cannot forge isPhilosopher",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner email update preserved",
+      "pass": true
+    },
+    {
+      "name": "owner failure cleanup preserves session release",
+      "pass": true
+    },
+    {
+      "name": "cannot enter Ranked without economic callable",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner submission read",
+      "pass": true
+    },
+    {
+      "name": "other user submission read denied",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "other user submission write denied",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner cannot forge evaluation",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner cannot rewrite confirmed submission",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "owner cannot erase pending submission",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "client cannot write admin seasons",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "client cannot write admin seasons/1999-01/members",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "client cannot write admin seasonAssignments",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "client cannot write admin users/qaNyV3DD5iouSZTwmpjcMyiPtJ1J/meritTransactions",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "client cannot write admin tournaments",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "client cannot write admin leagues",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "seasons accessed through callable, not private client documents",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "new genuine Users defaults accepted",
+      "pass": true
+    },
+    {
+      "name": "new forged grant rejected",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "new genuine Practice payload accepted",
+      "pass": true
+    },
+    {
+      "name": "new foreign author rejected",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "Ranked without paid session rejected",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "authenticated words catalog read",
+      "pass": true
+    },
+    {
+      "name": "catalog words write forbidden",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "authenticated themes catalog read",
+      "pass": true
+    },
+    {
+      "name": "catalog themes write forbidden",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "authenticated topics catalog read",
+      "pass": true
+    },
+    {
+      "name": "catalog topics write forbidden",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "initializer repetition preserves progress",
+      "pass": false,
+      "error": "A Firebase app named \"[DEFAULT]\" already exists with a different configuration."
+    }
+  ],
+  "transport": "Real emulator REST with anonymous Auth ID tokens; Admin SDK fixtures. No tokens recorded.",
+  "project": "demo-inkr8-local"
+}

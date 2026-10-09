@@ -1,0 +1,29 @@
+{
+  "project": "demo-inkr8-local",
+  "database": "core-invariants-seafinalrankedhold",
+  "results": [
+    {
+      "name": "cap/hold: one reward split, even when replay adds no liquid ledger entry",
+      "passed": true,
+      "actual": {
+        "count": 1,
+        "merit": 50000,
+        "hold": 205,
+        "earned": 305,
+        "rewardDocuments": 1
+      },
+      "expected": {
+        "count": 1,
+        "merit": 50000,
+        "hold": 205,
+        "earned": 305,
+        "rewardDocuments": 1
+      },
+      "error": null
+    }
+  ],
+  "passed": 1,
+  "failed": 0,
+  "externalFetches": 0,
+  "scope": "Actual Firestore transactions; synthetic created CloudEvents, fixed-score R8 double, test-only race barrier. No delivery/idempotency acceptance from static checks."
+}

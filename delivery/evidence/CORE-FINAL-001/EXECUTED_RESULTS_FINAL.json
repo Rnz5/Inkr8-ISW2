@@ -1,0 +1,909 @@
+{
+  "record": "CORE-FINAL-001",
+  "author": "Codex",
+  "unique_Android_methods": 46,
+  "passed": 46,
+  "failed_latest": 0,
+  "latest_methods": {
+    "com.inkr8.lab.LabDraftContractTest#actualPendingWriteAllowsEditBlocksSecondAndKeepsBOnSuccess": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabDraftContractTest#failedAndRepeatedCallbacksPreserveEditedRevision": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabDraftContractTest#accountAndExerciseSwitchRestoreOnlyTheirOwnDraft": {
+      "status": 0,
+      "run": "stable-context-final"
+    },
+    "com.inkr8.lab.LabDraftContractTest#secondSendBlockedUntilFailureThenNewUuidAllowed": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabDraftContractTest#remountedEditorCannotBeClearedByOldPendingConfirmation": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabDraftContractTest#legacyDraftNotClaimedAndNoAnonymousScope": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabDraftContractTest#emptyNewRevisionIsAlsoProtected": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabDraftContractTest#aToBToAPreservesRevisionDespiteEqualText": {
+      "status": 0,
+      "run": "stable-context-final"
+    },
+    "com.inkr8.lab.LabDraftContractTest#repeatedConfirmationCannotClearPostSuccessEdit": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabDraftContractTest#assignedWordIdentityAndMetadataSurviveReentry": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabRootFlowTest#pendingPreservesEditorAndDraft_throughAppRoot": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabRootFlowTest#confirmedPersistenceClearsDraftAndRestoredEditor_throughAppRoot": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabRootFlowTest#rejectedPersistencePreservesEditorAndDraft_throughAppRoot": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabDraftConcurrencyTest#laterUnsavedRevisionIsLostOnEarlierConfirmation_probe": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabCoreAcceptanceTest#rejectedPersistencePreservesEditorAndDraft_acceptanceProbe": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabScreenTest#omittedWordsKeepCurrentAdmissionAndEmptySubmissionFilter": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabScreenTest#recognitionKeepsCaseAndPunctuationTokenBoundaries": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabScreenTest#draftRestoresAndAutosavesActualSharedPreferences": {
+      "status": 0,
+      "run": "autosave-final"
+    },
+    "com.inkr8.lab.LabScreenTest#editorUsesInclusiveLimitsAndWhitespaceCount": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabRetryTest#realQueryErrorNotifiesRetryReadsSameIdAndRecoversAvailableResult": {
+      "status": 0,
+      "run": "retry-first"
+    },
+    "com.inkr8.lab.LabRetryTest#retryGenerationRejectsOldCallbacksAndOtherDocument": {
+      "status": 0,
+      "run": "retry-first"
+    },
+    "com.inkr8.lab.LabRetryTest#retriedFailedTerminalStillReturnsHomeAndCannotRetryFromHome": {
+      "status": 0,
+      "run": "retry-first"
+    },
+    "com.inkr8.lab.LabRetryTest#timeoutAtOriginal93SecondsThenRetryRecoversLateResultWithoutWrites": {
+      "status": 0,
+      "run": "retry-first"
+    },
+    "com.inkr8.lab.LabIdentityAcceptanceTest#obsoleteWaitCallbackCannotResolveCurrentWait": {
+      "status": 0,
+      "run": "wait-audit-fixed-and-consumers"
+    },
+    "com.inkr8.lab.LabIdentityAcceptanceTest#pollUsesConfirmedDocumentEvenWhenNewerBExists": {
+      "status": 0,
+      "run": "wait-audit-fixed-and-consumers"
+    },
+    "com.inkr8.lab.LabIdentityAcceptanceTest#disposedViewModelRejectsQueuedWaitResponse": {
+      "status": 0,
+      "run": "wait-audit-fixed-and-consumers"
+    },
+    "com.inkr8.lab.LabCoreAcceptanceTest#resultBMustNotResolveSubmissionA_acceptanceProbe": {
+      "status": 0,
+      "run": "retry-first"
+    },
+    "com.inkr8.lab.LabWaitTest#queryErrorDoesNotResolveOrExposeFailure": {
+      "status": 0,
+      "run": "retry-first"
+    },
+    "com.inkr8.lab.LabWaitTest#failedSubmissionReturnsHome": {
+      "status": 0,
+      "run": "retry-first"
+    },
+    "com.inkr8.lab.LabDraftContractTest#uncachedAssignmentFromRealRepositoryIsStableOnReentry": {
+      "status": 0,
+      "run": "stable-context-final"
+    },
+    "com.inkr8.lab.LabRetryTest#returningToWritingInvalidatesPreviousWaitBeforeNewPersistence": {
+      "status": 0,
+      "run": "wait-audit-fixed-and-consumers"
+    },
+    "com.inkr8.lab.LabResultRefreshTest#timeoutStillIgnoresLateMatchedEvaluation": {
+      "status": 0,
+      "run": "wait-audit-fixed-and-consumers"
+    },
+    "com.inkr8.lab.LabResultRefreshTest#ghostResolutionRefreshesSameDisplayedResult": {
+      "status": 0,
+      "run": "wait-audit-fixed-and-consumers"
+    },
+    "com.inkr8.lab.LabResultRefreshTest#leavingResultsDoesNotRefreshOrNavigateBack": {
+      "status": 0,
+      "run": "wait-audit-fixed-and-consumers"
+    },
+    "com.inkr8.lab.LabResultRefreshTest#clearedViewModelIgnoresQueuedMatchedUpdate": {
+      "status": 0,
+      "run": "wait-audit-fixed-and-consumers"
+    },
+    "com.inkr8.lab.LabResultRefreshTest#wrongDocumentAndOldGenerationCannotRefreshResult": {
+      "status": 0,
+      "run": "wait-audit-fixed-and-consumers"
+    },
+    "com.inkr8.lab.LabModeCompatibilityTest#everyRepositoryReaderPreservesModeAndPlaymode": {
+      "status": 0,
+      "run": "full-local-flows"
+    },
+    "com.inkr8.lab.LabModeCompatibilityTest#standardRootReachesLocalEvaluatorAndResults": {
+      "status": 0,
+      "run": "full-flows-final"
+    },
+    "com.inkr8.lab.LabModeCompatibilityTest#invalidPayloadFallbacksCharacterization": {
+      "status": 0,
+      "run": "full-local-flows"
+    },
+    "com.inkr8.lab.LabModeCompatibilityTest#onTopicRootReachesLocalEvaluatorAndResults": {
+      "status": 0,
+      "run": "full-flows-final"
+    },
+    "com.inkr8.lab.LabIntegratedFlowTest#laterAutomaticMatchUpdatesAlreadyDisplayedSameResult": {
+      "status": 0,
+      "run": "full-flows-final"
+    },
+    "com.inkr8.lab.LabIntegratedFlowTest#rankedCommitsReciprocalMatchAndShowsFinalRating": {
+      "status": 0,
+      "run": "full-flows-final"
+    },
+    "com.inkr8.lab.LabDraftContractTest#realPendingReentryMustNotResurrectConfirmedUnchangedDraft": {
+      "status": 0,
+      "run": "stable-context-final"
+    },
+    "com.inkr8.lab.LabDraftContractTest#unchangedRemountedEditorClearsOnOriginalConfirmation": {
+      "status": 0,
+      "run": "drafts-final-confirmation"
+    },
+    "com.inkr8.lab.LabDraftContractTest#metadataRefreshAndRecompositionKeepExistingExerciseRevision": {
+      "status": 0,
+      "run": "stable-context-final"
+    },
+    "com.inkr8.lab.LabIntegratedFlowTest#practicePersistsEvaluatesAndShowsActualResults": {
+      "status": 0,
+      "run": "full-flows-final"
+    }
+  },
+  "all_runs": {
+    "draft-contracts-first": {
+      "com.inkr8.lab.LabDraftContractTest#actualPendingWriteAllowsEditBlocksSecondAndKeepsBOnSuccess": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabDraftContractTest#failedAndRepeatedCallbacksPreserveEditedRevision": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabDraftContractTest#accountAndExerciseSwitchRestoreOnlyTheirOwnDraft": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabDraftContractTest#secondSendBlockedUntilFailureThenNewUuidAllowed": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabDraftContractTest#remountedEditorCannotBeClearedByOldPendingConfirmation": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabDraftContractTest#legacyDraftNotClaimedAndNoAnonymousScope": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabDraftContractTest#emptyNewRevisionIsAlsoProtected": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabDraftContractTest#aToBToAPreservesRevisionDespiteEqualText": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabDraftContractTest#repeatedConfirmationCannotClearPostSuccessEdit": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabDraftContractTest#assignedWordIdentityAndMetadataSurviveReentry": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabRootFlowTest#pendingPreservesEditorAndDraft_throughAppRoot": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabRootFlowTest#confirmedPersistenceClearsDraftAndRestoredEditor_throughAppRoot": {
+        "status": -2,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabRootFlowTest#rejectedPersistencePreservesEditorAndDraft_throughAppRoot": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabDraftConcurrencyTest#laterUnsavedRevisionIsLostOnEarlierConfirmation_probe": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabCoreAcceptanceTest#rejectedPersistencePreservesEditorAndDraft_acceptanceProbe": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabScreenTest#omittedWordsKeepCurrentAdmissionAndEmptySubmissionFilter": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabScreenTest#recognitionKeepsCaseAndPunctuationTokenBoundaries": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabScreenTest#draftRestoresAndAutosavesActualSharedPreferences": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      },
+      "com.inkr8.lab.LabScreenTest#editorUsesInclusiveLimitsAndWhitespaceCount": {
+        "status": 0,
+        "run": "draft-contracts-first"
+      }
+    },
+    "retry-first": {
+      "com.inkr8.lab.LabRetryTest#realQueryErrorNotifiesRetryReadsSameIdAndRecoversAvailableResult": {
+        "status": 0,
+        "run": "retry-first"
+      },
+      "com.inkr8.lab.LabRetryTest#retryGenerationRejectsOldCallbacksAndOtherDocument": {
+        "status": 0,
+        "run": "retry-first"
+      },
+      "com.inkr8.lab.LabRetryTest#retriedFailedTerminalStillReturnsHomeAndCannotRetryFromHome": {
+        "status": 0,
+        "run": "retry-first"
+      },
+      "com.inkr8.lab.LabRetryTest#timeoutAtOriginal93SecondsThenRetryRecoversLateResultWithoutWrites": {
+        "status": 0,
+        "run": "retry-first"
+      },
+      "com.inkr8.lab.LabIdentityAcceptanceTest#obsoleteWaitCallbackCannotResolveCurrentWait": {
+        "status": 0,
+        "run": "retry-first"
+      },
+      "com.inkr8.lab.LabIdentityAcceptanceTest#pollUsesConfirmedDocumentEvenWhenNewerBExists": {
+        "status": 0,
+        "run": "retry-first"
+      },
+      "com.inkr8.lab.LabIdentityAcceptanceTest#disposedViewModelRejectsQueuedWaitResponse": {
+        "status": 0,
+        "run": "retry-first"
+      },
+      "com.inkr8.lab.LabCoreAcceptanceTest#resultBMustNotResolveSubmissionA_acceptanceProbe": {
+        "status": 0,
+        "run": "retry-first"
+      },
+      "com.inkr8.lab.LabWaitTest#queryErrorDoesNotResolveOrExposeFailure": {
+        "status": 0,
+        "run": "retry-first"
+      },
+      "com.inkr8.lab.LabWaitTest#failedSubmissionReturnsHome": {
+        "status": 0,
+        "run": "retry-first"
+      }
+    },
+    "draft-context-authentic": {
+      "com.inkr8.lab.LabDraftContractTest#uncachedAssignmentFromRealRepositoryIsStableOnReentry": {
+        "status": 0,
+        "run": "draft-context-authentic"
+      },
+      "com.inkr8.lab.LabDraftContractTest#accountAndExerciseSwitchRestoreOnlyTheirOwnDraft": {
+        "status": 0,
+        "run": "draft-context-authentic"
+      }
+    },
+    "wait-audit-fixed-and-consumers": {
+      "com.inkr8.lab.LabRetryTest#returningToWritingInvalidatesPreviousWaitBeforeNewPersistence": {
+        "status": 0,
+        "run": "wait-audit-fixed-and-consumers"
+      },
+      "com.inkr8.lab.LabRootFlowTest#pendingPreservesEditorAndDraft_throughAppRoot": {
+        "status": 0,
+        "run": "wait-audit-fixed-and-consumers"
+      },
+      "com.inkr8.lab.LabRootFlowTest#confirmedPersistenceClearsDraftAndRestoredEditor_throughAppRoot": {
+        "status": -2,
+        "run": "wait-audit-fixed-and-consumers"
+      },
+      "com.inkr8.lab.LabRootFlowTest#rejectedPersistencePreservesEditorAndDraft_throughAppRoot": {
+        "status": 0,
+        "run": "wait-audit-fixed-and-consumers"
+      },
+      "com.inkr8.lab.LabIdentityAcceptanceTest#obsoleteWaitCallbackCannotResolveCurrentWait": {
+        "status": 0,
+        "run": "wait-audit-fixed-and-consumers"
+      },
+      "com.inkr8.lab.LabIdentityAcceptanceTest#pollUsesConfirmedDocumentEvenWhenNewerBExists": {
+        "status": 0,
+        "run": "wait-audit-fixed-and-consumers"
+      },
+      "com.inkr8.lab.LabIdentityAcceptanceTest#disposedViewModelRejectsQueuedWaitResponse": {
+        "status": 0,
+        "run": "wait-audit-fixed-and-consumers"
+      },
+      "com.inkr8.lab.LabResultRefreshTest#timeoutStillIgnoresLateMatchedEvaluation": {
+        "status": 0,
+        "run": "wait-audit-fixed-and-consumers"
+      },
+      "com.inkr8.lab.LabResultRefreshTest#ghostResolutionRefreshesSameDisplayedResult": {
+        "status": 0,
+        "run": "wait-audit-fixed-and-consumers"
+      },
+      "com.inkr8.lab.LabResultRefreshTest#leavingResultsDoesNotRefreshOrNavigateBack": {
+        "status": 0,
+        "run": "wait-audit-fixed-and-consumers"
+      },
+      "com.inkr8.lab.LabResultRefreshTest#clearedViewModelIgnoresQueuedMatchedUpdate": {
+        "status": 0,
+        "run": "wait-audit-fixed-and-consumers"
+      },
+      "com.inkr8.lab.LabResultRefreshTest#wrongDocumentAndOldGenerationCannotRefreshResult": {
+        "status": 0,
+        "run": "wait-audit-fixed-and-consumers"
+      }
+    },
+    "root-restoration-fixed": {
+      "com.inkr8.lab.LabRootFlowTest#confirmedPersistenceClearsDraftAndRestoredEditor_throughAppRoot": {
+        "status": 0,
+        "run": "root-restoration-fixed"
+      }
+    },
+    "full-local-flows": {
+      "com.inkr8.lab.LabModeCompatibilityTest#everyRepositoryReaderPreservesModeAndPlaymode": {
+        "status": 0,
+        "run": "full-local-flows"
+      },
+      "com.inkr8.lab.LabModeCompatibilityTest#standardRootReachesLocalEvaluatorAndResults": {
+        "status": 0,
+        "run": "full-local-flows"
+      },
+      "com.inkr8.lab.LabModeCompatibilityTest#invalidPayloadFallbacksCharacterization": {
+        "status": 0,
+        "run": "full-local-flows"
+      },
+      "com.inkr8.lab.LabModeCompatibilityTest#onTopicRootReachesLocalEvaluatorAndResults": {
+        "status": 0,
+        "run": "full-local-flows"
+      },
+      "com.inkr8.lab.LabIntegratedFlowTest#laterAutomaticMatchUpdatesAlreadyDisplayedSameResult": {
+        "status": 0,
+        "run": "full-local-flows"
+      }
+    },
+    "ranked-existing-candidate": {
+      "com.inkr8.lab.LabIntegratedFlowTest#rankedCommitsReciprocalMatchAndShowsFinalRating": {
+        "status": 0,
+        "run": "ranked-existing-candidate"
+      }
+    },
+    "drafts-final-confirmation": {
+      "com.inkr8.lab.LabDraftContractTest#actualPendingWriteAllowsEditBlocksSecondAndKeepsBOnSuccess": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#uncachedAssignmentFromRealRepositoryIsStableOnReentry": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#failedAndRepeatedCallbacksPreserveEditedRevision": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#realPendingReentryMustNotResurrectConfirmedUnchangedDraft": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#accountAndExerciseSwitchRestoreOnlyTheirOwnDraft": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#secondSendBlockedUntilFailureThenNewUuidAllowed": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#unchangedRemountedEditorClearsOnOriginalConfirmation": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#remountedEditorCannotBeClearedByOldPendingConfirmation": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#legacyDraftNotClaimedAndNoAnonymousScope": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#emptyNewRevisionIsAlsoProtected": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#aToBToAPreservesRevisionDespiteEqualText": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#repeatedConfirmationCannotClearPostSuccessEdit": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftContractTest#assignedWordIdentityAndMetadataSurviveReentry": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabRootFlowTest#pendingPreservesEditorAndDraft_throughAppRoot": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabRootFlowTest#confirmedPersistenceClearsDraftAndRestoredEditor_throughAppRoot": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabRootFlowTest#rejectedPersistencePreservesEditorAndDraft_throughAppRoot": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabDraftConcurrencyTest#laterUnsavedRevisionIsLostOnEarlierConfirmation_probe": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabCoreAcceptanceTest#rejectedPersistencePreservesEditorAndDraft_acceptanceProbe": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabScreenTest#omittedWordsKeepCurrentAdmissionAndEmptySubmissionFilter": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabScreenTest#recognitionKeepsCaseAndPunctuationTokenBoundaries": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabScreenTest#draftRestoresAndAutosavesActualSharedPreferences": {
+        "status": -2,
+        "run": "drafts-final-confirmation"
+      },
+      "com.inkr8.lab.LabScreenTest#editorUsesInclusiveLimitsAndWhitespaceCount": {
+        "status": 0,
+        "run": "drafts-final-confirmation"
+      }
+    },
+    "stable-context-final": {
+      "com.inkr8.lab.LabDraftContractTest#uncachedAssignmentFromRealRepositoryIsStableOnReentry": {
+        "status": 0,
+        "run": "stable-context-final"
+      },
+      "com.inkr8.lab.LabDraftContractTest#realPendingReentryMustNotResurrectConfirmedUnchangedDraft": {
+        "status": 0,
+        "run": "stable-context-final"
+      },
+      "com.inkr8.lab.LabDraftContractTest#accountAndExerciseSwitchRestoreOnlyTheirOwnDraft": {
+        "status": 0,
+        "run": "stable-context-final"
+      },
+      "com.inkr8.lab.LabDraftContractTest#metadataRefreshAndRecompositionKeepExistingExerciseRevision": {
+        "status": 0,
+        "run": "stable-context-final"
+      },
+      "com.inkr8.lab.LabDraftContractTest#aToBToAPreservesRevisionDespiteEqualText": {
+        "status": 0,
+        "run": "stable-context-final"
+      }
+    },
+    "autosave-final": {
+      "com.inkr8.lab.LabScreenTest#draftRestoresAndAutosavesActualSharedPreferences": {
+        "status": 0,
+        "run": "autosave-final"
+      }
+    },
+    "full-flows-final": {
+      "com.inkr8.lab.LabModeCompatibilityTest#standardRootReachesLocalEvaluatorAndResults": {
+        "status": 0,
+        "run": "full-flows-final"
+      },
+      "com.inkr8.lab.LabModeCompatibilityTest#onTopicRootReachesLocalEvaluatorAndResults": {
+        "status": 0,
+        "run": "full-flows-final"
+      },
+      "com.inkr8.lab.LabIntegratedFlowTest#practicePersistsEvaluatesAndShowsActualResults": {
+        "status": 0,
+        "run": "full-flows-final"
+      },
+      "com.inkr8.lab.LabIntegratedFlowTest#laterAutomaticMatchUpdatesAlreadyDisplayedSameResult": {
+        "status": 0,
+        "run": "full-flows-final"
+      },
+      "com.inkr8.lab.LabIntegratedFlowTest#rankedCommitsReciprocalMatchAndShowsFinalRating": {
+        "status": 0,
+        "run": "full-flows-final"
+      }
+    }
+  },
+  "audit_red_before": {
+    "com.inkr8.lab.LabRetryTest#returningToWritingInvalidatesPreviousWaitBeforeNewPersistence": {
+      "status": -2,
+      "run": "wait-audit-red"
+    }
+  },
+  "red_B_before_reused": "CORE-CLOSE-001 red observation/assertion; same strict assertion passes here",
+  "Ranked_SDK_cases": [
+    {
+      "name": "sequential: one reward/count per submission",
+      "passed": true,
+      "actual": {
+        "count": 1,
+        "rewardDocuments": 1,
+        "merit": 1305,
+        "earned": 305,
+        "hold": 0
+      },
+      "expected": {
+        "count": 1,
+        "rewardDocuments": 1,
+        "merit": 1305,
+        "earned": 305,
+        "hold": 0
+      },
+      "error": null
+    },
+    {
+      "name": "parallel: one reward/count per submission",
+      "passed": true,
+      "actual": {
+        "count": 1,
+        "rewardDocuments": 1,
+        "merit": 1305,
+        "earned": 305,
+        "hold": 0
+      },
+      "expected": {
+        "count": 1,
+        "rewardDocuments": 1,
+        "merit": 1305,
+        "earned": 305,
+        "hold": 0
+      },
+      "error": null
+    },
+    {
+      "name": "race: one candidate, one reciprocal pair",
+      "passed": true,
+      "actual": {
+        "claims": 1,
+        "reciprocal": 1
+      },
+      "expected": {
+        "claims": 1,
+        "reciprocal": 1
+      },
+      "error": null
+    },
+    {
+      "name": "race: candidate rating/streak change once",
+      "passed": true,
+      "actual": {
+        "rating": 54,
+        "loss": 1
+      },
+      "expected": {
+        "rating": 54,
+        "loss": 1
+      },
+      "error": null
+    },
+    {
+      "name": "fresh EVALUATED snapshot is skipped",
+      "passed": true,
+      "actual": {
+        "count": 1,
+        "merit": 1457,
+        "hold": 0,
+        "earned": 457,
+        "rewardDocuments": 1,
+        "rating": 64,
+        "win": 1,
+        "loss": 0,
+        "placement": 0,
+        "placementScore": 0,
+        "status": "EVALUATED",
+        "matchStatus": "MATCHED",
+        "matchResult": {
+          "opponentId": "finalmain-aa-candidate-author",
+          "opponentName": "Local invariant fixture",
+          "opponentScore": 70,
+          "outcome": "WIN",
+          "ratingChange": 4
+        },
+        "evaluation": {
+          "submissionId": "finalmain-racea",
+          "finalScore": 80,
+          "feedback": "Explicit R8 double; no provider invoked",
+          "meritEarned": 457,
+          "meritToHold": 0,
+          "resultStatus": "EVALUATED",
+          "source": "mock",
+          "ratingChange": 4
+        }
+      },
+      "expected": {
+        "count": 1,
+        "merit": 1457,
+        "hold": 0,
+        "earned": 457,
+        "rewardDocuments": 1,
+        "rating": 64,
+        "win": 1,
+        "loss": 0,
+        "placement": 0,
+        "placementScore": 0,
+        "status": "EVALUATED",
+        "matchStatus": "MATCHED",
+        "matchResult": {
+          "opponentId": "finalmain-aa-candidate-author",
+          "opponentName": "Local invariant fixture",
+          "opponentScore": 70,
+          "outcome": "WIN",
+          "ratingChange": 4
+        },
+        "evaluation": {
+          "submissionId": "finalmain-racea",
+          "finalScore": 80,
+          "feedback": "Explicit R8 double; no provider invoked",
+          "meritEarned": 457,
+          "meritToHold": 0,
+          "resultStatus": "EVALUATED",
+          "source": "mock",
+          "ratingChange": 4
+        }
+      },
+      "error": null
+    },
+    {
+      "name": "created-event replay preserves settled effects and pair",
+      "passed": true,
+      "actual": {
+        "count": 1,
+        "merit": 1457,
+        "hold": 0,
+        "earned": 457,
+        "rewardDocuments": 1,
+        "rating": 64,
+        "win": 1,
+        "loss": 0,
+        "placement": 0,
+        "placementScore": 0,
+        "status": "EVALUATED",
+        "matchStatus": "MATCHED",
+        "matchResult": {
+          "opponentId": "finalmain-aa-candidate-author",
+          "opponentName": "Local invariant fixture",
+          "opponentScore": 70,
+          "outcome": "WIN",
+          "ratingChange": 4
+        },
+        "evaluation": {
+          "submissionId": "finalmain-racea",
+          "finalScore": 80,
+          "feedback": "Explicit R8 double; no provider invoked",
+          "meritEarned": 457,
+          "meritToHold": 0,
+          "resultStatus": "EVALUATED",
+          "source": "mock",
+          "ratingChange": 4
+        }
+      },
+      "expected": {
+        "count": 1,
+        "merit": 1457,
+        "hold": 0,
+        "earned": 457,
+        "rewardDocuments": 1,
+        "rating": 64,
+        "win": 1,
+        "loss": 0,
+        "placement": 0,
+        "placementScore": 0,
+        "status": "EVALUATED",
+        "matchStatus": "MATCHED",
+        "matchResult": {
+          "opponentId": "finalmain-aa-candidate-author",
+          "opponentName": "Local invariant fixture",
+          "opponentScore": 70,
+          "outcome": "WIN",
+          "ratingChange": 4
+        },
+        "evaluation": {
+          "submissionId": "finalmain-racea",
+          "finalScore": 80,
+          "feedback": "Explicit R8 double; no provider invoked",
+          "meritEarned": 457,
+          "meritToHold": 0,
+          "resultStatus": "EVALUATED",
+          "source": "mock",
+          "ratingChange": 4
+        }
+      },
+      "error": null
+    },
+    {
+      "name": "placement: one evaluation contributes once",
+      "passed": true,
+      "actual": {
+        "count": 1,
+        "played": 1,
+        "totalScore": 80,
+        "rewards": 1
+      },
+      "expected": {
+        "count": 1,
+        "played": 1,
+        "totalScore": 80,
+        "rewards": 1
+      },
+      "error": null
+    },
+    {
+      "name": "cap/hold: one reward split, even when replay adds no liquid ledger entry",
+      "passed": true,
+      "actual": {
+        "count": 1,
+        "merit": 50000,
+        "hold": 205,
+        "earned": 305,
+        "rewardDocuments": 1
+      },
+      "expected": {
+        "count": 1,
+        "merit": 50000,
+        "hold": 205,
+        "earned": 305,
+        "rewardDocuments": 1
+      },
+      "error": null
+    },
+    {
+      "name": "Stale created event cannot reopen terminal FAILED",
+      "actual": {
+        "status": "FAILED",
+        "score": null,
+        "error": "Prior terminal failure",
+        "count": 0,
+        "merit": 1000,
+        "rewards": 0,
+        "inRanked": true,
+        "session": null
+      },
+      "expected": {
+        "status": "FAILED",
+        "score": null,
+        "error": "Prior terminal failure",
+        "count": 0,
+        "merit": 1000,
+        "rewards": 0,
+        "inRanked": true,
+        "session": null
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "name": "Late provider error preserves committed success and newer session",
+      "actual": {
+        "status": "EVALUATED",
+        "score": 80,
+        "error": null,
+        "count": 1,
+        "merit": 1457,
+        "rewards": 1,
+        "inRanked": true,
+        "session": 123456
+      },
+      "expected": {
+        "status": "EVALUATED",
+        "score": 80,
+        "error": null,
+        "count": 1,
+        "merit": 1457,
+        "rewards": 1,
+        "inRanked": true,
+        "session": 123456
+      },
+      "passed": true,
+      "error": null
+    },
+    {
+      "name": "Distinct submissions on one author still each contribute once",
+      "actual": {
+        "count": 2,
+        "merit": 1610,
+        "rewards": 2
+      },
+      "expected": {
+        "count": 2,
+        "merit": 1610,
+        "rewards": 2
+      },
+      "passed": true,
+      "error": null
+    }
+  ],
+  "ghost_SDK_passed": 2,
+  "lifecycle_SDK_passed": 1,
+  "unit_Android_module": [
+    {
+      "suite": "com.inkr8.characterization.ProductCoreContractTest",
+      "tests": 14,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "com.inkr8.evaluation.ProductWritingAdmissionTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "com.inkr8.ExampleUnitTest",
+      "tests": 1,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "unit_passed": 19,
+  "repeated_runs_not_extra_coverage": true,
+  "ADB_exit_0_not_JUnit_acceptance": true,
+  "harness_findings": [
+    "One Root success assertion raced actual assignment: preserved failure, wait for real editor then unchanged empty assertion PASS",
+    "A mistyped Ranked method filter selected no method: full-local-flows has 5 actual tests; missing actual method executed separately, not counted before",
+    "Writing scalar task regenerated exact source; test was UP-TO-DATE, 28 historical cases reused without a new execution claim"
+  ],
+  "doubles": [
+    "R8 HTTP boundary fixed 80 in full flows",
+    "Explicit evaluator fixtures and reflected queued callbacks for retry/identity/guards",
+    "R8 function, CloudEvents and scheduling barriers in Node SDK invariant tests",
+    "Local Auth SDK anonymous/email test accounts; Google/OAuth/Ads/MainActivity bypassed"
+  ],
+  "R8_external_real": false,
+  "no_deploy": true,
+  "reentry_before": {
+    "com.inkr8.lab.LabDraftContractTest#realPendingReentryMustNotResurrectConfirmedUnchangedDraft": {
+      "status": 0,
+      "run": "reentry-red"
+    },
+    "com.inkr8.lab.LabDraftContractTest#unchangedRemountedEditorClearsOnOriginalConfirmation": {
+      "status": -2,
+      "run": "reentry-red"
+    }
+  },
+  "explicit_red_reentry_fixture": "1/2 failed at live remounted editor callback double; full SDK reentry passed before",
+  "metadata_recomposition": "strict current production Compose test PASS",
+  "fixture_setup_timeout": "One genuine word seed Tasks.await timeout before assertions, retained; affected autosave test alone rerun PASS",
+  "delivery_fixture_repair": "No-op with authentic endpoint metadata prevents missing registered function; original source untouched"
+}

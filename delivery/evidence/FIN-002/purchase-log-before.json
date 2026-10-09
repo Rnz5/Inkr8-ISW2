@@ -1,0 +1,22 @@
+{
+  "rows": [
+    {
+      "name": "Existing stub effect and Merit/rating unchanged",
+      "pass": true
+    },
+    {
+      "name": "Sensitive purchase token absent from console log",
+      "pass": false
+    }
+  ],
+  "passed": 1,
+  "failed": 1,
+  "realSDK": true,
+  "doubles": [
+    "Constructed auth/callable request; synthetic purchase token; existing production Google verification stub, NOT genuine billing"
+  ],
+  "limits": [
+    "Stub accepts any nonempty token/product. This is a prior security defect and external integration dependency; not fixed by log hygiene.",
+    "No purchase, Google API or external account used"
+  ]
+}

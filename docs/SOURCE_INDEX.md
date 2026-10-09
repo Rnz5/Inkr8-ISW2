@@ -1,5 +1,10 @@
 # Índice de fuentes y autoridad
 
+**Alcance posterior SCP-001 — registro 05/10/2026:** Marco comunica una nueva captura/mensaje de Renzo: «Ranked y Merit permanecen»; «Torneos, ligas y reputación se retiran». La imagen original y su fecha no están adjuntas al contexto disponible; no se infiere aprobación grupal ni fecha de subida. Esta instrucción humana posterior sustituye la retirada total de Merit de U3/DEC-03 para el trabajo vigente. Se conservan Ranked/rating/Merit y las reglas económicas existentes; no se inventan usos, precios o recompensas nuevos. Temporadas permanece incluida con reglas pendientes. RET-001–005 y sus evidencias describen el alcance anterior y no se reescriben. [Recuperación y restitución](RECOVERED_ENVIRONMENT.md).
+
+**REC-PKG-01:** [carpeta principal](https://drive.google.com/drive/folders/1Q8qxBKZFUkUrhdPp0EGVK8HLx7zlzu4k) → [Codigo base + gradle (backup)](https://drive.google.com/drive/folders/1XRnumcpsdbYlq6OMYgAcicnJco-d5f1A) → [Inkr8 - Backup.zip](https://drive.google.com/file/d/1PLS-M_o4qR4iRRn8RAGTCm1H0Elx1bbt/view). Descarga autenticada comprobada: 116.969.901 bytes, SHA256 `9cbc37ebdd8e4cd60ed21b39d5d56afa5d826ec30e1c3ef00c244e3c0f127345`, CRC correcto. Git interno: `4abf00956cfe9506e1c9e0bcaf2698b8b9d7c3d0`, commit pre-beta-v0.6.6; fecha de commit 2026-08-27, no fecha de aprobación/subida. La metadata Drive «30 sept»/111,6 MB no prueba integridad ni versión por sí sola. Informe y manifest REC-002; paquete original privado conservado.
+
+
 Actualizado: 03/10/2026, America/Lima. Este índice identifica procedencia y copias de consulta; no modifica originales ni convierte propuestas de IA en decisiones del equipo.
 
 **Origen de Drive:** [00 - Contexto IA y Refactorización](https://drive.google.com/drive/folders/1_JiJ0ly1JnIq5NtqrdD8xVNqORUv9RzI). Las ubicaciones abreviadas de la tabla son relativas a esa carpeta. «02 / Proyecto Final» significa `02 - Material del profesor/IngSoftIi853_108248_1/Proyecto Final`; «02 / Información General» usa la misma raíz del curso.

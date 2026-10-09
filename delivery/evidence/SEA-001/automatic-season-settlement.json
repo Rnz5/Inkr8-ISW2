@@ -1,0 +1,51 @@
+{
+  "passed": 1,
+  "settledDocuments": 6,
+  "rows": [
+    {
+      "submissionId": "7434ec00-6136-442d-9d40-046239fde770",
+      "season": "2026-10",
+      "rating": 2,
+      "merit": 457,
+      "automatic": true
+    },
+    {
+      "submissionId": "99e4db34-a624-47f4-a27c-79219ee4ed28",
+      "season": "2026-10",
+      "rating": 1,
+      "merit": 457,
+      "automatic": true
+    },
+    {
+      "submissionId": "a27d9a01-7940-47f7-93f0-c846be021803",
+      "season": "2026-10",
+      "rating": 1,
+      "merit": 457,
+      "automatic": true
+    },
+    {
+      "submissionId": "c592056b-ba68-4216-95ba-5a71aa568381",
+      "season": "2026-10",
+      "rating": 1,
+      "merit": 457,
+      "automatic": true
+    },
+    {
+      "submissionId": "lab-integrated-candidate-2f0be577-a01c-4170-a4d5-28996aefb3cf",
+      "season": "2026-10",
+      "rating": -6,
+      "merit": 0,
+      "automatic": true
+    },
+    {
+      "submissionId": "lab-later-submission-31b63dd1-b3bf-4494-a818-0e0da9fb3533",
+      "season": "2026-10",
+      "rating": 1,
+      "merit": 457,
+      "automatic": true
+    }
+  ],
+  "realSDK": true,
+  "delivery": "automatic local Firestore created/updated events",
+  "R8": "HTTP fixed80 double; candidate/state fixtures explicit"
+}

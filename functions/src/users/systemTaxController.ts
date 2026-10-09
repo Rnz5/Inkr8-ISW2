@@ -1,6 +1,5 @@
 import {onSchedule} from "firebase-functions/v2/scheduler";
 import {db} from "../firebase/admin";
-import {adjustReputation} from "../utils/reputationManager";
 
 /**
  * the weekly tax system runs every Sunday at 00:00
@@ -61,43 +60,5 @@ export const weeklyTaxProcessor = onSchedule(
 
     await writer.close();
     console.log(`Weekly tax processed for ${usersSnap.size} users.`);
-  }
-);
-
-/**
- * daily debt penalty: runs every day at 00:05
- * decreases reputation for users with negative merit
- */
-export const dailyDebtPenaltyProcessor = onSchedule(
-  {
-    schedule: "5 0 * * *",
-    region: "us-central1",
-    timeoutSeconds: 300,
-  },
-  async () => {
-    const usersInDebt = await db.collection("users")
-      .where("merit", "<", 0)
-      .select("reputation")
-      .get();
-
-    if (usersInDebt.empty) {
-      console.log("dailyDebtPenaltyProcessor: No users in debt.");
-      return;
-    }
-
-    const writer = db.bulkWriter();
-
-    usersInDebt.docs.forEach((doc) => {
-      const data = doc.data();
-      const currentRep = data.reputation ?? 0;
-      const newRep = adjustReputation(currentRep, -5);
-
-      writer.update(doc.ref, {
-        reputation: newRep,
-      });
-    });
-
-    await writer.close();
-    console.log(`Daily debt penalty processed for ${usersInDebt.size} users.`);
   }
 );

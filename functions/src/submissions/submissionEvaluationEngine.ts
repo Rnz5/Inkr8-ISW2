@@ -2,9 +2,9 @@ import {onDocumentCreated} from "firebase-functions/v2/firestore";
 import {db, FieldValue} from "../firebase/admin";
 import {OPENAI_API_KEY, evaluateWithR8} from "../r8/evaluateWithR8";
 import {calculateMerit} from "../utils/meritCalculator";
-import {onRankedCompleted} from "../utils/reputationManager";
 import {pruneOldSubmissions} from "./pruneOldSubmissions";
-import {getLeagueFromRating} from "../utils/leagueManager";
+import {recordSeasonSubmission, syncSeasonSubmission} from "../seasons/seasonLedger";
+import {tryMatchRankedSubmission} from "./rankedMatching";
 
 function getUtcDayInt(): number {
   const now = new Date();
@@ -19,32 +19,6 @@ function getStreakMultiplier(streak: number): number {
   if (streak >= 3) return 1.05;
   if (streak >= 2) return 1.03;
   return 1.0;
-}
-
-function calculateDynamicRatingChange(
-  myRating: number,
-  opponentRating: number,
-  outcome: "WIN" | "LOSS" | "DRAW"
-): number {
-  const ratingGap = opponentRating - myRating;
-
-  const gapAdjustment = Math.max(-5, Math.min(5, ratingGap * 0.05));
-
-  if (outcome === "WIN") {
-    let winChange = Math.round(4 + gapAdjustment);
-
-    if (myRating >= 180) {
-      winChange = Math.min(winChange, 2);
-    } else if (myRating >= 150) {
-      winChange = Math.min(winChange, 3);
-    }
-
-    return Math.max(1, winChange);
-  } else if (outcome === "LOSS") {
-    return Math.min(-1, Math.round(-6 + gapAdjustment));
-  } else {
-    return 1;
-  }
 }
 
 // quality check to filter out nonsense or highly repetitive content >:(
@@ -92,6 +66,20 @@ function meritToHold(current: number, earned: number, cap: number): number {
   return earned - liquid;
 }
 
+// A failed/repeated worker must not replace an already committed evaluation.
+async function failPendingSubmission(
+  submissionRef: import("firebase-admin/firestore").DocumentReference,
+  evaluationError: string
+): Promise<boolean> {
+  return db.runTransaction(async (tx) => {
+    const current = await tx.get(submissionRef);
+    const status = current.get("status");
+    if (!current.exists || (status && status !== "PENDING")) return false;
+    tx.update(submissionRef, {status: "FAILED", evaluationError});
+    return true;
+  });
+}
+
 export const submissionEvaluationEngine = onDocumentCreated(
   {
     document: "submissions/{submissionId}",
@@ -117,20 +105,22 @@ export const submissionEvaluationEngine = onDocumentCreated(
     const submissionRef = snapshot.ref;
     const authorId = data.authorId;
     const playmode = data.playmode ?? "PRACTICE";
+    // Preserve invalid/null primary behavior; use the alias only when absent.
+    const gamemode = data.gamemode === undefined ? data.gamemodeName : data.gamemode;
 
     try {
       console.log("submissionEvaluationEngine triggered", {
         submissionId: snapshot.id,
         authorId: authorId ?? null,
         playmode: playmode ?? null,
-        gamemode: data.gamemode ?? null,
+        gamemode: gamemode ?? null,
         status: data.status ?? null,
       });
 
       const apiKey = OPENAI_API_KEY.value();
 
       if (playmode === "TOURNAMENT") {
-        console.log("submissionEvaluationEngine: skipped, TOURNAMENT playmode handled by tournamentEvaluationEngine", {
+        console.log("submissionEvaluationEngine: skipped, historical TOURNAMENT playmode is retired", {
           submissionId: snapshot.id,
         });
         return;
@@ -141,10 +131,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
           submissionId: snapshot.id,
         });
 
-        await submissionRef.update({
-          status: "FAILED",
-          evaluationError: "Missing authorId",
-        });
+        await failPendingSubmission(submissionRef, "Missing authorId");
 
         return;
       }
@@ -157,6 +144,11 @@ export const submissionEvaluationEngine = onDocumentCreated(
         return;
       }
 
+      const persistedSubmission = await submissionRef.get();
+      const persistedStatus = persistedSubmission.get("status");
+      if (!persistedSubmission.exists || (persistedStatus && persistedStatus !== "PENDING")) return;
+
+      await recordSeasonSubmission(snapshot).catch((err) => console.error("Season registration pending:", err));
       const content = data.content ?? "";
       const qualityCheck = isContentLowQuality(content);
 
@@ -166,10 +158,10 @@ export const submissionEvaluationEngine = onDocumentCreated(
           reason: qualityCheck.reason,
         });
 
-        await submissionRef.update({
-          status: "FAILED",
-          evaluationError: qualityCheck.reason ?? "Invalid content quality.",
-        });
+        const failed = await failPendingSubmission(
+          submissionRef, qualityCheck.reason ?? "Invalid content quality."
+        );
+        if (!failed) return;
 
         if (playmode === "RANKED") {
           await db.collection("users").doc(authorId).update({
@@ -216,7 +208,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
       const result = await evaluateWithR8({
         apiKey,
         content: content,
-        gamemode: data.gamemode ?? "STANDARD",
+        gamemode: gamemode ?? "STANDARD",
         requiredWords,
         themeName: data.themeName ?? null,
         topicName: data.topicName ?? null,
@@ -232,9 +224,11 @@ export const submissionEvaluationEngine = onDocumentCreated(
       });
 
       const userRef = db.collection("users").doc(authorId);
-      let leagueToIncrement: string | null = null;
 
-      await db.runTransaction(async (tx) => {
+      const evaluationCommitted = await db.runTransaction(async (tx) => {
+        const currentSubmission = await tx.get(submissionRef);
+        const currentStatus = currentSubmission.get("status");
+        if (!currentSubmission.exists || (currentStatus && currentStatus !== "PENDING")) return false;
         const userSnap = await tx.get(userRef);
         if (!userSnap.exists) {
           throw new Error("User not found for submission evaluation");
@@ -270,7 +264,7 @@ export const submissionEvaluationEngine = onDocumentCreated(
         const meritEarned = Math.floor(calculateMerit(
           result.finalScore,
           data.wordCount ?? 0,
-          data.gamemode,
+          gamemode,
           playmode === "RANKED" || playmode === "TOURNAMENT"
         ) * streakMultiplier);
 
@@ -313,15 +307,11 @@ export const submissionEvaluationEngine = onDocumentCreated(
               userUpdates.isPlaced = true;
               userUpdates.placementMatchesPlayed = 6;
               userUpdates.totalPlacementScore = totalScore;
-              userUpdates.reputation = onRankedCompleted(Number(userData.reputation ?? 0));
               userUpdates.currentlyInRanked = false;
               userUpdates.rankedSessionStartedAt = FieldValue.delete();
 
               ratingChangeResult = initialRating;
 
-              if (authorId !== "R8") {
-                leagueToIncrement = getLeagueFromRating(initialRating);
-              }
             } else {
               userUpdates.placementMatchesPlayed = played;
               userUpdates.totalPlacementScore = totalScore;
@@ -329,11 +319,6 @@ export const submissionEvaluationEngine = onDocumentCreated(
               userUpdates.rankedSessionStartedAt = FieldValue.delete();
             }
           } else {
-            const newReputation = onRankedCompleted(
-              Number(userData.reputation ?? 0)
-            );
-
-            userUpdates.reputation = newReputation;
             userUpdates.currentlyInRanked = false;
             userUpdates.rankedSessionStartedAt = FieldValue.delete();
           }
@@ -366,23 +351,16 @@ export const submissionEvaluationEngine = onDocumentCreated(
             balanceAfter: newMerit,
           });
         }
+        return true;
       });
-
-      // Optimization: Update global stats outside the transaction to prevent contention/timeouts
-      if (leagueToIncrement) {
-        db.collection("metadata").doc("rankings").set({
-          leagueCounts: {
-            [leagueToIncrement]: FieldValue.increment(1),
-          },
-        }, {merge: true}).catch((err) => console.error("Global stats update failed:", err));
-      }
+      if (!evaluationCommitted) return;
 
       if (playmode === "RANKED") {
         const authorUserSnap = await db.collection("users").doc(authorId).get();
         const authorName = authorUserSnap.data()?.name ?? "Unknown";
         const authorRating = Number(authorUserSnap.data()?.rating ?? 0);
 
-        tryMatchRankedSubmission(
+        await tryMatchRankedSubmission(
           snapshot.id,
           authorId,
           result.finalScore,
@@ -393,15 +371,16 @@ export const submissionEvaluationEngine = onDocumentCreated(
         });
       }
 
+      await syncSeasonSubmission(await submissionRef.get()).catch((err) => console.error("Season settlement pending:", err));
       pruneOldSubmissions(authorId).catch((err) => {
         console.error("Non-critical background task (pruning) failed:", err);
       });
     } catch (error) {
       console.error("submissionEvaluationEngine failed", error);
-      await submissionRef.update({
-        status: "FAILED",
-        evaluationError: error instanceof Error ? error.message : "Unknown failure",
-      });
+      const failed = await failPendingSubmission(
+        submissionRef, error instanceof Error ? error.message : "Unknown failure"
+      );
+      if (!failed) return;
       if (authorId && playmode === "RANKED") {
         try {
           await db.collection("users").doc(authorId).update({
@@ -416,163 +395,3 @@ export const submissionEvaluationEngine = onDocumentCreated(
     }
   }
 );
-
-async function tryMatchRankedSubmission(
-  submissionId: string,
-  authorId: string,
-  authorScore: number,
-  authorRating: number,
-  authorName: string
-): Promise<void> {
-  const RATING_RANGE = 20;
-  const FORTY_EIGHT_HOURS_MS = 48 * 60 * 60 * 1000;
-  const since = Date.now() - FORTY_EIGHT_HOURS_MS;
-
-  const candidatesSnap = await db.collection("submissions")
-    .where("playmode", "==", "RANKED")
-    .where("status", "==", "EVALUATED")
-    .where("matchStatus", "==", "PENDING")
-    .where("timestamp", ">=", since)
-    .get();
-
-  const submitterRef = db.collection("users").doc(authorId);
-  const mySubmissionRef = db.collection("submissions").doc(submissionId);
-
-  for (const doc of candidatesSnap.docs) {
-    const candidate = doc.data();
-
-    if (candidate.authorId === authorId) continue;
-
-    const candidateUserSnap = await db.collection("users").doc(candidate.authorId).get();
-    if (!candidateUserSnap.exists) continue;
-    const candidateRating = Number(candidateUserSnap.data()?.rating ?? 0);
-
-    if (Math.abs(authorRating - candidateRating) > RATING_RANGE) continue;
-
-    const candidateScore = Number(candidate.evaluation?.finalScore ?? 0);
-    const candidateRef = doc.ref;
-    const candidateAuthorRef = db.collection("users").doc(candidate.authorId);
-
-    const myScoreWins = authorScore > candidateScore;
-    const isDraw = authorScore === candidateScore;
-
-    const candidateName = candidateUserSnap.data()?.name ?? "Unknown";
-
-    const leagueAdjustments: Record<string, number> = {};
-
-    await db.runTransaction(async (tx) => {
-      const submitterSnap = await tx.get(submitterRef);
-      const candidateUserSnapTx = await tx.get(candidateAuthorRef);
-
-      if (!submitterSnap.exists || !candidateUserSnapTx.exists) return;
-
-      const submitterData = submitterSnap.data();
-      const candidateData = candidateUserSnapTx.data();
-
-      const currentMyRating = Number(submitterData?.rating ?? 0);
-      const currentTheirRating = Number(candidateData?.rating ?? 0);
-      const myIsPlaced = submitterData?.isPlaced === true;
-      const candidateIsPlaced = candidateData?.isPlaced === true;
-
-      const myRatingChange = calculateDynamicRatingChange(
-        currentMyRating,
-        currentTheirRating,
-        isDraw ? "DRAW" : myScoreWins ? "WIN" : "LOSS"
-      );
-
-      const theirRatingChange = calculateDynamicRatingChange(
-        currentTheirRating,
-        currentMyRating,
-        isDraw ? "DRAW" : myScoreWins ? "LOSS" : "WIN"
-      );
-
-      tx.update(mySubmissionRef, {
-        "matchStatus": "MATCHED",
-        "matchResult": {
-          opponentId: candidate.authorId,
-          opponentName: candidateName,
-          opponentScore: candidateScore,
-          outcome: isDraw ? "DRAW" : myScoreWins ? "WIN" : "LOSS",
-          ratingChange: myRatingChange,
-        },
-        "evaluation.ratingChange": myRatingChange,
-      });
-
-      tx.update(candidateRef, {
-        "matchStatus": "MATCHED",
-        "matchResult": {
-          opponentId: authorId,
-          opponentName: authorName,
-          opponentScore: authorScore,
-          outcome: isDraw ? "DRAW" : myScoreWins ? "LOSS" : "WIN",
-          ratingChange: theirRatingChange,
-        },
-        "evaluation.ratingChange": theirRatingChange,
-      });
-
-      if (myIsPlaced) {
-        const newRating = Math.max(0, currentMyRating + myRatingChange);
-        const myOutcome = isDraw ? "DRAW" : myScoreWins ? "WIN" : "LOSS";
-        const myWinStreak = Number(submitterData?.rankedWinStreak ?? 0);
-        const myLossStreak = Number(submitterData?.rankedLossStreak ?? 0);
-
-        const newMyWinStreak = myOutcome === "WIN" ? myWinStreak + 1 : 0;
-        const newMyLossStreak = myOutcome === "LOSS" ? myLossStreak + 1 : 0;
-
-        tx.update(submitterRef, {
-          rating: newRating,
-          rankedWinStreak: newMyWinStreak,
-          rankedLossStreak: newMyLossStreak,
-        });
-
-        if (authorId !== "R8") {
-          const oldLeague = getLeagueFromRating(currentMyRating);
-          const newLeague = getLeagueFromRating(newRating);
-          if (oldLeague !== newLeague) {
-            leagueAdjustments[oldLeague] = (leagueAdjustments[oldLeague] || 0) - 1;
-            leagueAdjustments[newLeague] = (leagueAdjustments[newLeague] || 0) + 1;
-          }
-        }
-      }
-
-      if (candidateIsPlaced) {
-        const newRating = Math.max(0, currentTheirRating + theirRatingChange);
-        const theirOutcome = isDraw ? "DRAW" : myScoreWins ? "LOSS" : "WIN";
-        const theirWinStreak = Number(candidateData?.rankedWinStreak ?? 0);
-        const theirLossStreak = Number(candidateData?.rankedLossStreak ?? 0);
-
-        const newTheirWinStreak = theirOutcome === "WIN" ? theirWinStreak + 1 : 0;
-        const newTheirLossStreak = theirOutcome === "LOSS" ? theirLossStreak + 1 : 0;
-
-        tx.update(candidateAuthorRef, {
-          rating: newRating,
-          rankedWinStreak: newTheirWinStreak,
-          rankedLossStreak: newTheirLossStreak,
-        });
-
-        if (candidate.authorId !== "R8") {
-          const oldLeague = getLeagueFromRating(currentTheirRating);
-          const newLeague = getLeagueFromRating(newRating);
-          if (oldLeague !== newLeague) {
-            leagueAdjustments[oldLeague] = (leagueAdjustments[oldLeague] || 0) - 1;
-            leagueAdjustments[newLeague] = (leagueAdjustments[newLeague] || 0) + 1;
-          }
-        }
-      }
-    });
-
-    // Optimization: Update global stats outside the transaction
-    if (Object.keys(leagueAdjustments).length > 0) {
-      const statsUpdate: Record<string, unknown> = {};
-      Object.entries(leagueAdjustments).forEach(([league, increment]) => {
-        statsUpdate[`leagueCounts.${league}`] = FieldValue.increment(increment);
-      });
-      db.collection("metadata").doc("rankings").update(statsUpdate)
-        .catch((err) => console.error("Match-driven global stats update failed:", err));
-    }
-
-    return;
-  }
-
-  await mySubmissionRef.update({matchStatus: "PENDING"});
-}

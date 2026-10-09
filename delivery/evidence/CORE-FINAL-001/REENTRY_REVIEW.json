@@ -1,0 +1,11 @@
+{
+  "author": "Codex",
+  "red_UI_callback_double": "1 FAIL: unchanged remounted editor was not cleared",
+  "real_SDK_reentry_before": "1 PASS; do not falsely claim server route was red",
+  "production_change": "Native preference acknowledgment marker and subscription to exact scoped revision; guards prevent re-saving acknowledged revision",
+  "metadata_change": "Composition keys use stable existing IDs; descriptions are not exercise identity",
+  "after": "Both reentry assertions and B/A->B->A/repeated callback/owner/context acceptance pass",
+  "historic_owner": "Old unscopeable legacy keys remain untouched by production; no automatic migration/attribution",
+  "no_new_backend_schema_rules_or_costs": true,
+  "SOLID": "Draft manager reports confirmation scalar, owns storage; editor owns UI state and unsubscribes on disposal. No extra interface/pattern or five-principle claim."
+}

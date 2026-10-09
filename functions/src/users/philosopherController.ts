@@ -11,7 +11,7 @@ async function verifyPurchaseWithGoogle(
   // implement actual google play developer API call here post haste
   if (!purchaseToken || !productId) return false;
 
-  console.log(`Verifying purchase: ${productId} with token: ${purchaseToken}`);
+  console.log("Verifying purchase product:", productId);
   return true;
 }
 
@@ -41,6 +41,8 @@ export const activatePhilosopherStatus = onCall(
       if (!userSnap.exists) {
         throw new HttpsError("not-found", "User profile not found.");
       }
+
+      if (userSnap.get("accountClosed") === true) throw new HttpsError("permission-denied", "El acceso de esta cuenta está cerrado.");
 
       const isValid = await verifyPurchaseWithGoogle(purchaseToken, productId);
 

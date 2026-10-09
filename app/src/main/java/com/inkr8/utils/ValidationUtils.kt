@@ -2,6 +2,9 @@ package com.inkr8.utils
 
 object ValidationUtils {
 
+    private val whitespacePattern = "\\s+".toRegex()
+    private val nonAsciiLetterPattern = "[^a-zA-Z]".toRegex()
+
     /**
      * Checks if the written content meets basic quality standards.
      * Returns a Pair: first is true if low quality is detected, second is the error message.
@@ -10,7 +13,7 @@ object ValidationUtils {
         val trimmed = content.trim()
         if (trimmed.length < 50) return true to "Transmission too short (min 50 chars)"
 
-        val words = trimmed.split("\\s+".toRegex()).filter { it.isNotBlank() }
+        val words = trimmed.split(whitespacePattern).filter { it.isNotBlank() }
 
         if (words.any { it.length > 35 }) {
             return true to "Nonsense detected (excessive word length)"
@@ -23,7 +26,7 @@ object ValidationUtils {
             }
         }
 
-        val letters = trimmed.replace("[^a-zA-Z]".toRegex(), "")
+        val letters = trimmed.replace(nonAsciiLetterPattern, "")
         if (letters.length > 30) {
             val vowels = letters.count { it.lowercaseChar() in "aeiou" }
             val vowelRatio = vowels.toDouble() / letters.length.toDouble()

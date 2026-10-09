@@ -1,0 +1,13 @@
+{
+  "rows": [
+    {
+      "name": "trigger owns the matching promise",
+      "resolvedWhileMatchingBlocked": false,
+      "matchStatus": "MATCHED",
+      "passed": true
+    }
+  ],
+  "passed": 1,
+  "failed": 0,
+  "scope": "Compiled genuine trigger/matching and real Firestore SDK; R8/CloudEvent and matching scheduling barrier are explicit doubles. No cloud-lifecycle claim."
+}

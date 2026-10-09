@@ -7,7 +7,7 @@ import com.google.firebase.firestore.Query
 import com.google.firebase.functions.functions
 import com.inkr8.AuthManager
 import com.inkr8.data.Submissions
-import com.inkr8.mappers.toDomain
+import com.inkr8.mappers.toSubmission
 import com.inkr8.mappers.toFirestore
 import com.inkr8.utils.SystemConfig
 
@@ -56,7 +56,9 @@ class FirestoreSubmissionRepository() {
         onSuccess: () -> Unit,
         onError: (Exception) -> Unit
     ) {
-        submissionsCollection.document(submissionId).delete()
+        Firebase.functions
+            .getHttpsCallable("deleteSubmission")
+            .call(hashMapOf("submissionId" to submissionId))
             .addOnSuccessListener { onSuccess() }
             .addOnFailureListener { e -> onError(e) }
     }
@@ -75,7 +77,7 @@ class FirestoreSubmissionRepository() {
                     return@addSnapshotListener
                 }
                 val submissions = snapshot?.documents?.mapNotNull { doc ->
-                    doc.toObject(FirestoreSubmission::class.java)?.copy(id = doc.id)?.toDomain()
+                    doc.toSubmission()
                 } ?: emptyList()
                 onUpdate(submissions)
             }
@@ -100,7 +102,7 @@ class FirestoreSubmissionRepository() {
                     return@addSnapshotListener
                 }
                 val submissions = snapshot?.documents?.mapNotNull { doc ->
-                    doc.toObject(FirestoreSubmission::class.java)?.copy(id = doc.id)?.toDomain()
+                    doc.toSubmission()
                 } ?: emptyList()
                 onUpdate(submissions)
             }
@@ -127,11 +129,42 @@ class FirestoreSubmissionRepository() {
         submissionsCollection.whereEqualTo("authorId", authorId).orderBy("timestamp", Query.Direction.DESCENDING).get()
             .addOnSuccessListener { snapshot ->
                 val submissions = snapshot.documents.mapNotNull { doc ->
-                    doc.toObject(FirestoreSubmission::class.java)?.copy(id = doc.id)?.toDomain()
+                    doc.toSubmission()
                 }
                 onSuccess(submissions)
             }
             .addOnFailureListener { onError(it) }
+    }
+
+    fun getSubmission(
+        submissionId: String,
+        onSuccess: (Submissions?) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
+        if (AuthManager.currentUser() == null) return
+        submissionsCollection.document(submissionId).get()
+            .addOnSuccessListener { doc ->
+                val submission = doc.toSubmission()
+                onSuccess(submission)
+            }
+            .addOnFailureListener { e -> onError(e) }
+    }
+
+    fun listenToSubmission(
+        submissionId: String,
+        onUpdate: (Submissions) -> Unit,
+        onError: (Exception) -> Unit
+    ): ListenerRegistration? {
+        if (AuthManager.currentUser() == null) return null
+        return submissionsCollection.document(submissionId)
+            .addSnapshotListener { doc, error ->
+                if (error != null) {
+                    onError(error)
+                    return@addSnapshotListener
+                }
+                val submission = doc?.toSubmission()
+                if (submission != null) onUpdate(submission)
+            }
     }
 
     fun getLastSubmission(
@@ -142,7 +175,7 @@ class FirestoreSubmissionRepository() {
         submissionsCollection.whereEqualTo("authorId", userId).orderBy("timestamp", Query.Direction.DESCENDING).limit(1).get()
             .addOnSuccessListener { snapshot ->
                 val doc = snapshot.documents.firstOrNull()
-                val submission = doc?.toObject(FirestoreSubmission::class.java)?.copy(id = doc.id)?.toDomain()
+                val submission = doc?.toSubmission()
                 onSuccess(submission)
             }
             .addOnFailureListener { e -> onError(e) }
@@ -164,7 +197,7 @@ class FirestoreSubmissionRepository() {
 
                 val doc = snapshot?.documents?.firstOrNull()
                 if (doc != null) {
-                    val submission = doc.toObject(FirestoreSubmission::class.java)?.copy(id = doc.id)?.toDomain()
+                    val submission = doc.toSubmission()
                     if (submission != null) {
                         onUpdate(submission)
                     }

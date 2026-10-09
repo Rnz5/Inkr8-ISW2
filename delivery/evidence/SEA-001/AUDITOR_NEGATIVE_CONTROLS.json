@@ -1,0 +1,21 @@
+{
+  "private_only": true,
+  "controls": [
+    {
+      "mutation": "app/src/main/java/com/inkr8/economy/RankedCostCalculator.kt",
+      "rejected": true,
+      "failed": [
+        "unchanged_source:app/src/main/java/com/inkr8/economy/RankedCostCalculator.kt"
+      ]
+    },
+    {
+      "mutation": "testing-blocks/android-emulator-lab/LabDraftContractTest.kt",
+      "rejected": true,
+      "failed": [
+        "reviewed_functional_delta:testing-blocks/android-emulator-lab/LabDraftContractTest.kt",
+        "audit_precondition_or_source_structure"
+      ]
+    }
+  ],
+  "acceptance_assertions_unchanged": true
+}

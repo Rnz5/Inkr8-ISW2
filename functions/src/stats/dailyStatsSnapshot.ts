@@ -52,7 +52,8 @@ export const dailyStatsSnapshot = onSchedule(
           totalScore += score;
           evaluatedCount++;
 
-          if (data.gamemodeName === "ON_TOPIC" && data.themeId) {
+          const gamemode = typeof data.gamemode === "string" ? data.gamemode : data.gamemodeName;
+          if (gamemode === "ON_TOPIC" && data.themeId) {
             if (!themeScores[data.themeId]) {
               themeScores[data.themeId] = {total: 0, count: 0};
             }
@@ -93,14 +94,6 @@ export const dailyStatsSnapshot = onSchedule(
         }
       });
 
-      const tournamentsSnap = await db.collection("tournaments")
-        .where("status", "==", "COMPLETED")
-        .where("completedAt", ">=", startTime)
-        .where("completedAt", "<", endTime)
-        .get();
-
-      const tournamentsCompleted = tournamentsSnap.size;
-
       const snapshotData = {
         date: dateId,
         totalSubmissions,
@@ -109,7 +102,6 @@ export const dailyStatsSnapshot = onSchedule(
         averageScore,
         totalMeritEarned,
         totalMeritSpent,
-        tournamentsCompleted,
         activeUsers: activeUsersSet.size,
         hardestTheme,
         createdAt: Date.now(),

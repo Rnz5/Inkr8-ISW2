@@ -31,7 +31,6 @@ import com.inkr8.utils.UserHeaderCard
 @Composable
 fun HomeScreen(
     user: Users,
-    pantheonPosition: Int?,
     onNavigateToPractice: () -> Unit,
     onNavigateToCompetitions: () -> Unit,
     onNavigateToProfile: () -> Unit
@@ -68,7 +67,6 @@ fun HomeScreen(
         ) {
             UserHeaderCard(
                 user = user,
-                pantheonPosition = pantheonPosition,
                 onClick = onNavigateToProfile
             )
         }
@@ -347,7 +345,6 @@ fun HomeScreenPreview() {
     Inkr8Theme {
         HomeScreen(
             user = fakeUser,
-            pantheonPosition = 64,
             onNavigateToPractice = {},
             onNavigateToCompetitions = {},
             onNavigateToProfile = {}

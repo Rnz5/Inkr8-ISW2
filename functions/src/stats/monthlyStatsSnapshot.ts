@@ -35,7 +35,6 @@ export const monthlyStatsSnapshot = onSchedule(
       let totalScoreWeighted = 0;
       let totalMeritEarned = 0;
       let totalMeritSpent = 0;
-      let tournamentsCompleted = 0;
       const themeDayCounts: Record<string, number> = {};
 
       recordsSnap.forEach((doc) => {
@@ -48,7 +47,6 @@ export const monthlyStatsSnapshot = onSchedule(
         practiceSubmissions += data.practiceSubmissions ?? 0;
         totalMeritEarned += data.totalMeritEarned ?? 0;
         totalMeritSpent += data.totalMeritSpent ?? 0;
-        tournamentsCompleted += data.tournamentsCompleted ?? 0;
 
         if (typeof data.averageScore === "number" && data.totalSubmissions > 0) {
           totalScoreWeighted += data.averageScore * data.totalSubmissions;
@@ -81,7 +79,6 @@ export const monthlyStatsSnapshot = onSchedule(
         averageScore,
         totalMeritEarned,
         totalMeritSpent,
-        tournamentsCompleted,
         mostPlayedGamemode,
         hardestTheme,
         createdAt: Date.now(),

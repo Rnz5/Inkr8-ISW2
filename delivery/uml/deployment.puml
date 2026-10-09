@@ -1,0 +1,33 @@
+@startuml
+!pragma layout smetana
+skinparam monochrome true
+skinparam shadowing false
+skinparam defaultFontName Arial
+skinparam defaultFontSize 13
+title Inkr8 despliegue local realmente comprobado
+node "AVD Android API 36 con WHPX" as AVD {
+ artifact "com.inkr8.lab APK debug" as APK
+ artifact "APK AndroidTest" as TEST
+}
+node "Host local demo-inkr8-local" as Host {
+ node "Auth emulador 9099" as Auth
+ database "Firestore emulador 8080\nreglas NUEVAS propuestas" as FS
+ node "Functions emulador 5001" as FN
+ node "HTTP doble R8 5010\nrespuesta fija 80" as Mock
+ node "Fixtures Admin 5011\nsinteticos y solo loopback" as Fixture
+}
+cloud "Proveedor R8 externo\nNO validado" as External
+APK --> Auth : ADB reverse 127.0.0.1
+APK --> FS : ADB reverse 127.0.0.1
+APK --> FN : ADB reverse 127.0.0.1
+TEST --> Fixture : datos controlados
+FN --> FS : Admin SDK real
+FN --> Auth : Admin disable y revoke
+FN --> Mock : evaluateWithR8 y SDK autenticos
+FN ..> External : bloqueado en laboratorio
+note bottom of APK
+ No requiere instrumentacion para abrir el host local.
+ Las sondas automaticas requieren AndroidTest.
+ MainActivity OAuth y Ads se omiten explicitamente.
+end note
+@enduml

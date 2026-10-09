@@ -1,12 +1,8 @@
 package com.inkr8.repository
 
-import com.google.android.gms.tasks.Tasks
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.QuerySnapshot
 import com.inkr8.data.Users
 import com.google.firebase.functions.FirebaseFunctions
-import com.inkr8.rating.League
 import com.inkr8.utils.SystemConfig
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -18,15 +14,6 @@ class UserRepository(
 ) {
 
     private val usersCollection = firestore.collection(SystemConfig.USERS_COLLECTION)
-
-    companion object {
-        @Volatile
-        private var cachedTop100: List<Users>? = null
-        @Volatile
-        private var lastFetchTime: Long = 0
-        private const val CACHE_DURATION = 5 * 60 * 1000 // 5 minutes
-        private val cacheLock = Any()
-    }
 
     fun listenToUser(userId: String): Flow<Users?> = callbackFlow {
         val listener = usersCollection.document(userId).addSnapshotListener { snapshot, error ->
@@ -48,28 +35,6 @@ class UserRepository(
             .addOnSuccessListener { snapshot ->
                 val users = snapshot.toObjects(Users::class.java)
                 onResult(users)
-            }
-    }
-
-    fun getLeagueCounts(onResult: (Map<League, Int>) -> Unit) {
-        firestore.collection(SystemConfig.METADATA_COLLECTION).document("rankings")
-            .get()
-            .addOnSuccessListener { snapshot ->
-                val counts = mutableMapOf<League, Int>()
-                val rawMap = snapshot.get("leagueCounts") as? Map<String, Long> ?: emptyMap()
-                
-                rawMap.forEach { (leagueName, count) ->
-                    try {
-                        val league = League.valueOf(leagueName)
-                        counts[league] = count.toInt()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
-                    }
-                }
-                onResult(counts)
-            }
-            .addOnFailureListener {
-                onResult(emptyMap())
             }
     }
 
@@ -219,27 +184,10 @@ class UserRepository(
         onSuccess: () -> Unit,
         onError: (Exception) -> Unit
     ) {
-        val userRef = usersCollection.document(userId)
-
-        firestore.runTransaction { transaction ->
-
-            val snapshot = transaction.get(userRef)
-            if (!snapshot.exists()) throw Exception("User not found")
-
-            val username = snapshot.getString("name") ?: ""
-            val normalized = username.lowercase()
-
-            val usernameRef = firestore.collection(SystemConfig.USERNAMES_COLLECTION).document(normalized)
-
-            transaction.delete(usernameRef)
-
-            transaction.delete(userRef)
-
-        }.addOnSuccessListener {
-            onSuccess()
-        }.addOnFailureListener {
-            onError(Exception(it.message ?: "Failed to delete account"))
-        }
+        functions.getHttpsCallable("closeAccount")
+            .call(hashMapOf("userId" to userId))
+            .addOnSuccessListener { onSuccess() }
+            .addOnFailureListener { onError(Exception(it.message ?: "Failed to close account access")) }
     }
 
     fun applyMeritAction(
@@ -303,33 +251,6 @@ class UserRepository(
         usersCollection.document(userId).update(updates)
     }
 
-    fun getTop100Users(
-        onResult: (List<Users>) -> Unit
-    ) {
-        val currentTime = System.currentTimeMillis()
-        
-        synchronized(cacheLock) {
-            if (cachedTop100 != null && (currentTime - lastFetchTime) < CACHE_DURATION) {
-                onResult(cachedTop100!!)
-                return
-            }
-        }
-
-        usersCollection.orderBy("rating", Query.Direction.DESCENDING).limit(100).get().addOnSuccessListener {
-            snapshot ->
-                val users = snapshot.documents.mapNotNull { it.toObject(Users::class.java) }
-                synchronized(cacheLock) {
-                    cachedTop100 = users
-                    lastFetchTime = System.currentTimeMillis()
-                }
-                onResult(users)
-            }
-    }
-
-    fun updateReputation(userId: String, newReputation: Long) {
-        usersCollection.document(userId).update("reputation", newReputation)
-    }
-
     fun startRankedSession(userId: String) {
         val updates = mapOf("currentlyInRanked" to true, "rankedSessionStartedAt" to System.currentTimeMillis())
 
@@ -340,38 +261,6 @@ class UserRepository(
         val updates = mapOf("currentlyInRanked" to false, "rankedSessionStartedAt" to null)
 
         usersCollection.document(userId).update(updates)
-    }
-
-    fun getUsersByIds(
-        userIds: List<String>,
-        onResult: (Map<String, Users>) -> Unit
-    ) {
-        val distinctIds = userIds.distinct().filter { it.isNotBlank() }
-
-        if (distinctIds.isEmpty()) {
-            onResult(emptyMap())
-            return
-        }
-
-        val tasks = distinctIds.chunked(30).map { chunk ->
-            usersCollection.whereIn("id", chunk).get()
-        }
-
-        Tasks.whenAllSuccess<QuerySnapshot>(tasks)
-            .addOnSuccessListener { snapshots ->
-                val allUsers = mutableMapOf<String, Users>()
-                for (snapshot in snapshots) {
-                    val users = snapshot.toObjects(Users::class.java)
-                    users.forEach { user ->
-                        allUsers[user.id] = user
-                    }
-                }
-                onResult(allUsers)
-            }
-            .addOnFailureListener {
-                it.printStackTrace()
-                onResult(emptyMap())
-            }
     }
 
     fun enablePhilosopher(
@@ -407,60 +296,5 @@ class UserRepository(
             .addOnFailureListener { onError(it) }
     }
 
-    fun sendGlobalTip(
-        tipperId: String,
-        recipientId: String,
-        amount: Long,
-        onSuccess: () -> Unit,
-        onError: (Exception) -> Unit
-    ) {
-        val tipId = "${tipperId}_${recipientId}"
-        val tipRef = firestore.collection("global_tips").document(tipId)
 
-        firestore.runTransaction { transaction ->
-            val snapshot = transaction.get(tipRef)
-            val now = System.currentTimeMillis()
-            
-            if (snapshot.exists()) {
-                val lastTipped = snapshot.getLong("createdAt") ?: 0L
-                val cooldownMs = 24 * 60 * 60 * 1000L
-                if (now - lastTipped < cooldownMs) {
-                    throw Exception("Cooldown active. You can tip this user again in ${formatCooldown(cooldownMs - (now - lastTipped))}")
-                }
-            }
-
-            val tipData = mapOf(
-                "tipperId" to tipperId,
-                "recipientId" to recipientId,
-                "amount" to amount,
-                "createdAt" to now,
-                "processed" to false
-            )
-            transaction.set(tipRef, tipData)
-        }.addOnSuccessListener { onSuccess() }
-        .addOnFailureListener { onError(it) }
-    }
-
-    private fun formatCooldown(ms: Long): String {
-        val hours = ms / (1000 * 60 * 60)
-        val minutes = (ms / (1000 * 60)) % 60
-        return "${hours}h ${minutes}m"
-    }
-
-    fun checkGlobalTipCooldown(
-        tipperId: String,
-        recipientId: String,
-        onResult: (Long?) -> Unit
-    ) {
-        val tipId = "${tipperId}_${recipientId}"
-        firestore.collection("global_tips").document(tipId).get()
-            .addOnSuccessListener { snapshot ->
-                if (snapshot.exists()) {
-                    onResult(snapshot.getLong("createdAt"))
-                } else {
-                    onResult(null)
-                }
-            }
-            .addOnFailureListener { onResult(null) }
-    }
 }

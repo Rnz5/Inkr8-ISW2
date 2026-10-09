@@ -1,0 +1,7 @@
+{
+  "node": "20.20.2",
+  "firebase_cli": "15.32.1",
+  "sdk_platform": 36,
+  "build_tools": "36.0.0",
+  "functions_package_lock_sha256": "5ea84f17e3bb1f34b5c4e50b003dd58379bb564dfffec4b1e5d6472b70dce4cd"
+}

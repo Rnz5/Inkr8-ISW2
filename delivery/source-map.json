@@ -1,0 +1,105 @@
+{
+  "baseline": "7d879c22030527e1d5f5003ad84b76b750d3b29e",
+  "author": "Codex",
+  "diagram_kind": "Selective final actual code; no human UML review invented",
+  "messages": [
+    {
+      "message": "addSubmission",
+      "file": "app/src/main/java/com/inkr8/repository/FirestoreSubmissionRepository.kt",
+      "line": 19,
+      "sha256": "92ca53ae09a584593365e252b97eac07ffda706858906b0f4b3e5ab018480216"
+    },
+    {
+      "message": "submitWriting",
+      "file": "app/src/main/java/com/inkr8/viewmodel/AppViewModel.kt",
+      "line": 119,
+      "sha256": "2a44c6e47cc56bd3e91d7d2a07198fd23929c6f60c9005323c30066bc6609df3"
+    },
+    {
+      "message": "startLoadingResult",
+      "file": "app/src/main/java/com/inkr8/viewmodel/AppViewModel.kt",
+      "line": 218,
+      "sha256": "2a44c6e47cc56bd3e91d7d2a07198fd23929c6f60c9005323c30066bc6609df3"
+    },
+    {
+      "message": "retryLoadingResult",
+      "file": "app/src/main/java/com/inkr8/viewmodel/AppViewModel.kt",
+      "line": 266,
+      "sha256": "2a44c6e47cc56bd3e91d7d2a07198fd23929c6f60c9005323c30066bc6609df3"
+    },
+    {
+      "message": "handleSubmissionUpdate",
+      "file": "app/src/main/java/com/inkr8/viewmodel/AppViewModel.kt",
+      "line": 279,
+      "sha256": "2a44c6e47cc56bd3e91d7d2a07198fd23929c6f60c9005323c30066bc6609df3"
+    },
+    {
+      "message": "confirmRevision",
+      "file": "app/src/main/java/com/inkr8/utils/DraftManager.kt",
+      "line": 64,
+      "sha256": "41938a7e3502c2c1ad9143af6d0e3fc5963d8ae3c099769773a19edd37caed5f"
+    },
+    {
+      "message": "WritingEditor",
+      "file": "app/src/main/java/com/inkr8/screens/Writing.kt",
+      "line": 104,
+      "sha256": "1f0b75faed76d18a7bd123b8add239ceecd8ec074c4635de520ab590d6a04046"
+    },
+    {
+      "message": "recordSeasonSubmission",
+      "file": "functions/src/seasons/seasonLedger.ts",
+      "line": 16,
+      "sha256": "adaf740a3a33f26c60cd47f1d4731c40ad4fc4710427ce29c019ae9b87899eca"
+    },
+    {
+      "message": "syncSeasonSubmission",
+      "file": "functions/src/seasons/seasonLedger.ts",
+      "line": 48,
+      "sha256": "adaf740a3a33f26c60cd47f1d4731c40ad4fc4710427ce29c019ae9b87899eca"
+    },
+    {
+      "message": "closeSeason",
+      "file": "functions/src/seasons/seasonLedger.ts",
+      "line": 80,
+      "sha256": "adaf740a3a33f26c60cd47f1d4731c40ad4fc4710427ce29c019ae9b87899eca"
+    },
+    {
+      "message": "tryMatchRankedSubmission",
+      "file": "functions/src/submissions/rankedMatching.ts",
+      "line": 4,
+      "sha256": "af54cc9b514c5d3303d3bb1d6e5d492f2a4cfc2f0b3cf2a3501b9e7116c3de4d"
+    },
+    {
+      "message": "calculateDynamicRatingChange",
+      "file": "functions/src/utils/dynamicRatingChange.ts",
+      "line": 1,
+      "sha256": "4b32674d6d250166786aa781c27f8a663530399c9a0b1998584b4c7f7e8ab641"
+    }
+  ],
+  "support_messages": [
+    {
+      "message": "deleteSubmission",
+      "file": "functions/src/submissions/deleteSubmission.ts",
+      "line": 7,
+      "sha256": "4e59f1f29597fa18ae00543f217509882f4ca473f678b2ba3bb2fca7d898ee2e"
+    },
+    {
+      "message": "deleteSubmission",
+      "file": "app/src/main/java/com/inkr8/repository/FirestoreSubmissionRepository.kt",
+      "line": 54,
+      "sha256": "92ca53ae09a584593365e252b97eac07ffda706858906b0f4b3e5ab018480216"
+    },
+    {
+      "message": "closeAccount",
+      "file": "functions/src/users/accountAccess.ts",
+      "line": 11,
+      "sha256": "ed69db9fc224ce73f14f9cb370f655029f25ea791e7b552e4ec39ae0f68be0c4"
+    },
+    {
+      "message": "deleteAccount",
+      "file": "app/src/main/java/com/inkr8/repository/UserRepository.kt",
+      "line": 182,
+      "sha256": "024ba9dffb95fb2f3df1b0b8a8afb52497290ca79c3812a670c7650c1874a0f3"
+    }
+  ]
+}

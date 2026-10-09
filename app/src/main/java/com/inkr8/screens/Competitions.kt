@@ -25,31 +25,24 @@ import com.google.firebase.analytics.logEvent
 import com.inkr8.data.*
 import com.inkr8.economy.EconomyConfig
 import com.inkr8.economy.RankedCostCalculator
-import com.inkr8.rating.League
 import com.inkr8.repository.FirestoreSubmissionRepository
-import com.inkr8.repository.FirestoreTournamentRepository
 import com.inkr8.repository.ThemeRepository
 import com.inkr8.repository.TopicRepository
 import com.inkr8.repository.UserRepository
 import com.inkr8.ui.theme.Inkr8Theme
 import com.inkr8.utils.SystemConfig
-import com.inkr8.utils.TournamentCard
 import com.inkr8.utils.UserHeaderCard
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 @Composable
 fun Competitions(
     user: Users,
-    pantheonPosition: Int?,
     onNavigateBack: () -> Unit,
     onNavigateToWriting: (Gamemode) -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToLeaderboard: () -> Unit,
-    onNavigateToTournamentDetails: (Tournament) -> Unit,
-    onNavigateToUserProfile: (String) -> Unit,
-    onNavigateToCreateTournament: () -> Unit,
 ) {
-    val league = League.fromRating(user.rating)
-    val tournamentRepository = remember { FirestoreTournamentRepository() }
     val themeRepository = remember { ThemeRepository() }
     val topicRepository = remember { TopicRepository() }
     val submissionRepository = remember { FirestoreSubmissionRepository() }
@@ -57,19 +50,11 @@ fun Competitions(
     val context = LocalContext.current
     val firebaseAnalytics = remember { FirebaseAnalytics.getInstance(context) }
 
-    var tournaments by remember { mutableStateOf<List<Tournament>>(emptyList()) }
-    var rankedGamemode by remember { mutableStateOf<Gamemode>(StandardWriting) }
-    var isGamemodeLoaded by remember { mutableStateOf(false) }
+    var selectedRankedMode by remember(user.id) { mutableStateOf("STANDARD") }
+    val scope = rememberCoroutineScope()
+    var rankedEntryError by remember(user.id) { mutableStateOf<String?>(null) }
     var recentRankedSubmissions by remember { mutableStateOf<List<Submissions>>(emptyList()) }
     var isEnteringRanked by remember { mutableStateOf(false) }
-
-    DisposableEffect(Unit) {
-        val registration = tournamentRepository.listenToTournamentFeed(
-            onUpdate = { tournaments = it },
-            onError = { it.printStackTrace() }
-        )
-        onDispose { registration.remove() }
-    }
 
     DisposableEffect(Unit) {
         val registration = submissionRepository.listenToRecentRankedSubmissions(
@@ -77,29 +62,6 @@ fun Competitions(
             onError = { it.printStackTrace() }
         )
         onDispose { registration?.remove() }
-    }
-
-    LaunchedEffect(Unit) {
-        if (!isGamemodeLoaded) {
-            rankedGamemode = when (league) {
-                League.SCRIBE, League.STYLIST -> StandardWriting
-                else -> {
-                    if ((0..1).random() == 0) {
-                        StandardWriting
-                    } else {
-                        val randomTheme = themeRepository.getRandomTheme()
-                        val randomTopic = randomTheme?.let { topicRepository.getRandomTopicFromTheme(it.id) }
-                        
-                        if (randomTheme != null && randomTopic != null) {
-                            OnTopicWriting(randomTheme, randomTopic)
-                        } else {
-                            StandardWriting
-                        }
-                    }
-                }
-            }
-            isGamemodeLoaded = true
-        }
     }
 
     val entryCost = RankedCostCalculator.calculateCost(
@@ -124,7 +86,6 @@ fun Competitions(
             item {
                 UserHeaderCard(
                     user = user,
-                    pantheonPosition = pantheonPosition,
                     onClick = onNavigateToProfile
                 )
             }
@@ -167,13 +128,18 @@ fun Competitions(
                                         letterSpacing = 0.5.sp
                                     )
                                 }
-                                IconButton(
-                                    onClick = onNavigateToLeaderboard,
-                                    modifier = Modifier.background(Color.White.copy(alpha = 0.05f), CircleShape).size(32.dp)
-                                ) {
-                                    Text("L", color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Black, fontSize = 12.sp)
-                                }
                             }
+
+                            Row(verticalAlignment = Alignment.CenterVertically) {
+                                RadioButton(selected = selectedRankedMode == "STANDARD", enabled = !isEnteringRanked,
+                                    onClick = { selectedRankedMode = "STANDARD" })
+                                Text("Standard")
+                                RadioButton(selected = selectedRankedMode == "ON_TOPIC", enabled = !isEnteringRanked,
+                                    onClick = { selectedRankedMode = "ON_TOPIC" })
+                                Text("On-Topic")
+                            }
+
+                            rankedEntryError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
 
                             Spacer(modifier = Modifier.height(16.dp))
 
@@ -184,13 +150,6 @@ fun Competitions(
                             ) {
                                 Column {
                                     if (user.isPlaced) {
-                                        Text(
-                                            text = league.displayName.uppercase(),
-                                            color = MaterialTheme.colorScheme.primary,
-                                            fontWeight = FontWeight.ExtraBold,
-                                            fontSize = 12.sp,
-                                            letterSpacing = 1.sp
-                                        )
                                         Text(
                                             text = "Rating: ${user.rating}",
                                             color = Color.Gray,
@@ -222,19 +181,40 @@ fun Competitions(
                                             return@Button
                                         }
 
+                                        rankedEntryError = null
                                         isEnteringRanked = true
-                                        userRepository.applyMeritAction(
-                                            action = "ENTER_RANKED",
-                                            onSuccess = {
+                                        scope.launch(Dispatchers.Main.immediate) {
+                                            val gamemode: Gamemode = try {
+                                                if (selectedRankedMode == "ON_TOPIC") {
+                                                    val theme = themeRepository.getRandomTheme()
+                                                    val topic = theme?.let { topicRepository.getRandomTopicFromTheme(it.id) }
+                                                    if (theme == null || topic == null) {
+                                                        throw IllegalStateException("Missing On-Topic context")
+                                                    }
+                                                    OnTopicWriting(theme, topic)
+                                                } else StandardWriting
+                                            } catch (e: CancellationException) {
                                                 isEnteringRanked = false
-                                                firebaseAnalytics.logEvent("ranked_entry_success", null)
-                                                onNavigateToWriting(rankedGamemode)
-                                            },
-                                            onError = { e ->
+                                                throw e
+                                            } catch (_: Exception) {
                                                 isEnteringRanked = false
-                                                Toast.makeText(context, e.message ?: "Access Denied", Toast.LENGTH_SHORT).show()
+                                                rankedEntryError = "No se pudo iniciar la partida On-Topic. Inténtalo nuevamente"
+                                                Toast.makeText(context, rankedEntryError, Toast.LENGTH_SHORT).show()
+                                                return@launch
                                             }
-                                        )
+                                            userRepository.applyMeritAction(
+                                                action = "ENTER_RANKED",
+                                                onSuccess = {
+                                                    isEnteringRanked = false
+                                                    firebaseAnalytics.logEvent("ranked_entry_success", null)
+                                                    onNavigateToWriting(gamemode)
+                                                },
+                                                onError = { e ->
+                                                    isEnteringRanked = false
+                                                    Toast.makeText(context, e.message ?: "Access Denied", Toast.LENGTH_SHORT).show()
+                                                }
+                                            )
+                                        }
                                     },
                                     enabled = !isEnteringRanked,
                                     shape = RoundedCornerShape(10.dp),
@@ -335,83 +315,6 @@ fun Competitions(
                 }
             }
 
-            item {
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondary),
-                    border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
-                ) {
-                    Row(
-                        modifier = Modifier.padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(
-                                text = "Host Tournament",
-                                fontWeight = FontWeight.Black,
-                                color = Color.White,
-                                fontSize = 16.sp
-                            )
-                            Text(
-                                text = "Establish your own directive. Set the stakes. Find the elite.",
-                                color = Color.Gray,
-                                style = MaterialTheme.typography.bodySmall,
-                                fontSize = 11.sp,
-                                lineHeight = 16.sp
-                            )
-                        }
-                        Spacer(modifier = Modifier.width(16.dp))
-                        Button(
-                            onClick = onNavigateToCreateTournament,
-                            shape = CircleShape,
-                            contentPadding = PaddingValues(0.dp),
-                            modifier = Modifier.size(44.dp),
-                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary, contentColor = Color.Black)
-                        ) {
-                            Text("+", fontWeight = FontWeight.Black, fontSize = 20.sp)
-                        }
-                    }
-                }
-            }
-
-            item {
-                Text(
-                    text = "Active Tournaments",
-                    color = Color.Gray,
-                    style = MaterialTheme.typography.labelSmall,
-                    letterSpacing = 2.sp,
-                    fontWeight = FontWeight.Black,
-                    modifier = Modifier.padding(top = 8.dp)
-                )
-            }
-
-            if (tournaments.isEmpty()) {
-                item {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().height(100.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text("R8 is cooking something...", color = Color.DarkGray, fontSize = 11.sp, fontWeight = FontWeight.Bold)
-                    }
-                }
-            } else {
-                items(tournaments, key = { it.id }) { tournament ->
-                    TournamentCard(
-                        tournament = tournament,
-                        creatorDisplayName = tournament.creatorName.ifBlank {
-                            if (tournament.creatorId == "R8") "R8" else "Unknown"
-                        },
-                        onClick = {
-                            firebaseAnalytics.logEvent("tournament_details_viewed") {
-                                param("tournament_id", tournament.id)
-                            }
-                            onNavigateToTournamentDetails(tournament)
-                        },
-                        onHostClick = { onNavigateToUserProfile(tournament.creatorId) }
-                    )
-                }
-            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -447,14 +350,9 @@ fun CompetitionsPreview() {
     Inkr8Theme {
         Competitions(
             user = fakeUser,
-            pantheonPosition = null,
             onNavigateBack = {},
             onNavigateToWriting = {},
-            onNavigateToProfile = {},
-            onNavigateToLeaderboard = {},
-            onNavigateToTournamentDetails = {},
-            onNavigateToUserProfile = {},
-            onNavigateToCreateTournament = {}
+            onNavigateToProfile = {}
         )
     }
 }

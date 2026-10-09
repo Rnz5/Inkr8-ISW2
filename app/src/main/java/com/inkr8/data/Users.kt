@@ -1,5 +1,7 @@
 package com.inkr8.data
 
+import com.google.firebase.firestore.PropertyName
+
 data class Users(
     val id: String = "",
     val name: String = "",
@@ -24,10 +26,12 @@ data class Users(
     val tournamentsWon: Long = 0,
     val totalMeritEarned: Long = 0,
     val tipsReceived: Long = 0,
+    @get:PropertyName("isPhilosopher")
     val isPhilosopher: Boolean = false,
     val philosopherSince: Long? = null,
     val hasChosenUsername: Boolean = false,
     val recentScores: List<Double> = emptyList(),
+    @get:PropertyName("isPlaced")
     val isPlaced: Boolean = false,
     val placementMatchesPlayed: Int = 0,
     val totalPlacementScore: Double = 0.0,

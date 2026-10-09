@@ -10,7 +10,6 @@ object SystemConfig {
 
     // Collection Names
     const val USERS_COLLECTION = "users"
-    const val TOURNAMENTS_COLLECTION = "tournaments"
     const val SUBMISSIONS_COLLECTION = "submissions"
     const val USERNAMES_COLLECTION = "usernames"
     const val METADATA_COLLECTION = "metadata"
@@ -21,12 +20,8 @@ object SystemConfig {
     // Functions Names
     const val APPLY_MERIT_ACTION = "applyMeritAction"
     const val ACTIVATE_PHILOSOPHER_STATUS = "activatePhilosopherStatus"
-    const val ENROLL_IN_TOURNAMENT = "enrollInTournament"
-    const val CREATE_USER_TOURNAMENT = "createUserTournament"
-    const val SEND_TOURNAMENT_TIP = "sendTournamentTip"
 
     // Merit Action Types
-    const val ACTION_PURCHASE_REPUTATION = "PURCHASE_REPUTATION_VIEW"
     const val ACTION_EXPAND_MERIT_CAP = "EXPAND_MERIT_CAP"
     const val ACTION_PURCHASE_EXAMPLE_SENTENCE = "PURCHASE_EXAMPLE_SENTENCE"
     const val ACTION_CHANGE_USERNAME = "CHANGE_USERNAME"

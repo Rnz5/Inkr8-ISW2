@@ -1,0 +1,68 @@
+{
+  "methods": [
+    {
+      "method": "confirmedMissingDeleteUsesTrustedRepositoryCallback",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "paidRankedStandardWithRestrictedRules",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "profileAndOwnSeasonHistoryWithAdminCollectionsDenied",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "practiceStandardWithRestrictedRules",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "closeAccountEndsAuthSessionAndPreservesHistory",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "practiceOnTopicWithRestrictedRules",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "paidRankedOnTopicWithRestrictedRules",
+      "pass": true,
+      "status": 0
+    },
+    {
+      "method": "realPermissionRejectionPreservesDraftAndText",
+      "pass": true,
+      "status": 0
+    }
+  ],
+  "passed": 8,
+  "failed": 0,
+  "project": "demo-inkr8-local",
+  "APK_sha256": "7216f9666379f6e9f597aafefdd4f57571ec196ae5d41fb0e6cbf5b17a9fff5d",
+  "rules_sha256": "f37afaf8e54d1afb60659a813a9ed1d10f5ab077b54c5608d7058bdc6fefeff7",
+  "author": "Codex",
+  "classification": "Final account closure policy plus seven preserved methods; Codex code/tests",
+  "history": "Actual response/history target waited; direct client admin read denied; callable real HTTP with demo Auth",
+  "rejection": "Original text below 50-word Standard minimum led to Incomplete, not attempted persistence. Fixture now meets original admission; all preservation assertions retained. Genuine SDK permission denial, no submission created.",
+  "permission_denials_observed": 4,
+  "doubles": [
+    "R8 HTTP transport fixed80",
+    "anonymous local Auth, no Google OAuth",
+    "Admin bootstrap/history/catalog/failed paid-session fixtures",
+    "empty assigned-word fixture for these six flows; recognition covered separately",
+    "MainActivity/Ads replaced only in laboratory"
+  ],
+  "limits": [
+    "No external provider/cloud/scheduler validation",
+    "No student execution/review attributed"
+  ],
+  "history_result_preserved": "ANDROID_ACCEPTANCE.json and android-final-secure-six remain intact",
+  "repository_delete": "Actual Android Firebase callable SDK, missing-document idempotent success callback once; balances unchanged. Existing-document and pending guards checked by real REST/SDK/HTTP probes.",
+  "account_closure": "Actual Settings→VM→UserRepository→callable→genuine Auth disable/revoke→signout callback; history and balances checked by explicit Admin fixture endpoint"
+}

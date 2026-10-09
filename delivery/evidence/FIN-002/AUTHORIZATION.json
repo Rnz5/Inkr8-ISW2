@@ -1,0 +1,10 @@
+{
+  "recorded": "2026-10-09 America/Lima",
+  "source": "Marco latest prompt in this chat",
+  "code_tests_docs_author": "Codex",
+  "DEC-AI-AUTH-001": "Professor permission communicated by Marco, original manual code reported; no invented individual attribution",
+  "new_permission": "Commit/push codex/refactorizacion-por-bloques and draft PR to master; no merge/deployment/real-data modifications",
+  "remote_master": "7d879c22030527e1d5f5003ad84b76b750d3b29e",
+  "remote_branch_did_not_exist": true,
+  "previous_readonly_pause": "FIN-001 preserved; not a completed delivery"
+}

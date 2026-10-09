@@ -1,0 +1,15 @@
+{
+  "commit": "de6d56989d9ae26d982e64e757865279e4b2f55e",
+  "branch": "codex/refactorizacion-por-bloques",
+  "author": "Codex",
+  "changes_scanned": 431,
+  "archive_entries_scanned": 961,
+  "SDK_parser_header_literals_without_PEM_payload": 2,
+  "sensitive_filename_keys_tokens_private_keys": "No credentials found by checks; only explicit zero demo API key allowed. Initial PEM header-only detector matched DEX SDK parsing constants; complete PEM payload detector remains enforced.",
+  "all_delivered_artifact_hashes_equal_after_autocrlf_true_clone": true,
+  "artifacts_verified": 121,
+  "fresh_clone_static_audit": "289 PASS; not extra functional tests",
+  "baseline_ancestor_preserved": true,
+  "source_map_current": true,
+  "limits": "Pattern checks and deliberate allowlist; no claim of exhaustive security audit or human independent review."
+}

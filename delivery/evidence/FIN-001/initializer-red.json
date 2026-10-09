@@ -1,0 +1,166 @@
+{
+  "passed": 37,
+  "failed": 2,
+  "rows": [
+    {
+      "name": "owner profile read",
+      "pass": true
+    },
+    {
+      "name": "anonymous denied private profile",
+      "pass": true
+    },
+    {
+      "name": "cross user profile read denied",
+      "pass": true
+    },
+    {
+      "name": "cross user profile write denied",
+      "pass": true
+    },
+    {
+      "name": "owner cannot forge rating",
+      "pass": true
+    },
+    {
+      "name": "owner cannot forge merit",
+      "pass": true
+    },
+    {
+      "name": "owner cannot forge meritCap",
+      "pass": true
+    },
+    {
+      "name": "owner cannot forge meritHold",
+      "pass": true
+    },
+    {
+      "name": "owner cannot forge isPlaced",
+      "pass": true
+    },
+    {
+      "name": "owner cannot forge reputation",
+      "pass": true
+    },
+    {
+      "name": "owner cannot forge isPhilosopher",
+      "pass": true
+    },
+    {
+      "name": "owner email update preserved",
+      "pass": true
+    },
+    {
+      "name": "owner failure cleanup preserves session release",
+      "pass": true
+    },
+    {
+      "name": "cannot enter Ranked without economic callable",
+      "pass": true
+    },
+    {
+      "name": "owner submission read",
+      "pass": true
+    },
+    {
+      "name": "other user submission read denied",
+      "pass": true
+    },
+    {
+      "name": "other user submission write denied",
+      "pass": true
+    },
+    {
+      "name": "owner cannot forge evaluation",
+      "pass": true
+    },
+    {
+      "name": "owner cannot rewrite confirmed submission",
+      "pass": true
+    },
+    {
+      "name": "owner cannot erase pending submission",
+      "pass": false,
+      "error": "Expected values to be strictly equal:\n\n200 !== 403\n"
+    },
+    {
+      "name": "client cannot write admin seasons",
+      "pass": true
+    },
+    {
+      "name": "client cannot write admin seasons/1999-01/members",
+      "pass": true
+    },
+    {
+      "name": "client cannot write admin seasonAssignments",
+      "pass": true
+    },
+    {
+      "name": "client cannot write admin users/HZKChhcLvdXiJm0Gs5LaHOU47EwD/meritTransactions",
+      "pass": true
+    },
+    {
+      "name": "client cannot write admin tournaments",
+      "pass": true
+    },
+    {
+      "name": "client cannot write admin leagues",
+      "pass": true
+    },
+    {
+      "name": "seasons accessed through callable, not private client documents",
+      "pass": true
+    },
+    {
+      "name": "new genuine Users defaults accepted",
+      "pass": true
+    },
+    {
+      "name": "new forged grant rejected",
+      "pass": true
+    },
+    {
+      "name": "new genuine Practice payload accepted",
+      "pass": true
+    },
+    {
+      "name": "new foreign author rejected",
+      "pass": true
+    },
+    {
+      "name": "Ranked without paid session rejected",
+      "pass": true
+    },
+    {
+      "name": "authenticated words catalog read",
+      "pass": true
+    },
+    {
+      "name": "catalog words write forbidden",
+      "pass": true
+    },
+    {
+      "name": "authenticated themes catalog read",
+      "pass": true
+    },
+    {
+      "name": "catalog themes write forbidden",
+      "pass": true
+    },
+    {
+      "name": "authenticated topics catalog read",
+      "pass": true
+    },
+    {
+      "name": "catalog topics write forbidden",
+      "pass": true
+    },
+    {
+      "name": "initializer repetition preserves progress",
+      "pass": false,
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected ... Lines skipped\n\n  {\n+   bestScore: 0,\n+   email: '',\n+   hasChosenUsername: false,\n+   hasSeenPlacementReveal: false,\n+   id: 'fin-initializer-1791423097711',\n+   isPhilosopher: false,\n+   isPlaced: false,\n+   joinedDate: 1791423098393,\n+   merit: 1000,\n+   name: '',\n+   placementMatchesPlayed: 0,\n+   profileImageURL: '',\n+   rating: 0,\n+   reputation: 0,\n-   achievements: [],\n-   bannerImageURL: '',\n-   bestScore: 0,\n-   currentStreak: 0,\n-   currentlyInRanked: false,\n-   email: null,\n-   hasChosenUsername: false,\n-   hasSeenPlacementReveal: false,\n-   id: 'fin-initializer-1791423097711',\n-   isPhilosopher: false,\n-   isPlaced: true,\n-   joinedDate: 1791423097712,\n-   lastSubmissionDay: 0,\n-   merit: 3456,\n-   meritCap: 50000,\n-   meritHold: 0,\n-   name: 'Existing',\n-   philosopherSince: null,\n-   placementMatchesPlayed: 0,\n-   profileImageURL: '',\n-   rankedLossStreak: 0,\n-   rankedSessionStartedAt: null,\n-   rankedWinStreak: 0,\n-   rating: 555,\n-   recentScores: [],\n-   reputation: 0,\n-   savedSubmissionsCount: 0,\n    submissionsCount: 0,\n...\n    tournamentsPlayed: 0,\n    tournamentsWon: 0\n  }"
+    }
+  ],
+  "transport": "Real emulator REST with anonymous Auth ID tokens; Admin SDK fixtures. No tokens recorded.",
+  "project": "demo-inkr8-local"
+}

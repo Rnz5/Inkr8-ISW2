@@ -1,0 +1,24 @@
+{
+  "launch": "Normal am start MAIN host; no instrument command or tests running",
+  "anonymous_auth": "Genuine demo sign-in and owner UserRepository read; existing synthetic lab identity may be reused",
+  "destination_texts": [
+    "SECURE LOCAL FIXTURE",
+    "2,345",
+    "Liquid Merit",
+    "Capacity: 50,000",
+    "R8 Core",
+    "Active Judgment",
+    "Enhance your writing.",
+    "Lexicon Analyzer",
+    "ancient",
+    "Frequency: 100"
+  ],
+  "project": "demo-inkr8-local",
+  "only_loopback_UID_guard": true,
+  "APK_sha256": "7216f9666379f6e9f597aafefdd4f57571ec196ae5d41fb0e6cbf5b17a9fff5d",
+  "limits": [
+    "Not fresh installation/onboarding coverage",
+    "Not Google OAuth or Ads",
+    "Fixture server not needed for this entry; catalog/profile may already exist in lab"
+  ]
+}

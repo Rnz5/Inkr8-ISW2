@@ -1,0 +1,39 @@
+{
+  "rows": [
+    {
+      "scenario": "claimed",
+      "expected": {
+        "matchStatus": "MATCHED",
+        "rating": 64,
+        "delta": 4,
+        "opponentId": "opponent"
+      },
+      "actual": {
+        "matchStatus": "MATCHED",
+        "rating": 64,
+        "delta": 4,
+        "opponentId": "opponent"
+      },
+      "passed": true
+    },
+    {
+      "scenario": "fresh-rating",
+      "expected": {
+        "matchStatus": "GHOST",
+        "rating": 72,
+        "delta": 2,
+        "opponentId": "GHOST"
+      },
+      "actual": {
+        "matchStatus": "GHOST",
+        "rating": 72,
+        "delta": 2,
+        "opponentId": "GHOST"
+      },
+      "passed": true
+    }
+  ],
+  "passed": 2,
+  "failed": 0,
+  "scope": "Firestore SDK and compiled ghost handler; delayed transaction/competing commit fixtures. Ghost benchmark, ±2 and +2/-4/+1 unchanged."
+}

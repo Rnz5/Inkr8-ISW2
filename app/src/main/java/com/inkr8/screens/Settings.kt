@@ -36,11 +36,11 @@ fun Settings(
         AlertDialog(
             onDismissRequest = { showDeleteDialog = false },
             containerColor = MaterialTheme.colorScheme.surface,
-            title = { Text("Dissolve Identity", color = Color.White) },
-            text = { Text("This will permanently delete your account and release your username. This action cannot be undone.", color = Color.Gray) },
+            title = { Text("Close account access", color = Color.White) },
+            text = { Text("This closes sign-in access. Your profile, username, history and economic records are retained.", color = Color.Gray) },
             confirmButton = {
                 TextButton(onClick = { showDeleteDialog = false; onDeleteAccount() }) {
-                    Text("Dissolve", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
+                    Text("Close access", color = MaterialTheme.colorScheme.error, fontWeight = FontWeight.Bold)
                 }
             },
             dismissButton = { TextButton(onClick = { showDeleteDialog = false }) { Text("Cancel", color = Color.White) } }
@@ -151,7 +151,7 @@ fun Settings(
                 ),
                 border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.2f))
             ) {
-                Text("DISSOLVE IDENTITY", fontWeight = FontWeight.Black, letterSpacing = 2.sp)
+                Text("CLOSE ACCOUNT ACCESS", fontWeight = FontWeight.Black, letterSpacing = 2.sp)
             }
 
             Spacer(modifier = Modifier.height(48.dp))
