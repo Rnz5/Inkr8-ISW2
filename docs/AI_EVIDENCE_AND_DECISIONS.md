@@ -189,3 +189,36 @@ Los localizadores HU/CT/M/CP proceden de las matrices previas enlazadas; no se r
 [VERIFICATION](evidence/DOC-011/VERIFICATION.json) conserva los resultados reales de enlaces/anclas/tablas, IDs/fichas, hashes históricos, preservación de todos los archivos previos salvo README/STATUS/DECISIONS, nueve copias recuperadas, seis XML históricos y C1 en lectura. [BEFORE](evidence/DOC-011/BEFORE.json) fija el paquete anterior completo fuera de .git. Los auxiliares de esta etapa son documentación/integridad, no código o tests del producto.
 
 Se verificó la procedencia y se contrastaron requisitos/textos disponibles; este razonamiento del agente **no sustituye revisión crítica humana**. Sin builds/tests de producto o arnés, escenarios nuevos, modificación de originales/baseline/DOC-001–010/código/configuración/datos/servicios/GitHub, instalación de dependencias del producto, reconstrucción R8/versiones, arquitectura final, implementación de retiradas/temporadas o mensajes a otros chats. S01–S25 siguen sin ejecutar; ningún AC se cerró íntegramente.
+
+
+## ACCOUNT-ACCESS-001 — decisión posterior aplicada
+
+Marco respondió «aplica lo recomendable» a la consulta agrupada de FIN-002.
+Se adopta el cierre de acceso Auth con conservación de perfil, nombre, historial
+y registros económicos. Código/pruebas/revisión: Codex; no aprobación grupal o
+fuentes externas inferidas. La denegación temporal anterior es antecedente.
+
+`UserRepository.deleteAccount` conserva firma/callbacks y llama `closeAccount`.
+Settings informa cierre de acceso y retención de datos. La función marca primero
+`accountClosed/accountClosedAt` (campos nuevos sólo Functions), sin tocar saldos,
+rating, sesión, reservas, username o historial. Después deshabilita Auth y revoca
+refresh tokens. Rules/callables bloquean tokens previos; fallo parcial mantiene
+acceso cerrado y permite completar el cierre mediante reintento autenticado.
+Sin reactivación automática ni nueva política de borrado. Procesamiento Admin de
+envíos pendientes y fórmulas económicas anteriores permanecen.
+
+**8 métodos Android PASS**, incluido Settings→VM→repositorio→callable→Auth/signout;
+**19 comprobaciones de cierre PASS** REST/Auth/SDK/HTTP: permiso, preservación,
+reapertura denegada,8 concurrentes, tokens antiguos y refresh, acceso ajeno,
+fallo parcial explícito de entrega Auth y reintento SDK real. Sonda previa sin
+callable disponible (preparación, no aceptación funcional);
+16/1 posterior detectó conversión indebida de403 a400 en manejador económico:
+se conserva HttpsError, sin cambios de costes/fórmulas. Aserciones intactas.
+Regresiones afectadas:39 permisos,6 nombre,10 retirada/economía,14 operación,
+16 borrado y2 higiene de log PASS. Auditor289 contrastes estáticos PASS; mutación
+de nueva fuente detectada y oráculos anteriores intactos. No se suman repeticiones.
+
+No se aportaron reglas originales, credenciales/ID de prueba R8/Google ni pruebas
+individuales/actas/P5. Esos límites siguen; Auth/IAM cloud y proveedor externo no
+se validan con emuladores. La nueva política local no implica despliegue o datos
+reales ni autoría humana del código.

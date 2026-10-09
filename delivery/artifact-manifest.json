@@ -1,5 +1,6 @@
 {
-  "verified_production_commit": "90bc51a64be168211a24159734af29a42288a7e4",
+  "verified_production_commit": "2f96c6d43d68673c80a2d794a47d0da6d1933012",
+  "prior_verified_production_commit": "90bc51a64be168211a24159734af29a42288a7e4",
   "baseline": "7d879c22030527e1d5f5003ad84b76b750d3b29e",
   "author": "Codex",
   "artifacts": {
@@ -17,6 +18,18 @@
     },
     "evidence/android-unit/TEST-com.inkr8.ExampleUnitTest.xml": {
       "sha256": "9f58fbccb02fcc93d75c8e44d06cf729bab8b9fa137a151f73ba4b6065173eeb",
+      "bytes": 414
+    },
+    "evidence/android-unit-account/TEST-com.inkr8.characterization.ProductCoreContractTest.xml": {
+      "sha256": "8352749bbac77b080bff007ea5d8bccf180e61be6583fc4fa7f14837552db0e6",
+      "bytes": 2216
+    },
+    "evidence/android-unit-account/TEST-com.inkr8.evaluation.ProductWritingAdmissionTest.xml": {
+      "sha256": "1818c2da0cf9a05367ce48a7c5fa0879aa8659ddd3f98d8abfe770e91ca81804",
+      "bytes": 904
+    },
+    "evidence/android-unit-account/TEST-com.inkr8.ExampleUnitTest.xml": {
+      "sha256": "e1b5ee4b9e99442e3868bd648163dd756761c15567124bccc6cb9687200931fc",
       "bytes": 414
     },
     "evidence/android-unit-final/TEST-com.inkr8.characterization.ProductCoreContractTest.xml": {
@@ -79,9 +92,37 @@
       "sha256": "7f8411c2b437c6457622d17722a656e9bfc2e5035a1c136cda423aefb897a145",
       "bytes": 545
     },
+    "evidence/FIN-002/account-closure-after.json": {
+      "sha256": "cb1e90d21671ecf2470e90adf8dd84c319621826ff880ca291170fc1adf0ef26",
+      "bytes": 2090
+    },
+    "evidence/FIN-002/account-closure-final.json": {
+      "sha256": "de5c62aeaa516a959f1965b51ce61f266d2c01913efe8a19a7f160759add832c",
+      "bytes": 2232
+    },
+    "evidence/FIN-002/account-closure-verified.json": {
+      "sha256": "32aca8925098f5e16c36b2f8406ef07feb1261e120b93391ee48dca63022f2a4",
+      "bytes": 2016
+    },
+    "evidence/FIN-002/ACCOUNT_BASELINE_OBSERVATION.json": {
+      "sha256": "e1f6dd20e895f8ae54d0c9b7870fa39e38838d9ab0330b39d6d25302f594d5fd",
+      "bytes": 406
+    },
+    "evidence/FIN-002/ACCOUNT_HUMAN_DECISION.json": {
+      "sha256": "7671f5c45555efcfd572072f145ed0db39d134a208f625b96a98ead99e048dd0",
+      "bytes": 886
+    },
+    "evidence/FIN-002/ACCOUNT_RULE_REFRESH.json": {
+      "sha256": "3c009bdf070911f126e863e1f50538bb9a536247fbef8d8660609b3de25f9f07",
+      "bytes": 190
+    },
     "evidence/FIN-002/ANDROID_ACCEPTANCE.json": {
       "sha256": "b4e99c8c1b041a5408955da311c9c9f84479b29eaca21624582b33cf2eb3f179",
       "bytes": 1911
+    },
+    "evidence/FIN-002/ANDROID_ACCEPTANCE_ACCOUNT_FINAL.json": {
+      "sha256": "eb42a7dfe157143b6a4d9cf8b03cd9c4b29950ba2f3070107f0369a8634b91f9",
+      "bytes": 2663
     },
     "evidence/FIN-002/ANDROID_ACCEPTANCE_FINAL.json": {
       "sha256": "6ffd04afa95a01907535eef64919a23ce6765468332abe963cd45b6293c424f1",
@@ -91,9 +132,17 @@
       "sha256": "45d9fd3cafa26050c004f9569e3c325b692dc633477fb9e13be699216ec2cc59",
       "bytes": 811
     },
+    "evidence/FIN-002/APK_ENTRY_SMOKE_ACCOUNT.json": {
+      "sha256": "df56b0a93bf554f9507071c68f963921824136f0352831248993d9a1ff7b4675",
+      "bytes": 812
+    },
     "evidence/FIN-002/APK_ENTRY_SMOKE_FINAL.json": {
       "sha256": "a70dc47056e8d0712baa1df53e224d234d0562904db14230f70b05f7bbacaac8",
       "bytes": 812
+    },
+    "evidence/FIN-002/audit-final-account/audit.json": {
+      "sha256": "63d0735ebf2f9bb59bd0c41d45ed3557abd1d031ecbcfe7cd9f0930401fae36f",
+      "bytes": 57979
     },
     "evidence/FIN-002/audit-final-deletion/audit.json": {
       "sha256": "3072b7aac23be2c37f3218cdfea56bf5bf3cdfde743ebdffb0540d4b09d76507",
@@ -115,6 +164,10 @@
       "sha256": "996fa966c0aa5d4ddaf808723a4e6318a43842c744c5b264c0582a2fbc24e5ff",
       "bytes": 588
     },
+    "evidence/FIN-002/deletion-account-final.json": {
+      "sha256": "fffce67c794915f6b8a6584b63b7de37c2790e904f37b715f3d6d6748545980f",
+      "bytes": 1986
+    },
     "evidence/FIN-002/deletion-after.json": {
       "sha256": "a9737ad2d05bf81ed0493120170b5e8138a3dee4f2e20c71e5b8dcdf6a0c8e57",
       "bytes": 2060
@@ -131,13 +184,25 @@
       "sha256": "566ee7636eaf8b5978383358cfca74cf1281abf1d95d0d7e78e2d95366e4f308",
       "bytes": 2737
     },
+    "evidence/FIN-002/name-account-final.json": {
+      "sha256": "4a1d7061375080980832e7fc248dad641ea840c1ca5bcc70962a289a6438709c",
+      "bytes": 846
+    },
     "evidence/FIN-002/name-claim-consumers.json": {
       "sha256": "4a1d7061375080980832e7fc248dad641ea840c1ca5bcc70962a289a6438709c",
       "bytes": 846
     },
+    "evidence/FIN-002/NEGATIVE_ACCOUNT_CONTROL.json": {
+      "sha256": "af27e6347c7f880c103ff97ea3c16db1ec31f5c93c4038ccad5cc11bb1e4c881",
+      "bytes": 90
+    },
     "evidence/FIN-002/NEGATIVE_CONTROLS_FIN002.json": {
       "sha256": "fd5e61e4554bf1b914036eff907dc06161805b2073889b2817f1644a3b21bc21",
       "bytes": 645
+    },
+    "evidence/FIN-002/operation-account-final.json": {
+      "sha256": "1ad010b5d9346fabfcd98f97c32f2db9cac373c3105710ab2dd07ec555a47013",
+      "bytes": 2254
     },
     "evidence/FIN-002/permission-denial-status.log": {
       "sha256": "1424816142d64c01fc9bf42f4aadaf886771703f30c31135901336cb1291a753",
@@ -151,6 +216,10 @@
       "sha256": "ad63bd63f60b57b140a3be0e6a035fbdf25d0735382cec6fc04ab2ab588bbd09",
       "bytes": 863
     },
+    "evidence/FIN-002/purchase-account-final.json": {
+      "sha256": "0d25128323fb8d03d9327a70f94bdd2ce20329cca1e1faba346c91038c1971d0",
+      "bytes": 633
+    },
     "evidence/FIN-002/purchase-log-after.json": {
       "sha256": "0d25128323fb8d03d9327a70f94bdd2ce20329cca1e1faba346c91038c1971d0",
       "bytes": 633
@@ -160,6 +229,10 @@
       "bytes": 634
     },
     "evidence/FIN-002/REPORT_AUTHORING.json": {
+      "sha256": "6210ef78ffb5994deab2a69d0f277e17d77bfd25ed874928d4d8724753d203fe",
+      "bytes": 479
+    },
+    "evidence/FIN-002/REPORT_AUTHORING_BEFORE_ACCOUNT.json": {
       "sha256": "376db382e94e77740d40cc30e9264a5ad1ead6a3b8ffd6860edfafff980f790a",
       "bytes": 479
     },
@@ -171,6 +244,10 @@
       "sha256": "30beb3fe0ab03946e562748b54156e98d7647f1579ebf638b7429e89134a6cbb",
       "bytes": 801
     },
+    "evidence/FIN-002/REPORT_VISUAL_QA_ACCOUNT.json": {
+      "sha256": "882c84c9e0c0d401229d27718b37bd1fe7fa7b5575c6fa90f5bd0a2307592119",
+      "bytes": 920
+    },
     "evidence/FIN-002/REPORT_VISUAL_QA_FINAL.json": {
       "sha256": "b621fdedfa460c4d272e091d2b24da50e30e11adf81b7449f875b3d6d0544b02",
       "bytes": 869
@@ -178,6 +255,22 @@
     "evidence/FIN-002/RULE_REFRESH.json": {
       "sha256": "4df04450395e6a631fe4ef115b717dbedf4ca1bfae972914ef279f14c4ea475b",
       "bytes": 207
+    },
+    "evidence/FIN-002/runs/account-closure-before/console.log": {
+      "sha256": "d98322f604f23d3f55075e9097df5010f52d4516beca46e30bdc8813bbeedec8",
+      "bytes": 56
+    },
+    "evidence/FIN-002/runs/android-account-closure-build/console.log": {
+      "sha256": "daa02f8413aaa2edcfedd89164bc8b3ee53fd931191b2e49a27ae1e3102d23cb",
+      "bytes": 6697
+    },
+    "evidence/FIN-002/runs/android-account-final-eight/console.log": {
+      "sha256": "f4336a94b7c23e508ba9683caf5e9732e76ea2e4081323e475ebf9a51a4cbf3e",
+      "bytes": 5341
+    },
+    "evidence/FIN-002/runs/android-account-product-build/console.log": {
+      "sha256": "ebc4306ef2a78ea301ab1dc952266501d2362bde98f824db419bd48e6dce8904",
+      "bytes": 4275
     },
     "evidence/FIN-002/runs/android-corrected-probes/console.log": {
       "sha256": "ff6fb94bbaaac41a89c6f864fbd617ff0ba657cdfcd988ea9f94c02c30f8be42",
@@ -211,6 +304,10 @@
       "sha256": "40a3c32af64f9de058a59118cdc157e0bb655dfe6c1c14776cc83f4298dca6ec",
       "bytes": 5382
     },
+    "evidence/FIN-002/runs/functions-account-error-build/console.log": {
+      "sha256": "8fe4571ad4e1c8d99b7bc7e6576a20f57e5d161cc24c4d631421068c0431e2c1",
+      "bytes": 16
+    },
     "evidence/FIN-002/runs/functions-deletion-support-build/console.log": {
       "sha256": "8fe4571ad4e1c8d99b7bc7e6576a20f57e5d161cc24c4d631421068c0431e2c1",
       "bytes": 16
@@ -223,9 +320,17 @@
       "sha256": "1598db58aa410ae9eb99ad3e855cd6fc94bc606fc19b67c1308003e74522d53b",
       "bytes": 2255
     },
+    "evidence/FIN-002/security-account-final.json": {
+      "sha256": "d8e933f665cc36fcd6e93a1ca95c7ae36dbd9f212942558c9b04c06c622cce64",
+      "bytes": 3483
+    },
     "evidence/FIN-002/security-final-rules.json": {
       "sha256": "18c259e0bf8b007f53ea3a4558d33ceae2a9512c8d5691d6368eb7ec7fc9f05f",
       "bytes": 3483
+    },
+    "evidence/FIN-002/withdrawal-account-final.json": {
+      "sha256": "46133e515591602bbe29d8f2530da04307d0ce76ee3a0934a8182de4d9d742b7",
+      "bytes": 3540
     },
     "evidence/SEA-001/AUDITOR_NEGATIVE_CONTROLS.json": {
       "sha256": "23d94b2a2ffe847f2bbab6bcc90a2ad201c046ffcda3cd8f15e187f1dd5c2f53",
@@ -272,36 +377,36 @@
       "bytes": 2202
     },
     "evidence-index.json": {
-      "sha256": "f59456af687cc6cf42eac373e3d23edaff754d5af61f19696219ba973f627ecb",
-      "bytes": 23421
+      "sha256": "f97cb03f415921903756aceb2f300f74dab62313a7ad588f11b2b49c04fa13bb",
+      "bytes": 32807
     },
     "Informe-Inkr8-P4.docx": {
-      "sha256": "6e31c334ae07d0eeb87b988191d329e1ee90b5a8559c02ebdeed049141de598b",
-      "bytes": 239077
+      "sha256": "fada9365df2d227b6e79ca47c5f3f1dc46adc9633a7a1e6a9e5b0b12f7ecfc54",
+      "bytes": 246090
     },
     "Informe-Inkr8-P4.pdf": {
-      "sha256": "727b58fa1ec834a7a9c79e2374564b06eb6bcfc7d23262058545813fd8997b08",
-      "bytes": 376819
+      "sha256": "9d043bbf598a878f7fd6c771db075138f2c63775b47653eec30e87d88fd0941e",
+      "bytes": 383668
     },
     "inkr8-lab-androidTest.apk": {
-      "sha256": "c0b65166223cc6a1f9d007283a9aa4120289f38fca2c77264934452e61e83f78",
-      "bytes": 1134786
+      "sha256": "afb0c3786581ab8d677ed11b55ec190614d0d7ba4ba16e4b3483f1e9d7b9edd4",
+      "bytes": 1136076
     },
     "inkr8-lab-debug.apk": {
-      "sha256": "b87f956cfc4629f18486d29216115ad117117e78bf5ee154d9f6099d619b059d",
+      "sha256": "7216f9666379f6e9f597aafefdd4f57571ec196ae5d41fb0e6cbf5b17a9fff5d",
       "bytes": 32364003
     },
     "PR_DESCRIPTION.md": {
-      "sha256": "7601d95e27d7a54b11996df8ead2a5eb9d399a8e6f3a29746d0dbdf3f093cf86",
-      "bytes": 3746
+      "sha256": "8cb218cc7f435d6eaa99dd5069eb34d57338684c0f4e4ae060abbc638fa0fe27",
+      "bytes": 4439
     },
     "README.md": {
-      "sha256": "7d59c3516f61137ffa7939e431e014f567f384012685209968f18a5a2ec45f73",
-      "bytes": 9539
+      "sha256": "64f445d4196a055135f1b763649179e24ae93115463a65ea4befa370a98d7d69",
+      "bytes": 11839
     },
     "source-map.json": {
-      "sha256": "1c58049f57892925ef8bf87aa6b73028acf22722acbc69eef30e8b83a4cdf7ad",
-      "bytes": 3385
+      "sha256": "65e80fd858406269c7b411baf377ecdd31aea7fd5616790fac1a4b09f5f18ace",
+      "bytes": 3821
     },
     "uml/classes.png": {
       "sha256": "15d6e8c203789cd82e0d8a3ecbe751b43f116551fdf08a98bad39f872e579a21",
@@ -316,40 +421,40 @@
       "bytes": 25254
     },
     "uml/components.png": {
-      "sha256": "7d952b0f25c6793d3c692b0281e2948c12328251ac2dd481af9eda9ef887386f",
-      "bytes": 32953
+      "sha256": "e5b0d256a7ea6624a05ec72793409b4eb45a0e2e6b001da693e85c6a69aa6e5e",
+      "bytes": 36994
     },
     "uml/components.puml": {
-      "sha256": "14313355912e1490405b1a7860cb7fbbc8b3a0cfbc8ebdb1b475f10c348b757d",
-      "bytes": 1217
+      "sha256": "633c58b3b947d03473edb6f23a841e66d2abaa28f9de18f3d345d701453b4d7c",
+      "bytes": 1309
     },
     "uml/components.svg": {
-      "sha256": "5d3edc9d9b07e3d96f752520b3864a0305b47127b9dd800029cc2d02f9d5d46c",
-      "bytes": 26662
+      "sha256": "b5435997867656d17576b3b031a06a2b8ec5960ec52b835afb0e79e8ace2a557",
+      "bytes": 28925
     },
     "uml/data-model.png": {
-      "sha256": "cc7fc3209f30d917e3d942639eeec91d412f487e25f98aac0d22321bb7592942",
-      "bytes": 27548
+      "sha256": "518f292fedd972d4dd49e3cdd60d57b36e13a447494f1285a644afd93c2434de",
+      "bytes": 28546
     },
     "uml/data-model.puml": {
-      "sha256": "e9566707d696867403e7d06c2d63b4dd1666a37c331fb8ed1e9616bc5160bd06",
-      "bytes": 1259
+      "sha256": "db27380586d0045f535f78258a33387ff04d3d475539bb61d0f248417c4bd510",
+      "bytes": 1321
     },
     "uml/data-model.svg": {
-      "sha256": "da25023cb670726cdf10695a9111e6f537ef4050d50f8c2ff1b0ef32e34677c2",
-      "bytes": 22859
+      "sha256": "b96a75aa793dd6bcaa17c5c5dbfd6dc234c5547d0a8577d1bea9f415089915b0",
+      "bytes": 23166
     },
     "uml/deployment.png": {
-      "sha256": "fbf3dcf79e828a20343512e9850aa5680add582413fe40a6cb4cb7c437ac6495",
-      "bytes": 26538
+      "sha256": "bda57d1ba790a8024e4076d6256a46703fcb083d6fb6b660f0278ef7264dd85b",
+      "bytes": 28621
     },
     "uml/deployment.puml": {
-      "sha256": "286ac72b491f5c7121997ea0f11efd5804f51a6aefe3226f3469f8ec12421766",
-      "bytes": 1134
+      "sha256": "acde8d82d61de5f4c085732eab4868770c61894924b1885ad83340f05846cfaa",
+      "bytes": 1171
     },
     "uml/deployment.svg": {
-      "sha256": "f28b61171f9c7029e0159504aab1b5b5d369968c08f7e86dcad060e75b8cc204",
-      "bytes": 15659
+      "sha256": "b66a3d53a6e5539cf5f9c686e28b2e5a669d0cfe19b5bffa37212a0f3f6ac494",
+      "bytes": 16283
     },
     "uml/README.md": {
       "sha256": "f762ee190119e2477edafd42f172f734febdb7f02653a8260d135f181b22793d",
@@ -384,6 +489,5 @@
       "bytes": 267
     }
   },
-  "artifact_scope": "Demo APKs only; final Android7 PASS, real Firestore permissions, strict NEW rules, R8 transport double. All previous evidence kept.",
-  "clean_clone_before_publication": "ad22e01eb5b8383fbdc532b267d4ec067843bbe3"
+  "artifact_scope": "Final demo APKs:8 Android PASS,19 account PASS, final affected regressions and289 static checks separately. R8 HTTP double and one Auth failure injection declared. No cloud or individual academic proof."
 }

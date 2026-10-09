@@ -32,11 +32,11 @@ class LabSecureAcceptanceTest {
  private val db get()=FirebaseFirestore.getInstance()
  private lateinit var user:Users
  private lateinit var vm:AppViewModel
- private fun fixture(kind:String) {
+ private fun fixture(kind:String):JSONObject {
   val c=URL("http://127.0.0.1:5011/fixture/$kind").openConnection() as HttpURLConnection
   c.requestMethod="POST";c.doOutput=true;c.connectTimeout=15000;c.readTimeout=15000
   c.setRequestProperty("Content-Type","application/json");c.outputStream.use{it.write(JSONObject(mapOf("uid" to user.id)).toString().toByteArray())}
-  assertEquals(200,c.responseCode);c.disconnect()
+  assertEquals(200,c.responseCode);val result=c.inputStream.bufferedReader().use{JSONObject(it.readText())};c.disconnect();return result
  }
  @Before fun setup(){
   assertEquals("demo-inkr8-local",FirebaseApp.getInstance().options.projectId)
@@ -47,9 +47,9 @@ class LabSecureAcceptanceTest {
   ui.runOnIdle{vm=ViewModelProvider(ui.activity,AppViewModelFactory(user))[uid,AppViewModel::class.java]}
  }
  @After fun release(){ui.runOnIdle{ui.activity.viewModelStore.clear()}}
- private fun show(){ui.activityRule.scenario.onActivity{it.show{
+ private fun show(onSessionEnded:()->Unit={}){ui.activityRule.scenario.onActivity{it.show{
   val launcher=rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()){}
-  AppRoot(user,launcher,{})
+  AppRoot(user,launcher,onSessionEnded)
  }}}
  private fun mode(topic:Boolean):Gamemode=if(topic) OnTopicWriting(Theme(id="fin-theme",name="Nature"),Topic(id="fin-topic",themeId="fin-theme",name="Rivers")) else StandardWriting
  private fun root(topic:Boolean,ranked:Boolean){
@@ -79,6 +79,16 @@ class LabSecureAcceptanceTest {
   assertTrue(done.await(20,TimeUnit.SECONDS));assertNull(error);assertEquals(1,successes)
   val snapshot=Tasks.await(db.collection("users").document(user.id).get(Source.SERVER),15,TimeUnit.SECONDS)
   assertEquals(2345L,snapshot.getLong("merit"));assertEquals(500L,snapshot.getLong("rating"))
+ }
+ @Test fun closeAccountEndsAuthSessionAndPreservesHistory(){
+  fixture("history");var ended=false
+  ui.runOnIdle{vm.navigateTo(Screen.settings)};show{ended=true}
+  ui.onNodeWithText("CLOSE ACCOUNT ACCESS").performScrollTo().performClick()
+  ui.onNodeWithText("This closes sign-in access. Your profile, username, history and economic records are retained.").assertExists()
+  ui.onNodeWithText("Close access").performClick();ui.waitUntil(20000){ended}
+  assertNull(FirebaseAuth.getInstance().currentUser)
+  val result=fixture("closure-check");assertTrue(result.getBoolean("closed"));assertTrue(result.getBoolean("disabled"))
+  assertTrue(result.getBoolean("historyRetained"));assertEquals(2345L,result.getLong("merit"));assertEquals(500L,result.getLong("rating"))
  }
  @Test fun profileAndOwnSeasonHistoryWithAdminCollectionsDenied(){
   fixture("history");ui.runOnIdle{vm.navigateTo(Screen.profile)};show()

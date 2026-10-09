@@ -28,6 +28,7 @@ if(adapter.FieldValue===undefined) adapter.FieldValue=require('firebase-admin/fi
 module.exports=require('./users/applyMeritAction.js');
 Object.assign(module.exports,require('./submissions/submissionEvaluationEngine.js'));
 Object.assign(module.exports,require('./submissions/deleteSubmission.js'));
+Object.assign(module.exports,require('./users/accountAccess.js'));
 const seasons=require('./seasons/seasonFunctions.js');
 for(const name of ['seasonSubmissionCreated','seasonSubmissionUpdated','getSeasonRanking','getSeasonHistory']) module.exports[name]=seasons[name];
 ''',encoding='utf-8')

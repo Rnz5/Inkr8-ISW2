@@ -238,3 +238,36 @@ conservados;3 mutaciones aisladas detectadas. No son287 pruebas funcionales.
 La propuesta deniega el cierre de cuenta anterior; Settings recibe error.
 Restituir un cierre seguro exige política/ciclo Auth confiables. **No se acredita
 que el equipo haya retirado o excluido esa función del alcance.**
+
+
+## ACCOUNT-ACCESS-001 — decisión posterior aplicada
+
+Marco respondió «aplica lo recomendable» a la consulta agrupada de FIN-002.
+Se adopta el cierre de acceso Auth con conservación de perfil, nombre, historial
+y registros económicos. Código/pruebas/revisión: Codex; no aprobación grupal o
+fuentes externas inferidas. La denegación temporal anterior es antecedente.
+
+`UserRepository.deleteAccount` conserva firma/callbacks y llama `closeAccount`.
+Settings informa cierre de acceso y retención de datos. La función marca primero
+`accountClosed/accountClosedAt` (campos nuevos sólo Functions), sin tocar saldos,
+rating, sesión, reservas, username o historial. Después deshabilita Auth y revoca
+refresh tokens. Rules/callables bloquean tokens previos; fallo parcial mantiene
+acceso cerrado y permite completar el cierre mediante reintento autenticado.
+Sin reactivación automática ni nueva política de borrado. Procesamiento Admin de
+envíos pendientes y fórmulas económicas anteriores permanecen.
+
+**8 métodos Android PASS**, incluido Settings→VM→repositorio→callable→Auth/signout;
+**19 comprobaciones de cierre PASS** REST/Auth/SDK/HTTP: permiso, preservación,
+reapertura denegada,8 concurrentes, tokens antiguos y refresh, acceso ajeno,
+fallo parcial explícito de entrega Auth y reintento SDK real. Sonda previa sin
+callable disponible (preparación, no aceptación funcional);
+16/1 posterior detectó conversión indebida de403 a400 en manejador económico:
+se conserva HttpsError, sin cambios de costes/fórmulas. Aserciones intactas.
+Regresiones afectadas:39 permisos,6 nombre,10 retirada/economía,14 operación,
+16 borrado y2 higiene de log PASS. Auditor289 contrastes estáticos PASS; mutación
+de nueva fuente detectada y oráculos anteriores intactos. No se suman repeticiones.
+
+No se aportaron reglas originales, credenciales/ID de prueba R8/Google ni pruebas
+individuales/actas/P5. Esos límites siguen; Auth/IAM cloud y proveedor externo no
+se validan con emuladores. La nueva política local no implica despliegue o datos
+reales ni autoría humana del código.

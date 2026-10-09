@@ -81,13 +81,25 @@
       "message": "deleteSubmission",
       "file": "functions/src/submissions/deleteSubmission.ts",
       "line": 7,
-      "sha256": "f123797159189555444e354264b88119cb7c74f29f0a75f3c67e5dda7a07c256"
+      "sha256": "4e59f1f29597fa18ae00543f217509882f4ca473f678b2ba3bb2fca7d898ee2e"
     },
     {
       "message": "deleteSubmission",
       "file": "app/src/main/java/com/inkr8/repository/FirestoreSubmissionRepository.kt",
       "line": 54,
       "sha256": "92ca53ae09a584593365e252b97eac07ffda706858906b0f4b3e5ab018480216"
+    },
+    {
+      "message": "closeAccount",
+      "file": "functions/src/users/accountAccess.ts",
+      "line": 11,
+      "sha256": "ed69db9fc224ce73f14f9cb370f655029f25ea791e7b552e4ec39ae0f68be0c4"
+    },
+    {
+      "message": "deleteAccount",
+      "file": "app/src/main/java/com/inkr8/repository/UserRepository.kt",
+      "line": 182,
+      "sha256": "024ba9dffb95fb2f3df1b0b8a8afb52497290ca79c3812a670c7650c1874a0f3"
     }
   ]
 }

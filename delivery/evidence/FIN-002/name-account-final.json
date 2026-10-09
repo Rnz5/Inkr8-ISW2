@@ -1,0 +1,31 @@
+{
+  "passed": 6,
+  "rows": [
+    {
+      "name": "Name cannot be claimed without atomic matching index",
+      "pass": true
+    },
+    {
+      "name": "Actual username writer contract accepted atomically",
+      "pass": true
+    },
+    {
+      "name": "Cross-user existing name cannot be stolen",
+      "pass": true
+    },
+    {
+      "name": "Denied collision has no partial profile/index effects",
+      "pass": true
+    },
+    {
+      "name": "Second free claim denied; paid change remains callable",
+      "pass": true
+    },
+    {
+      "name": "Name registration does not grant or charge Merit",
+      "pass": true
+    }
+  ],
+  "realTransport": "Auth ID tokens and Firestore atomic REST commit; no tokens saved",
+  "fixtures": "Minimal unclaimed profiles inserted by Admin; genuine production field contract, not full Android onboarding"
+}

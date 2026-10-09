@@ -14,5 +14,11 @@ http.createServer(async(req,res)=>{try{
   const old='1997-01';await db.collection('seasons').doc(old).set({status:'CLOSED',start:852076800000,end:854755200000,pendingCount:0});await db.collection('seasons').doc(old).collection('members').doc(d.uid).set({userId:d.uid,rating:14,meritEarned:457});
  }else if(req.url==='/fixture/failure'){
   await db.collection('users').doc(d.uid).update({currentlyInRanked:false,rankedSessionStartedAt:null});
+ }else if(req.url==='/fixture/closure-check'){
+  const profile=await db.collection('users').doc(d.uid).get(),authUser=await getAuth().getUser(d.uid);
+  const history=await db.collection('seasons').doc('1997-01').collection('members').doc(d.uid).get();
+  res.writeHead(200,{'Content-Type':'application/json'});
+  res.end(JSON.stringify({ok:true,closed:profile.get('accountClosed')===true,disabled:authUser.disabled,
+    historyRetained:history.exists,merit:profile.get('merit'),rating:profile.get('rating')}));return;
  }else throw Error('Unknown fixture');res.writeHead(200,{'Content-Type':'application/json'});res.end('{"ok":true}');
 }catch(e){res.writeHead(400);res.end('{"ok":false}')}}).listen(5011,'127.0.0.1',()=>console.log('Demo Admin fixture endpoint only on loopback 5011; synthetic data, no product service.'));

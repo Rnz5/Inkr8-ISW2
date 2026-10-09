@@ -21,6 +21,7 @@ package Functions {
  [rankedMatching] as M
  [calculateDynamicRatingChange] as C
  [applyMeritAction] as A
+ [accountAccess] as AC
  [seasonLedger] as L
  [seasonFunctions] as F
  [evaluateWithR8 autentico] as R8
@@ -37,6 +38,7 @@ VM --> R
 SS --> R
 R --> DB : SDK concreto
 R --> A : callable
+R --> AC : cierre autenticado
 R --> F : callables autenticados
 DB --> E : evento creado
 E --> R8
@@ -45,6 +47,7 @@ M --> C
 E --> DB : evaluacion atomica
 M --> DB : pareja reciproca atomica
 A --> DB : transaccion economica
+AC --> DB : marcador de acceso cerrado
 DB --> F : creado y actualizado
 F --> L
 L --> DB : acuse y liquidacion atomicos

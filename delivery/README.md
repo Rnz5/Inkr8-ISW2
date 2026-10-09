@@ -14,18 +14,19 @@ No hacer merge, deploy o conexión a datos reales por estos comandos.
 - `inkr8-lab-debug.apk`: paquete **com.inkr8.lab**, **demo-inkr8-local** solamente.
   Abre host local sin instrumentación; entrada Auth→AppRoot comprobada. Se omiten
   MainActivity/Google OAuth/Ads, R8 HTTP doble. Requiere servicios locales+ADB reverse.
-- `inkr8-lab-androidTest.apk`: necesario sólo para sondas automáticas. 7 métodos
+- `inkr8-lab-androidTest.apk`: necesario sólo para sondas automáticas. 8 métodos
   finales PASS, incluidas las dos sondas pendientes; no fue un fallo de producción.
 - `evidence/` y `evidence-index.json`: copias fieles de resultados rojos/verdes
   pertinentes y sus hashes, sin secretos/exports originales privados.
 - FIN-00139 seguridad PASS, FIN-0026 nombre-atómico PASS, 14 operación PASS,
-  token-rojo1/1→2verde; 287 contrastes **estáticos**, separados de pruebas funcionales.
+  token-rojo1/1→2verde; 289 contrastes **estáticos**, separados de pruebas funcionales.
 - Historial de suites CORE/SEA reutilizado; no se suman ejecuciones repetidas.
 
 Reglas `security/firestore.proposed.rules`: propuesta **NUEVA**, no original ni
 desplegada. Acceso owner, cross-user denegado y temporadas/dinero Admin-only
 comprobados localmente. No valida por sí sola antiabuso de metadata/reservas de
-sesión. Cuenta-client-delete denegada requiere un cierre confiable si se restituye.
+sesión. Delete directo denegado; el cierre de acceso aprobado usa callable/disable/
+revoke y conserva perfil/historial/economía. Comprobado localmente, IAM cloud pendiente.
 Philosopher conserva verificación de compras placeholder previo; se retiró token
 del log, pero falta Google real. R8 externo, OAuth/Ads/billing y scheduler cloud
 no acreditados. Por estos límites la entrega no es cierre cloud/académico completo.
@@ -101,11 +102,11 @@ adb -s $serial reverse tcp:5011 tcp:5011
 adb -s $serial install -r delivery/inkr8-lab-debug.apk
 adb -s $serial install -r delivery/inkr8-lab-androidTest.apk
 adb -s $serial shell am start -n com.inkr8.lab/com.inkr8.lab.LabHostActivity
-# Para automatizar los siete métodos de aceptación final
+# Para automatizar los ocho métodos de aceptación final
 adb -s $serial shell am instrument -w -r -e class com.inkr8.lab.LabSecureAcceptanceTest com.inkr8.lab.test/androidx.test.runner.AndroidJUnitRunner
 ```
 
-**Leer `OK (7 tests)` y los estados del runner**, no sólo exit0 de adb. No limpiar
+**Leer `OK (8 tests)` y los estados del runner**, no sólo exit0 de adb. No limpiar
 datos, desinstalar o hacer wipe para repetir. Fixtures crean usuarios demo nuevos.
 El demo manual necesita catálogo/user de prueba; las sondas lo preparan de forma
 explícita. Esta entrada manual no sustituye cobertura de onboarding/OAuth real.
@@ -131,6 +132,7 @@ node testing-blocks/final/name-claim-check.cjs $functionsRoot "$runOut/name-clai
 node testing-blocks/final/operation-check.cjs $functionsRoot "$runOut/operations.json"
 node testing-blocks/final/purchase-log-check.cjs $functionsRoot "$runOut/purchase-log.json"
 node testing-blocks/final/deletion-settlement-check.cjs $functionsRoot "$runOut/deletion.json"
+node testing-blocks/final/account-closure-check.cjs $functionsRoot "$runOut/account-closure.json"
 python testing-blocks/local-refactor-audit/verify_local_refactor.py --repo $repoRoot --report-dir "$runOut/static-audit"
 ```
 
@@ -147,9 +149,9 @@ Las obligaciones académicas individuales y pares/sprints auténticos se listan
 en informe y docs/FINAL_DELIVERY.md. No atribuir pruebas del agente al estudiante.
 
 Borrado:16 casos SDK/REST/HTTP PASS; consumidor Android callable confirmado.
-El APK final corresponde al guardado protegido, reglas nuevas y resultado7 PASS.
-La UI Settings de cierre de cuenta recibe denegación; su ciclo seguro/política no
-están resueltos ni se presentan como retirada humana aprobada.
+El APK final corresponde al guardado protegido, reglas nuevas y cierre Auth:8 PASS.
+Settings usa ahora cierre de acceso Auth aprobado por Marco; conserva datos.
+19 comprobaciones y consumidor Android pasan; IAM/Auth cloud no acreditados.
 
 ## Publicación y paquete
 
@@ -167,4 +169,36 @@ El ZIP exportado contiene fuentes actuales/entregables, sin `.git`; para ese aud
 usar el clon anterior. Su `PACKAGE-EXPORT.json` identifica commit y hash de cada
 archivo. No incluye credenciales originales, ZIP/documents privados, exports de
 emuladores, node_modules/lib/build ni JAR de PlantUML. APK abre host local sin
-instrumentación; las siete sondas requieren AndroidTest y emuladores demo.
+instrumentación; las ocho sondas requieren AndroidTest y emuladores demo.
+
+## ACCOUNT-ACCESS-001 — decisión posterior aplicada
+
+Marco respondió «aplica lo recomendable» a la consulta agrupada de FIN-002.
+Se adopta el cierre de acceso Auth con conservación de perfil, nombre, historial
+y registros económicos. Código/pruebas/revisión: Codex; no aprobación grupal o
+fuentes externas inferidas. La denegación temporal anterior es antecedente.
+
+`UserRepository.deleteAccount` conserva firma/callbacks y llama `closeAccount`.
+Settings informa cierre de acceso y retención de datos. La función marca primero
+`accountClosed/accountClosedAt` (campos nuevos sólo Functions), sin tocar saldos,
+rating, sesión, reservas, username o historial. Después deshabilita Auth y revoca
+refresh tokens. Rules/callables bloquean tokens previos; fallo parcial mantiene
+acceso cerrado y permite completar el cierre mediante reintento autenticado.
+Sin reactivación automática ni nueva política de borrado. Procesamiento Admin de
+envíos pendientes y fórmulas económicas anteriores permanecen.
+
+**8 métodos Android PASS**, incluido Settings→VM→repositorio→callable→Auth/signout;
+**19 comprobaciones de cierre PASS** REST/Auth/SDK/HTTP: permiso, preservación,
+reapertura denegada,8 concurrentes, tokens antiguos y refresh, acceso ajeno,
+fallo parcial explícito de entrega Auth y reintento SDK real. Sonda previa sin
+callable disponible (preparación, no aceptación funcional);
+16/1 posterior detectó conversión indebida de403 a400 en manejador económico:
+se conserva HttpsError, sin cambios de costes/fórmulas. Aserciones intactas.
+Regresiones afectadas:39 permisos,6 nombre,10 retirada/economía,14 operación,
+16 borrado y2 higiene de log PASS. Auditor289 contrastes estáticos PASS; mutación
+de nueva fuente detectada y oráculos anteriores intactos. No se suman repeticiones.
+
+No se aportaron reglas originales, credenciales/ID de prueba R8/Google ni pruebas
+individuales/actas/P5. Esos límites siguen; Auth/IAM cloud y proveedor externo no
+se validan con emuladores. La nueva política local no implica despliegue o datos
+reales ni autoría humana del código.

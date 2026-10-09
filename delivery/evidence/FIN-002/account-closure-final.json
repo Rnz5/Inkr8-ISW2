@@ -1,0 +1,88 @@
+{
+  "passed": 19,
+  "failed": 0,
+  "rows": [
+    {
+      "name": "Owner cannot forge the Functions-only closure marker",
+      "pass": true
+    },
+    {
+      "name": "Trusted owner closure available",
+      "pass": true
+    },
+    {
+      "name": "Auth disabled genuinely, not deleted",
+      "pass": true
+    },
+    {
+      "name": "Profile balances/rating/reservation preserved exactly",
+      "pass": true
+    },
+    {
+      "name": "Username, submission and economic ledger retained",
+      "pass": true
+    },
+    {
+      "name": "Old ID token cannot read closed profile",
+      "pass": true
+    },
+    {
+      "name": "Old ID token cannot read prior submission",
+      "pass": true
+    },
+    {
+      "name": "Old ID token cannot use catalog",
+      "pass": true
+    },
+    {
+      "name": "Direct profile deletion still denied",
+      "pass": true
+    },
+    {
+      "name": "Closed caller cannot reopen the marker or reset retained balance",
+      "pass": true
+    },
+    {
+      "name": "Closed token cannot use season ranking/history",
+      "pass": true
+    },
+    {
+      "name": "Closed token cannot spend or enter Ranked",
+      "pass": true
+    },
+    {
+      "name": "Closed token cannot delete historical submission",
+      "pass": true
+    },
+    {
+      "name": "Repeated/concurrent closure preserves first marker and history",
+      "pass": true
+    },
+    {
+      "name": "Refresh of existing Auth session is denied",
+      "pass": true
+    },
+    {
+      "name": "Another user cannot close this account or a foreign target",
+      "pass": true
+    },
+    {
+      "name": "Anonymous callable closure denied",
+      "pass": true
+    },
+    {
+      "name": "Philosopher old token gate precedes existing purchase placeholder",
+      "pass": true
+    },
+    {
+      "name": "Partial Auth failure blocks access, safe retry completes closure",
+      "pass": true
+    }
+  ],
+  "phase": "green",
+  "transport": "Real Auth/REST/callable/Firestore/Admin SDK; synthetic users only. No token or text retained in evidence.",
+  "doubles": [
+    "One explicit Auth update delivery failure injected only in final partial-failure case; retry uses genuine SDK",
+    "Historical data fixtures; no cloud/OAuth/real billing"
+  ]
+}

@@ -51,8 +51,8 @@
     {
       "source_record": "FIN-002/REPORT_AUTHORING.json",
       "public_file": "delivery/evidence/FIN-002/REPORT_AUTHORING.json",
-      "sha256_original": "376db382e94e77740d40cc30e9264a5ad1ead6a3b8ffd6860edfafff980f790a",
-      "sha256_copy": "376db382e94e77740d40cc30e9264a5ad1ead6a3b8ffd6860edfafff980f790a"
+      "sha256_original": "6210ef78ffb5994deab2a69d0f277e17d77bfd25ed874928d4d8724753d203fe",
+      "sha256_copy": "6210ef78ffb5994deab2a69d0f277e17d77bfd25ed874928d4d8724753d203fe"
     },
     {
       "source_record": "FIN-002/REPORT_VISUAL_QA.json",
@@ -395,6 +395,162 @@
       "public_file": "delivery/evidence/FIN-002/audit-fresh-checkout-complete/audit.json",
       "sha256_original": "a5713822f8c5a61bc476ee572e23d8bb983a967c1ce84dd9b14d8b2498c32df7",
       "sha256_copy": "a5713822f8c5a61bc476ee572e23d8bb983a967c1ce84dd9b14d8b2498c32df7"
+    },
+    {
+      "source_record": "FIN-002 former delivered authoring before account",
+      "public_file": "delivery/evidence/FIN-002/REPORT_AUTHORING_BEFORE_ACCOUNT.json",
+      "sha256_original": "376db382e94e77740d40cc30e9264a5ad1ead6a3b8ffd6860edfafff980f790a",
+      "sha256_copy": "376db382e94e77740d40cc30e9264a5ad1ead6a3b8ffd6860edfafff980f790a"
+    },
+    {
+      "source_record": "FIN-002/ACCOUNT_HUMAN_DECISION.json",
+      "public_file": "delivery/evidence/FIN-002/ACCOUNT_HUMAN_DECISION.json",
+      "sha256_original": "7671f5c45555efcfd572072f145ed0db39d134a208f625b96a98ead99e048dd0",
+      "sha256_copy": "7671f5c45555efcfd572072f145ed0db39d134a208f625b96a98ead99e048dd0"
+    },
+    {
+      "source_record": "FIN-002/ACCOUNT_RULE_REFRESH.json",
+      "public_file": "delivery/evidence/FIN-002/ACCOUNT_RULE_REFRESH.json",
+      "sha256_original": "3c009bdf070911f126e863e1f50538bb9a536247fbef8d8660609b3de25f9f07",
+      "sha256_copy": "3c009bdf070911f126e863e1f50538bb9a536247fbef8d8660609b3de25f9f07"
+    },
+    {
+      "source_record": "FIN-002/ANDROID_ACCEPTANCE_ACCOUNT_FINAL.json",
+      "public_file": "delivery/evidence/FIN-002/ANDROID_ACCEPTANCE_ACCOUNT_FINAL.json",
+      "sha256_original": "eb42a7dfe157143b6a4d9cf8b03cd9c4b29950ba2f3070107f0369a8634b91f9",
+      "sha256_copy": "eb42a7dfe157143b6a4d9cf8b03cd9c4b29950ba2f3070107f0369a8634b91f9"
+    },
+    {
+      "source_record": "FIN-002/APK_ENTRY_SMOKE_ACCOUNT.json",
+      "public_file": "delivery/evidence/FIN-002/APK_ENTRY_SMOKE_ACCOUNT.json",
+      "sha256_original": "df56b0a93bf554f9507071c68f963921824136f0352831248993d9a1ff7b4675",
+      "sha256_copy": "df56b0a93bf554f9507071c68f963921824136f0352831248993d9a1ff7b4675"
+    },
+    {
+      "source_record": "FIN-002/REPORT_VISUAL_QA_ACCOUNT.json",
+      "public_file": "delivery/evidence/FIN-002/REPORT_VISUAL_QA_ACCOUNT.json",
+      "sha256_original": "882c84c9e0c0d401229d27718b37bd1fe7fa7b5575c6fa90f5bd0a2307592119",
+      "sha256_copy": "882c84c9e0c0d401229d27718b37bd1fe7fa7b5575c6fa90f5bd0a2307592119"
+    },
+    {
+      "source_record": "FIN-002/runs/account-closure-before/console.log",
+      "public_file": "delivery/evidence/FIN-002/runs/account-closure-before/console.log",
+      "sha256_original": "d98322f604f23d3f55075e9097df5010f52d4516beca46e30bdc8813bbeedec8",
+      "sha256_copy": "d98322f604f23d3f55075e9097df5010f52d4516beca46e30bdc8813bbeedec8"
+    },
+    {
+      "source_record": "FIN-002/account-closure-after.json",
+      "public_file": "delivery/evidence/FIN-002/account-closure-after.json",
+      "sha256_original": "cb1e90d21671ecf2470e90adf8dd84c319621826ff880ca291170fc1adf0ef26",
+      "sha256_copy": "cb1e90d21671ecf2470e90adf8dd84c319621826ff880ca291170fc1adf0ef26"
+    },
+    {
+      "source_record": "FIN-002/account-closure-verified.json",
+      "public_file": "delivery/evidence/FIN-002/account-closure-verified.json",
+      "sha256_original": "32aca8925098f5e16c36b2f8406ef07feb1261e120b93391ee48dca63022f2a4",
+      "sha256_copy": "32aca8925098f5e16c36b2f8406ef07feb1261e120b93391ee48dca63022f2a4"
+    },
+    {
+      "source_record": "FIN-002/account-closure-final.json",
+      "public_file": "delivery/evidence/FIN-002/account-closure-final.json",
+      "sha256_original": "de5c62aeaa516a959f1965b51ce61f266d2c01913efe8a19a7f160759add832c",
+      "sha256_copy": "de5c62aeaa516a959f1965b51ce61f266d2c01913efe8a19a7f160759add832c"
+    },
+    {
+      "source_record": "FIN-002/NEGATIVE_ACCOUNT_CONTROL.json",
+      "public_file": "delivery/evidence/FIN-002/NEGATIVE_ACCOUNT_CONTROL.json",
+      "sha256_original": "af27e6347c7f880c103ff97ea3c16db1ec31f5c93c4038ccad5cc11bb1e4c881",
+      "sha256_copy": "af27e6347c7f880c103ff97ea3c16db1ec31f5c93c4038ccad5cc11bb1e4c881"
+    },
+    {
+      "source_record": "FIN-002/audit-final-account/audit.json",
+      "public_file": "delivery/evidence/FIN-002/audit-final-account/audit.json",
+      "sha256_original": "63d0735ebf2f9bb59bd0c41d45ed3557abd1d031ecbcfe7cd9f0930401fae36f",
+      "sha256_copy": "63d0735ebf2f9bb59bd0c41d45ed3557abd1d031ecbcfe7cd9f0930401fae36f"
+    },
+    {
+      "source_record": "FIN-002/security-account-final.json",
+      "public_file": "delivery/evidence/FIN-002/security-account-final.json",
+      "sha256_original": "d8e933f665cc36fcd6e93a1ca95c7ae36dbd9f212942558c9b04c06c622cce64",
+      "sha256_copy": "d8e933f665cc36fcd6e93a1ca95c7ae36dbd9f212942558c9b04c06c622cce64"
+    },
+    {
+      "source_record": "FIN-002/name-account-final.json",
+      "public_file": "delivery/evidence/FIN-002/name-account-final.json",
+      "sha256_original": "4a1d7061375080980832e7fc248dad641ea840c1ca5bcc70962a289a6438709c",
+      "sha256_copy": "4a1d7061375080980832e7fc248dad641ea840c1ca5bcc70962a289a6438709c"
+    },
+    {
+      "source_record": "FIN-002/withdrawal-account-final.json",
+      "public_file": "delivery/evidence/FIN-002/withdrawal-account-final.json",
+      "sha256_original": "46133e515591602bbe29d8f2530da04307d0ce76ee3a0934a8182de4d9d742b7",
+      "sha256_copy": "46133e515591602bbe29d8f2530da04307d0ce76ee3a0934a8182de4d9d742b7"
+    },
+    {
+      "source_record": "FIN-002/deletion-account-final.json",
+      "public_file": "delivery/evidence/FIN-002/deletion-account-final.json",
+      "sha256_original": "fffce67c794915f6b8a6584b63b7de37c2790e904f37b715f3d6d6748545980f",
+      "sha256_copy": "fffce67c794915f6b8a6584b63b7de37c2790e904f37b715f3d6d6748545980f"
+    },
+    {
+      "source_record": "FIN-002/operation-account-final.json",
+      "public_file": "delivery/evidence/FIN-002/operation-account-final.json",
+      "sha256_original": "1ad010b5d9346fabfcd98f97c32f2db9cac373c3105710ab2dd07ec555a47013",
+      "sha256_copy": "1ad010b5d9346fabfcd98f97c32f2db9cac373c3105710ab2dd07ec555a47013"
+    },
+    {
+      "source_record": "FIN-002/purchase-account-final.json",
+      "public_file": "delivery/evidence/FIN-002/purchase-account-final.json",
+      "sha256_original": "0d25128323fb8d03d9327a70f94bdd2ce20329cca1e1faba346c91038c1971d0",
+      "sha256_copy": "0d25128323fb8d03d9327a70f94bdd2ce20329cca1e1faba346c91038c1971d0"
+    },
+    {
+      "source_record": "FIN-002/runs/android-account-final-eight/console.log",
+      "public_file": "delivery/evidence/FIN-002/runs/android-account-final-eight/console.log",
+      "sha256_original": "f4336a94b7c23e508ba9683caf5e9732e76ea2e4081323e475ebf9a51a4cbf3e",
+      "sha256_copy": "f4336a94b7c23e508ba9683caf5e9732e76ea2e4081323e475ebf9a51a4cbf3e"
+    },
+    {
+      "source_record": "FIN-002/runs/android-account-closure-build/console.log",
+      "public_file": "delivery/evidence/FIN-002/runs/android-account-closure-build/console.log",
+      "sha256_original": "daa02f8413aaa2edcfedd89164bc8b3ee53fd931191b2e49a27ae1e3102d23cb",
+      "sha256_copy": "daa02f8413aaa2edcfedd89164bc8b3ee53fd931191b2e49a27ae1e3102d23cb"
+    },
+    {
+      "source_record": "FIN-002/runs/android-account-product-build/console.log",
+      "public_file": "delivery/evidence/FIN-002/runs/android-account-product-build/console.log",
+      "sha256_original": "ebc4306ef2a78ea301ab1dc952266501d2362bde98f824db419bd48e6dce8904",
+      "sha256_copy": "ebc4306ef2a78ea301ab1dc952266501d2362bde98f824db419bd48e6dce8904"
+    },
+    {
+      "source_record": "FIN-002/runs/functions-account-error-build/console.log",
+      "public_file": "delivery/evidence/FIN-002/runs/functions-account-error-build/console.log",
+      "sha256_original": "8fe4571ad4e1c8d99b7bc7e6576a20f57e5d161cc24c4d631421068c0431e2c1",
+      "sha256_copy": "8fe4571ad4e1c8d99b7bc7e6576a20f57e5d161cc24c4d631421068c0431e2c1"
+    },
+    {
+      "source_record": "FIN-002 genuine app/testDebugUnitTest final account/TEST-com.inkr8.characterization.ProductCoreContractTest.xml",
+      "public_file": "delivery/evidence/android-unit-account/TEST-com.inkr8.characterization.ProductCoreContractTest.xml",
+      "sha256_original": "8352749bbac77b080bff007ea5d8bccf180e61be6583fc4fa7f14837552db0e6",
+      "sha256_copy": "8352749bbac77b080bff007ea5d8bccf180e61be6583fc4fa7f14837552db0e6"
+    },
+    {
+      "source_record": "FIN-002 genuine app/testDebugUnitTest final account/TEST-com.inkr8.evaluation.ProductWritingAdmissionTest.xml",
+      "public_file": "delivery/evidence/android-unit-account/TEST-com.inkr8.evaluation.ProductWritingAdmissionTest.xml",
+      "sha256_original": "1818c2da0cf9a05367ce48a7c5fa0879aa8659ddd3f98d8abfe770e91ca81804",
+      "sha256_copy": "1818c2da0cf9a05367ce48a7c5fa0879aa8659ddd3f98d8abfe770e91ca81804"
+    },
+    {
+      "source_record": "FIN-002 genuine app/testDebugUnitTest final account/TEST-com.inkr8.ExampleUnitTest.xml",
+      "public_file": "delivery/evidence/android-unit-account/TEST-com.inkr8.ExampleUnitTest.xml",
+      "sha256_original": "e1b5ee4b9e99442e3868bd648163dd756761c15567124bccc6cb9687200931fc",
+      "sha256_copy": "e1b5ee4b9e99442e3868bd648163dd756761c15567124bccc6cb9687200931fc"
+    },
+    {
+      "source_record": "FIN-002/ACCOUNT_BASELINE_OBSERVATION.json",
+      "public_file": "delivery/evidence/FIN-002/ACCOUNT_BASELINE_OBSERVATION.json",
+      "sha256_original": "e1f6dd20e895f8ae54d0c9b7870fa39e38838d9ab0330b39d6d25302f594d5fd",
+      "sha256_copy": "e1f6dd20e895f8ae54d0c9b7870fa39e38838d9ab0330b39d6d25302f594d5fd"
     }
   ],
   "history": "Private originals/snapshots/logs intact; selection is not entirety or new repeated coverage",

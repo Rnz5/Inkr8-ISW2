@@ -1,7 +1,7 @@
 # Alcance vigente de Inkr8
 
 **Vigente FIN-002 — 09/10/2026:** cierre y entrega revisable documentados en
-[FINAL_DELIVERY.md](FINAL_DELIVERY.md), con 7 Android PASS, reglas nuevas
+[FINAL_DELIVERY.md](FINAL_DELIVERY.md), con 8 Android PASS, reglas nuevas
 propuestas y límites externos/académicos explícitos. Los estados inferiores son
 antecedentes preservados; no revocan DEC-AI-AUTH-001, las decisiones respondidas
 ni el permiso actual de publicar rama/PR, sin fusión o despliegue.
@@ -94,3 +94,6 @@ Crear/revisar documentación derivada, preservar evidencia, consultar fuentes/c�
 
 
 **Etapa posterior vigente:** el usuario autoriza cambios locales conservadores, recuperación auténtica, compilación y pruebas; no publicación, despliegue, datos reales, reglas inventadas ni atribución de autoría automática al estudiante. Las restricciones concretas P1 siguen vigentes.
+
+Cierre de acceso Auth aprobado por respuesta posterior de Marco: ACCOUNT-ACCESS-001,
+perfil/historial/economía retenidos,8 Android y19 cuenta PASS; ver FINAL_DELIVERY.

@@ -1,7 +1,7 @@
 # Documentación de trabajo de Inkr8
 
 **Vigente FIN-002 — 09/10/2026:** cierre y entrega revisable documentados en
-[FINAL_DELIVERY.md](FINAL_DELIVERY.md), con 7 Android PASS, reglas nuevas
+[FINAL_DELIVERY.md](FINAL_DELIVERY.md), con 8 Android PASS, reglas nuevas
 propuestas y límites externos/académicos explícitos. Los estados inferiores son
 antecedentes preservados; no revocan DEC-AI-AUTH-001, las decisiones respondidas
 ni el permiso actual de publicar rama/PR, sin fusión o despliegue.
@@ -87,3 +87,6 @@ No se creó otro chat automáticamente. La publicación documental no autoriza l
 Actualizar la síntesis correspondiente con cada nueva decisión/evidencia y conservar fuente y fecha conocida. No inventar aprobación grupal, revisión humana, contribuciones individuales ni resultados. Registrar los cambios autorizados sin repetir preguntas que ya estén resueltas.
 
 [Registro nuevo de implementación por bloques](IMPLEMENTATION_LOG.md): alcance, diff, pruebas y límites de IMPL-001; evidencia histórica preservada.
+
+Cierre de acceso Auth aprobado por respuesta posterior de Marco: ACCOUNT-ACCESS-001,
+perfil/historial/economía retenidos,8 Android y19 cuenta PASS; ver FINAL_DELIVERY.

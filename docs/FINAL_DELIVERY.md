@@ -1,5 +1,37 @@
 # FIN-002 entrega revisable y cierre local
 
+## ACCOUNT-ACCESS-001 — decisión posterior aplicada
+
+Marco respondió «aplica lo recomendable» a la consulta agrupada de FIN-002.
+Se adopta el cierre de acceso Auth con conservación de perfil, nombre, historial
+y registros económicos. Código/pruebas/revisión: Codex; no aprobación grupal o
+fuentes externas inferidas. La denegación temporal anterior es antecedente.
+
+`UserRepository.deleteAccount` conserva firma/callbacks y llama `closeAccount`.
+Settings informa cierre de acceso y retención de datos. La función marca primero
+`accountClosed/accountClosedAt` (campos nuevos sólo Functions), sin tocar saldos,
+rating, sesión, reservas, username o historial. Después deshabilita Auth y revoca
+refresh tokens. Rules/callables bloquean tokens previos; fallo parcial mantiene
+acceso cerrado y permite completar el cierre mediante reintento autenticado.
+Sin reactivación automática ni nueva política de borrado. Procesamiento Admin de
+envíos pendientes y fórmulas económicas anteriores permanecen.
+
+**8 métodos Android PASS**, incluido Settings→VM→repositorio→callable→Auth/signout;
+**19 comprobaciones de cierre PASS** REST/Auth/SDK/HTTP: permiso, preservación,
+reapertura denegada,8 concurrentes, tokens antiguos y refresh, acceso ajeno,
+fallo parcial explícito de entrega Auth y reintento SDK real. Sonda previa sin
+callable disponible (preparación, no aceptación funcional);
+16/1 posterior detectó conversión indebida de403 a400 en manejador económico:
+se conserva HttpsError, sin cambios de costes/fórmulas. Aserciones intactas.
+Regresiones afectadas:39 permisos,6 nombre,10 retirada/economía,14 operación,
+16 borrado y2 higiene de log PASS. Auditor289 contrastes estáticos PASS; mutación
+de nueva fuente detectada y oráculos anteriores intactos. No se suman repeticiones.
+
+No se aportaron reglas originales, credenciales/ID de prueba R8/Google ni pruebas
+individuales/actas/P5. Esos límites siguen; Auth/IAM cloud y proveedor externo no
+se validan con emuladores. La nueva política local no implica despliegue o datos
+reales ni autoría humana del código.
+
 Registro 09/10/2026 America/Lima. Implementación, pruebas, revisión, UML e informe:
 **Codex**, bajo DEC-AI-AUTH-001 comunicado por Marco. El prompt actual autoriza
 commits/push en `codex/refactorizacion-por-bloques` y PR a `master`, sin merge o
@@ -30,8 +62,9 @@ seguridad integral, proveedor externo ni cumplimiento individual del curso.
 | Reglas propuestas y propietarios | FIN-001 39 PASS REST/Auth; FIN-002 6 PASS registro atómico de nombre/collision/rollback, economía intacta |
 | Temporadas y operación | FIN-002 14 PASS: UTC/leap/year, tardíos, cierre8 concurrente/repetido, volumen1201/1203 y initializer8 concurrente |
 | Token de compra sensible | Roja1 PASS/1 FAIL → verde2 PASS; se retiró sólo el log de token. Placeholder de verificación sigue como defecto previo externo |
-| Auditoría separada | 287 contrastes estáticos PASS; oráculos previos preservados y deltas explícitos; no equivalen a casos funcionales |
-| Compilación | Lab APK/testAPK PASS; Functions final PASS. Android auténtico y 19 métodos unitarios previos preservados, sin cambios de producto Android en FIN-002 |
+| Auditoría separada | 289 contrastes estáticos PASS; oráculos previos preservados y deltas explícitos; no equivalen a casos funcionales |
+| Compilación | Android auténtico assembleDebug/testDebugUnitTest, Functions y lab APK/testAPK PASS sobre cierre Auth final; 19 métodos unitarios PASS |
+| Cierre de acceso aprobado | 19 REST/Auth/SDK/HTTP PASS y consumidor Android Settings→AppRoot→signout PASS; historia/economía retenidas, ocho cierres concurrentes y fallo parcial explícito |
 
 ### Causas corregidas y revisión
 
@@ -61,9 +94,10 @@ No se implementó ni simuló una verificación Google auténtica.
 - Antiabuso de metadata y exclusividad de submission por sesión requieren autoridad
   servidor adicional: las reglas propuestas no acreditan esos controles. El bloqueo
   UI/VM de segundo envío no es una reserva cloud antimaliciosa.
-- Cierre de cuenta cliente denegado por propuesta: evita recrear saldo sin ciclo Auth.
-  La UI histórica informa error; hace falta un ciclo confiable y su política.
-  No hay aprobación humana de excluir esa función; no se borra historia por este encargo.
+- ACCOUNT-ACCESS-001 resuelve el cierre de acceso: callable con marcador servidor,
+  disable/revoke Auth y conservación de datos. 19 casos y consumidor Android PASS.
+  Pendiente verificación de permisos IAM/operación Auth en entorno cloud autorizado.
+  El delete directo histórico sigue denegado; no es una retirada de esa función.
 - R8 externo: no credencial/configuración de prueba autorizada disponible. Se usa
   evaluador recuperado + SDK real + HTTP double80; no proveedor externo. OAuth,
   Ads, billing y Cloud Scheduler no validados. Activación estacional cloud requiere
@@ -92,7 +126,7 @@ del mismo baseline, sin reemplazar el oráculo. Los logs previos FAIL y controle
 negativos se conservan. La revisión de Codex no es auditoría independiente del equipo.
 
 
-### FIN-002 comprobación final y protección de borrado
+### FIN-002 antecedente previo a ACCOUNT-ACCESS-001: protección de borrado
 
 Suite final: **7 métodos Android PASS**, mismos seis objetivos de aceptación más
 callback SDK de deleteSubmission. Android auténtico assembleDebug/testDebugUnitTest
@@ -108,12 +142,12 @@ ganancia, coste o backfill. Un404 inicial de callable precedió a su recarga en 
 emulador y se conserva como sincronización de soporte, no defecto productivo.
 Auditor final: **287 contrastes estáticos PASS**, deltas exactos y oráculos anteriores
 conservados;3 mutaciones aisladas detectadas. No son287 pruebas funcionales.
-La propuesta deniega el cierre de cuenta anterior; Settings recibe error.
-Restituir un cierre seguro exige política/ciclo Auth confiables. **No se acredita
-que el equipo haya retirado o excluido esa función del alcance.**
+En esta comprobación anterior a la respuesta humana, Settings recibía denegación
+y el cierre seguro estaba pendiente. ACCOUNT-ACCESS-001, descrito al inicio,
+resuelve posteriormente esa política y conexión local; conserva la evidencia roja.
 
 
-## Publicación FIN-002
+## Antecedente de publicación FIN-002 previo a cierre de acceso
 
 **Publicación revisable FIN-002:** [PR #2 en borrador](https://github.com/Rnz5/Inkr8-ISW2/pull/2)
 hacia master; [rama](https://github.com/Rnz5/Inkr8-ISW2/tree/codex/refactorizacion-por-bloques).

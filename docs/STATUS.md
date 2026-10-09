@@ -1,6 +1,38 @@
 # Estado de trabajo de Inkr8
 
-**Publicación revisable FIN-002:** [PR #2 en borrador](https://github.com/Rnz5/Inkr8-ISW2/pull/2)
+## ACCOUNT-ACCESS-001 — decisión posterior aplicada
+
+Marco respondió «aplica lo recomendable» a la consulta agrupada de FIN-002.
+Se adopta el cierre de acceso Auth con conservación de perfil, nombre, historial
+y registros económicos. Código/pruebas/revisión: Codex; no aprobación grupal o
+fuentes externas inferidas. La denegación temporal anterior es antecedente.
+
+`UserRepository.deleteAccount` conserva firma/callbacks y llama `closeAccount`.
+Settings informa cierre de acceso y retención de datos. La función marca primero
+`accountClosed/accountClosedAt` (campos nuevos sólo Functions), sin tocar saldos,
+rating, sesión, reservas, username o historial. Después deshabilita Auth y revoca
+refresh tokens. Rules/callables bloquean tokens previos; fallo parcial mantiene
+acceso cerrado y permite completar el cierre mediante reintento autenticado.
+Sin reactivación automática ni nueva política de borrado. Procesamiento Admin de
+envíos pendientes y fórmulas económicas anteriores permanecen.
+
+**8 métodos Android PASS**, incluido Settings→VM→repositorio→callable→Auth/signout;
+**19 comprobaciones de cierre PASS** REST/Auth/SDK/HTTP: permiso, preservación,
+reapertura denegada,8 concurrentes, tokens antiguos y refresh, acceso ajeno,
+fallo parcial explícito de entrega Auth y reintento SDK real. Sonda previa sin
+callable disponible (preparación, no aceptación funcional);
+16/1 posterior detectó conversión indebida de403 a400 en manejador económico:
+se conserva HttpsError, sin cambios de costes/fórmulas. Aserciones intactas.
+Regresiones afectadas:39 permisos,6 nombre,10 retirada/economía,14 operación,
+16 borrado y2 higiene de log PASS. Auditor289 contrastes estáticos PASS; mutación
+de nueva fuente detectada y oráculos anteriores intactos. No se suman repeticiones.
+
+No se aportaron reglas originales, credenciales/ID de prueba R8/Google ni pruebas
+individuales/actas/P5. Esos límites siguen; Auth/IAM cloud y proveedor externo no
+se validan con emuladores. La nueva política local no implica despliegue o datos
+reales ni autoría humana del código.
+
+**Antecedente de publicación FIN-002 previo a ACCOUNT-ACCESS-001:** [PR #2 en borrador](https://github.com/Rnz5/Inkr8-ISW2/pull/2)
 hacia master; [rama](https://github.com/Rnz5/Inkr8-ISW2/tree/codex/refactorizacion-por-bloques).
 Código/pruebas/UML/informe: Codex; publicación con cuenta autorizada MACOABC.
 7 Android,39 permisos,6 nombre,14 operación,16 borrado y2 log PASS;287 contrastes
@@ -9,7 +41,7 @@ estáticos separados. Copia limpia con autocrlf=true conserva recursos auténtic
 Sin merge/deploy/datos reales; dependencias externas/académicas en FINAL_DELIVERY.
 
 **Vigente FIN-002 — 09/10/2026:** cierre y entrega revisable documentados en
-[FINAL_DELIVERY.md](FINAL_DELIVERY.md), con 7 Android PASS, reglas nuevas
+[FINAL_DELIVERY.md](FINAL_DELIVERY.md), con 8 Android PASS, reglas nuevas
 propuestas y límites externos/académicos explícitos. Los estados inferiores son
 antecedentes preservados; no revocan DEC-AI-AUTH-001, las decisiones respondidas
 ni el permiso actual de publicar rama/PR, sin fusión o despliegue.

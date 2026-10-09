@@ -11,6 +11,8 @@ entity "users/{uid}" as User {
  merit
  isPlaced
  currentlyInRanked
+ accountClosed solo Functions
+ accountClosedAt solo Functions
  reputation historica congelada
 }
 entity "submissions/{id}" as Sub {

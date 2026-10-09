@@ -685,3 +685,7 @@ del código final, sin revisión humana inventada; mapa exacto source-map.json.
 La protección de borrado final conserva firmas del repositorio y añade el callable
 owner/estado/ACK; source-map.json.support_messages registra sus dos funciones.
 Los seis diagramas son vistas selectivas, no un inventario de todos los métodos.
+
+UML final actualizado: accountAccess y Admin Auth en componentes/despliegue;
+accountClosed/accountClosedAt sólo servidor en mapa Firestore, no en DTO Users.
+La política procede de Marco; los modelos y revisión son de Codex.
