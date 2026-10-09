@@ -132,3 +132,7 @@
 *.png binary
 *.jar binary
 "functions/src/submissions/deleteSubmission.ts" -text
+
+# Delivery manifests refer to exact bytes, including textual evidence.
+delivery/** -text
+testing-blocks/local-refactor-audit/audit-spec.json -text
