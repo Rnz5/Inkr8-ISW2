@@ -1,5 +1,15 @@
 # Estado de trabajo de Inkr8
 
+**Publicación actualizada tras ACCOUNT-ACCESS-001:** [PR #2 en borrador](https://github.com/Rnz5/Inkr8-ISW2/pull/2)
+y [rama publicada](https://github.com/Rnz5/Inkr8-ISW2/tree/codex/refactorizacion-por-bloques).
+8 Android y19 cierre de acceso PASS; regresiones finales39/6/10/14/16/2 PASS.
+289 contrastes estáticos separados. Copia limpia revisada de6d569 conserva121
+artefactos previos a este registro, fuente/métodos y baseline; manifiesto final
+incorpora resultados de esa revisión. Informe23 páginas, seis UML y APK demo
+actualizados. Código/tests/revisión: Codex; publisher autorizado MACOABC.
+Master conserva7d879c2; sin merge/deploy/datos reales. El ZIP identifica commit y
+verifica todos los bytes de entrega. Límites externos/académicos en este documento.
+
 ## ACCOUNT-ACCESS-001 — decisión posterior aplicada
 
 Marco respondió «aplica lo recomendable» a la consulta agrupada de FIN-002.

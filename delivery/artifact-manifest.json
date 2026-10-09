@@ -152,6 +152,10 @@
       "sha256": "e790759e92d7a1a6b45b0822f697f2e4f2262c3e275ae19dd1e6922ef04dcfa4",
       "bytes": 55483
     },
+    "evidence/FIN-002/audit-fresh-account/audit.json": {
+      "sha256": "0b4e025c46576b82db3e0fca74a0aad18f1e423d19cc28f86db70b310e64f4af",
+      "bytes": 58023
+    },
     "evidence/FIN-002/audit-fresh-checkout/audit.json": {
       "sha256": "f283b648b1eb8ce0bd452dfab055de13704d69d48e56678c4bbc8d353ef1da3b",
       "bytes": 56466
@@ -208,6 +212,10 @@
       "sha256": "1424816142d64c01fc9bf42f4aadaf886771703f30c31135901336cb1291a753",
       "bytes": 743
     },
+    "evidence/FIN-002/PRESERVATION_ACCOUNT_VERIFIED.json": {
+      "sha256": "ce51211ad847d25c1ab29f3c8462d17544711192c64adf6c5ebf58b7ae800cd8",
+      "bytes": 167
+    },
     "evidence/FIN-002/PRESERVATION_VERIFIED.json": {
       "sha256": "54d937c49a2e5051730d24100b70b3118356aa8965f53d9cd4f5e80c5de3f559",
       "bytes": 218
@@ -215,6 +223,10 @@
     "evidence/FIN-002/PUBLICATION_REVIEW.json": {
       "sha256": "ad63bd63f60b57b140a3be0e6a035fbdf25d0735382cec6fc04ab2ab588bbd09",
       "bytes": 863
+    },
+    "evidence/FIN-002/PUBLICATION_REVIEW_ACCOUNT.json": {
+      "sha256": "a19f38605213d7f440005bff56923e008e1ac474e2635914b5130e3bc91e1ce0",
+      "bytes": 864
     },
     "evidence/FIN-002/purchase-account-final.json": {
       "sha256": "0d25128323fb8d03d9327a70f94bdd2ce20329cca1e1faba346c91038c1971d0",
@@ -377,8 +389,8 @@
       "bytes": 2202
     },
     "evidence-index.json": {
-      "sha256": "f97cb03f415921903756aceb2f300f74dab62313a7ad588f11b2b49c04fa13bb",
-      "bytes": 32807
+      "sha256": "e1c30512077856884bbd0c1d02f862b34fb75e7d28434d58f0c7f08325051cc8",
+      "bytes": 33855
     },
     "Informe-Inkr8-P4.docx": {
       "sha256": "fada9365df2d227b6e79ca47c5f3f1dc46adc9633a7a1e6a9e5b0b12f7ecfc54",
@@ -489,5 +501,6 @@
       "bytes": 267
     }
   },
-  "artifact_scope": "Final demo APKs:8 Android PASS,19 account PASS, final affected regressions and289 static checks separately. R8 HTTP double and one Auth failure injection declared. No cloud or individual academic proof."
+  "artifact_scope": "Final demo APKs:8 Android PASS,19 account PASS, final affected regressions and289 static checks separately. R8 HTTP double and one Auth failure injection declared. No cloud or individual academic proof.",
+  "clean_clone_before_publication": "de6d56989d9ae26d982e64e757865279e4b2f55e"
 }

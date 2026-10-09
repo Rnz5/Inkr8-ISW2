@@ -8,18 +8,19 @@
     },
     "baseRefName": "master",
     "headRefName": "codex/refactorizacion-por-bloques",
-    "headRefOid": "ad22e01eb5b8383fbdc532b267d4ec067843bbe3",
+    "headRefOid": "de6d56989d9ae26d982e64e757865279e4b2f55e",
     "isDraft": true,
     "mergeable": "MERGEABLE",
     "state": "OPEN",
     "url": "https://github.com/Rnz5/Inkr8-ISW2/pull/2"
   },
   "branch_url": "https://github.com/Rnz5/Inkr8-ISW2/tree/codex/refactorizacion-por-bloques",
-  "tested_production_commit": "90bc51a64be168211a24159734af29a42288a7e4",
-  "clean_clone_reviewed_commit": "ad22e01eb5b8383fbdc532b267d4ec067843bbe3",
+  "tested_production_commit": "2f96c6d43d68673c80a2d794a47d0da6d1933012",
+  "code_tests_delivery_reviewed_commit": "de6d56989d9ae26d982e64e757865279e4b2f55e",
+  "baseline_and_remote_master": "7d879c22030527e1d5f5003ad84b76b750d3b29e",
   "author_of_code_tests_docs": "Codex <codex@local.invalid>",
   "GitHub_authenticated_publisher": "MACOABC",
-  "source_of_authorization": "Marco FIN-002 prompt 2026-10-09; DEC-AI-AUTH-001",
+  "source_of_authorization": "Marco FIN-002 publication prompt, DEC-AI-AUTH-001 and subsequent aplica lo recomendable response for account-access policy",
   "not_merged_not_deployed_no_real_data_operations": true,
-  "publication_metadata_note": "This record precedes its own metadata commit; final source commit is in the exported ZIP metadata and Git branch HEAD. No self-referential hash asserted."
+  "publication_metadata_note": "This record precedes its own metadata commit. Export metadata identifies final commit. No self-referential hash or human review claimed."
 }

@@ -551,6 +551,24 @@
       "public_file": "delivery/evidence/FIN-002/ACCOUNT_BASELINE_OBSERVATION.json",
       "sha256_original": "e1f6dd20e895f8ae54d0c9b7870fa39e38838d9ab0330b39d6d25302f594d5fd",
       "sha256_copy": "e1f6dd20e895f8ae54d0c9b7870fa39e38838d9ab0330b39d6d25302f594d5fd"
+    },
+    {
+      "source_record": "FIN-002/PUBLICATION_REVIEW_ACCOUNT.json",
+      "public_file": "delivery/evidence/FIN-002/PUBLICATION_REVIEW_ACCOUNT.json",
+      "sha256_original": "a19f38605213d7f440005bff56923e008e1ac474e2635914b5130e3bc91e1ce0",
+      "sha256_copy": "a19f38605213d7f440005bff56923e008e1ac474e2635914b5130e3bc91e1ce0"
+    },
+    {
+      "source_record": "FIN-002/PRESERVATION_ACCOUNT_VERIFIED.json",
+      "public_file": "delivery/evidence/FIN-002/PRESERVATION_ACCOUNT_VERIFIED.json",
+      "sha256_original": "ce51211ad847d25c1ab29f3c8462d17544711192c64adf6c5ebf58b7ae800cd8",
+      "sha256_copy": "ce51211ad847d25c1ab29f3c8462d17544711192c64adf6c5ebf58b7ae800cd8"
+    },
+    {
+      "source_record": "FIN-002/audit-fresh-account/audit.json",
+      "public_file": "delivery/evidence/FIN-002/audit-fresh-account/audit.json",
+      "sha256_original": "0b4e025c46576b82db3e0fca74a0aad18f1e423d19cc28f86db70b310e64f4af",
+      "sha256_copy": "0b4e025c46576b82db3e0fca74a0aad18f1e423d19cc28f86db70b310e64f4af"
     }
   ],
   "history": "Private originals/snapshots/logs intact; selection is not entirety or new repeated coverage",

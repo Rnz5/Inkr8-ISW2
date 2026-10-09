@@ -754,3 +754,22 @@ No se aportaron reglas originales, credenciales/ID de prueba R8/Google ni prueba
 individuales/actas/P5. Esos límites siguen; Auth/IAM cloud y proveedor externo no
 se validan con emuladores. La nueva política local no implica despliegue o datos
 reales ni autoría humana del código.
+
+
+## FIN-002 publicación posterior a ACCOUNT-ACCESS-001
+
+**Publicación actualizada tras ACCOUNT-ACCESS-001:** [PR #2 en borrador](https://github.com/Rnz5/Inkr8-ISW2/pull/2)
+y [rama publicada](https://github.com/Rnz5/Inkr8-ISW2/tree/codex/refactorizacion-por-bloques).
+8 Android y19 cierre de acceso PASS; regresiones finales39/6/10/14/16/2 PASS.
+289 contrastes estáticos separados. Copia limpia revisada de6d569 conserva121
+artefactos previos a este registro, fuente/métodos y baseline; manifiesto final
+incorpora resultados de esa revisión. Informe23 páginas, seis UML y APK demo
+actualizados. Código/tests/revisión: Codex; publisher autorizado MACOABC.
+Master conserva7d879c2; sin merge/deploy/datos reales. El ZIP identifica commit y
+verifica todos los bytes de entrega. Límites externos/académicos en este documento.
+
+La sonda anterior a la exportación de closeAccount sólo produjo error de parser
+ante Function unknown: preparación, no aceptación0/1. Se conserva el log y el
+registro ACCOUNT_BASELINE_OBSERVATION. El caso económico400 frente a403 sí fue
+una aserción real y se corrigió preservando HttpsError. SHA manifiesto/publicación
+se actualizan sin editar las evidencias históricas ni afirmar revisión humana.
