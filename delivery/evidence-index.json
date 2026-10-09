@@ -569,6 +569,18 @@
       "public_file": "delivery/evidence/FIN-002/audit-fresh-account/audit.json",
       "sha256_original": "0b4e025c46576b82db3e0fca74a0aad18f1e423d19cc28f86db70b310e64f4af",
       "sha256_copy": "0b4e025c46576b82db3e0fca74a0aad18f1e423d19cc28f86db70b310e64f4af"
+    },
+    {
+      "source_record": "INT-001 merged artifact manifest before documentation",
+      "public_file": "delivery/evidence/INT-001/artifact-manifest-before.json",
+      "sha256_original": "9630736b02ca184218e2545a68e7ee75236b19982ee22a2c649bca279ece4877",
+      "sha256_copy": "9630736b02ca184218e2545a68e7ee75236b19982ee22a2c649bca279ece4877"
+    },
+    {
+      "source_record": "INT-001/MERGE_VERIFIED.json",
+      "public_file": "delivery/evidence/INT-001/MERGE_VERIFIED.json",
+      "sha256_original": "9cf4ef49b3785ae7b83c3d0067ae4a40ef5ac1af40ad2df953bbd04f5a8ff2e4",
+      "sha256_copy": "9cf4ef49b3785ae7b83c3d0067ae4a40ef5ac1af40ad2df953bbd04f5a8ff2e4"
     }
   ],
   "history": "Private originals/snapshots/logs intact; selection is not entirety or new repeated coverage",

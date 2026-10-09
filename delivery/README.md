@@ -1,10 +1,28 @@
 # Entrega Inkr8 FIN-002 para revisión
 
+**INT-001 — integración autorizada en master,09/10/2026:**
+[PR #2 fusionado](https://github.com/Rnz5/Inkr8-ISW2/pull/2) mediante merge commit
+[`6165415`](https://github.com/Rnz5/Inkr8-ISW2/commit/6165415ca9538c3a87c854caab2269c5cff6776f).
+La rama `codex/refactorizacion-por-bloques` permanece en `180837d` como referencia.
+El árbol fusionado coincide exactamente con la entrega comprobada:0 cambios de
+contenido,124 hashes de artefactos y383 archivos del ZIP previo verificados.
+Código/pruebas/documentación e integración: Codex, con autorización de Marco;
+la revisión del equipo será posterior, no se acredita revisión humana realizada.
+Cierre local comprobado; R8 HTTP doble, proveedor/cloud/IAM/compras y obligaciones
+individuales auténticas pendientes. Sin despliegue ni cambios de datos reales.
+Los registros inferiores de PR en borrador/sin fusión son antecedentes preservados.
+
+Registro verificable: [INTEGRATION.json](INTEGRATION.json). Informe, diagramas y
+APK conservan los bytes probados anteriores a la fusión. El ZIP FIN-002 anterior
+corresponde a180837d; la descarga del repositorio integrado incorpora este registro
+documental. Esta distinción no implica un nuevo build o validación funcional.
+
 Fuentes auténticas recuperadas + núcleo A01–A07 corregido y refactorizado,
 retiradas de torneos/ligas/reputación, Ranked/rating/Merit conservados y temporadas.
 Código, pruebas, revisión e informe derivados: Codex bajo DEC-AI-AUTH-001 comunicado
-por Marco. El PR es borrador para revisión independiente y validaciones indispensables.
-No hacer merge, deploy o conexión a datos reales por estos comandos.
+por Marco. PR #2 integrado en master por autorización posterior explícita; revisión
+del equipo y validaciones indispensables pendientes. No hacer deploy ni conectar
+a datos reales mediante estos comandos.
 
 ## Contenido y resultados
 

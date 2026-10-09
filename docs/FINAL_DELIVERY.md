@@ -1,5 +1,17 @@
 # FIN-002 entrega revisable y cierre local
 
+**INT-001 — integración autorizada en master,09/10/2026:**
+[PR #2 fusionado](https://github.com/Rnz5/Inkr8-ISW2/pull/2) mediante merge commit
+[`6165415`](https://github.com/Rnz5/Inkr8-ISW2/commit/6165415ca9538c3a87c854caab2269c5cff6776f).
+La rama `codex/refactorizacion-por-bloques` permanece en `180837d` como referencia.
+El árbol fusionado coincide exactamente con la entrega comprobada:0 cambios de
+contenido,124 hashes de artefactos y383 archivos del ZIP previo verificados.
+Código/pruebas/documentación e integración: Codex, con autorización de Marco;
+la revisión del equipo será posterior, no se acredita revisión humana realizada.
+Cierre local comprobado; R8 HTTP doble, proveedor/cloud/IAM/compras y obligaciones
+individuales auténticas pendientes. Sin despliegue ni cambios de datos reales.
+Los registros inferiores de PR en borrador/sin fusión son antecedentes preservados.
+
 **Publicación actualizada tras ACCOUNT-ACCESS-001:** [PR #2 en borrador](https://github.com/Rnz5/Inkr8-ISW2/pull/2)
 y [rama publicada](https://github.com/Rnz5/Inkr8-ISW2/tree/codex/refactorizacion-por-bloques).
 8 Android y19 cierre de acceso PASS; regresiones finales39/6/10/14/16/2 PASS.

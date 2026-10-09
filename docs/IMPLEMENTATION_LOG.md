@@ -773,3 +773,20 @@ ante Function unknown: preparación, no aceptación0/1. Se conserva el log y el
 registro ACCOUNT_BASELINE_OBSERVATION. El caso económico400 frente a403 sí fue
 una aserción real y se corrigió preservando HttpsError. SHA manifiesto/publicación
 se actualizan sin editar las evidencias históricas ni afirmar revisión humana.
+
+
+## INT-001 — integrar entrega académica preservando el código comprobado
+
+Problema: la entrega local/publicada permanecía en PR borrador y master conservaba
+el baseline. Decisión: autorización explícita de Marco de integrar ahora y revisar
+en equipo después. Cambio: PR ready y merge commit6165415, rama conservada.
+Verificación: padres exactos7d879c2/180837d y árbol idéntico;124 artefactos y383
+archivos del ZIP previo coinciden. Código/temporadas/retiradas/tests/informe/UML/APK
+presentes.3374 evidencias históricas/configuración privada intactas. Sin nuevos
+builds o suites: el merge no altera contenido; no se cuenta cobertura repetida.
+Una aserción de soporte clasificó erróneamente systemTaxController como retirado;
+se corrigió la lista al comprobar que conserva el impuesto Merit y retira sólo
+la penalización de reputación. Producción/aserciones de aceptación intactas.
+Registro documental posterior, autor Codex; reporte P4/UML/APK conservan bytes
+probados y fechas de su versión. R8/cloud/compras/academia individual pendientes.
+Evidencia: delivery/INTEGRATION.json y delivery/evidence/INT-001/.

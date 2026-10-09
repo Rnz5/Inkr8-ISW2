@@ -344,14 +344,6 @@
       "sha256": "46133e515591602bbe29d8f2530da04307d0ce76ee3a0934a8182de4d9d742b7",
       "bytes": 3540
     },
-    "evidence/INT-001/artifact-manifest-before.json": {
-      "sha256": "9630736b02ca184218e2545a68e7ee75236b19982ee22a2c649bca279ece4877",
-      "bytes": 21295
-    },
-    "evidence/INT-001/MERGE_VERIFIED.json": {
-      "sha256": "9cf4ef49b3785ae7b83c3d0067ae4a40ef5ac1af40ad2df953bbd04f5a8ff2e4",
-      "bytes": 1918
-    },
     "evidence/SEA-001/AUDITOR_NEGATIVE_CONTROLS.json": {
       "sha256": "23d94b2a2ffe847f2bbab6bcc90a2ad201c046ffcda3cd8f15e187f1dd5c2f53",
       "bytes": 632
@@ -397,8 +389,8 @@
       "bytes": 2202
     },
     "evidence-index.json": {
-      "sha256": "a759f7a8b1d1089888e251042d5b155124d195a13edd520fc7e99c3df3c898b6",
-      "bytes": 34539
+      "sha256": "e1c30512077856884bbd0c1d02f862b34fb75e7d28434d58f0c7f08325051cc8",
+      "bytes": 33855
     },
     "Informe-Inkr8-P4.docx": {
       "sha256": "fada9365df2d227b6e79ca47c5f3f1dc46adc9633a7a1e6a9e5b0b12f7ecfc54",
@@ -416,17 +408,13 @@
       "sha256": "7216f9666379f6e9f597aafefdd4f57571ec196ae5d41fb0e6cbf5b17a9fff5d",
       "bytes": 32364003
     },
-    "INTEGRATION.json": {
-      "sha256": "57c77a36e796b3af4fa2bfb43ae8a3c6d0b74aa2b2355034d03924ae4ce04e5d",
-      "bytes": 2257
-    },
     "PR_DESCRIPTION.md": {
       "sha256": "8cb218cc7f435d6eaa99dd5069eb34d57338684c0f4e4ae060abbc638fa0fe27",
       "bytes": 4439
     },
     "README.md": {
-      "sha256": "f718bda807df1d2f657203f781d5a570b557e63dfc0b3c6d52a26aa3a61a6736",
-      "bytes": 13114
+      "sha256": "64f445d4196a055135f1b763649179e24ae93115463a65ea4befa370a98d7d69",
+      "bytes": 11839
     },
     "source-map.json": {
       "sha256": "65e80fd858406269c7b411baf377ecdd31aea7fd5616790fac1a4b09f5f18ace",
@@ -514,8 +502,5 @@
     }
   },
   "artifact_scope": "Final demo APKs:8 Android PASS,19 account PASS, final affected regressions and289 static checks separately. R8 HTTP double and one Auth failure injection declared. No cloud or individual academic proof.",
-  "clean_clone_before_publication": "de6d56989d9ae26d982e64e757865279e4b2f55e",
-  "prior_artifact_manifest_sha256": "9630736b02ca184218e2545a68e7ee75236b19982ee22a2c649bca279ece4877",
-  "integrated_merge_commit": "6165415ca9538c3a87c854caab2269c5cff6776f",
-  "integration_record": "INTEGRATION.json"
+  "clean_clone_before_publication": "de6d56989d9ae26d982e64e757865279e4b2f55e"
 }

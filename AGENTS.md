@@ -1,5 +1,11 @@
 # Inkr8 — instrucciones de trabajo
 
+**Autorización posterior INT-001:** Marco autorizó fusionar PR2 en esta copia
+académica mediante merge commit, con revisión humana posterior. Ejecutado por
+Codex en6165415; rama/evidencias conservadas. El límite actual sigue prohibiendo
+despliegues y operaciones en servicios/datos reales. Ver docs/FINAL_DELIVERY.md.
+Las prohibiciones anteriores de fusión describen etapas históricas.
+
 **Vigente FIN-002 — 09/10/2026:** cierre y entrega revisable documentados en
 [FINAL_DELIVERY.md](docs/FINAL_DELIVERY.md), con 8 Android PASS, reglas nuevas
 propuestas y límites externos/académicos explícitos. Los estados inferiores son

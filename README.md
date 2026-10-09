@@ -1,5 +1,10 @@
 # Inkr8 entrega para revisión
 
+**Integrado en master:** [PR #2 fusionado](https://github.com/Rnz5/Inkr8-ISW2/pull/2).
+[Entrega, informe, UML, APK y comandos](delivery/README.md). Código comprobado
+conservado; revisión del equipo posterior. Límites externos/académicos siguen
+explícitos en [estado final](docs/FINAL_DELIVERY.md).
+
 Writing/Practice, Ranked, rating, Merit, autenticación y perfil básico conservados;
 torneos, ligas y reputación retirados como funciones; temporadas HU3.27/3.28.
 

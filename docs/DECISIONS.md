@@ -207,3 +207,15 @@ No se aportaron reglas originales, credenciales/ID de prueba R8/Google ni prueba
 individuales/actas/P5. Esos límites siguen; Auth/IAM cloud y proveedor externo no
 se validan con emuladores. La nueva política local no implica despliegue o datos
 reales ni autoría humana del código.
+
+
+### INT-001 — fusión de la copia académica
+
+Procedencia: prompt actual de Marco,09/10/2026 America/Lima: «Autorizo fusionar
+el PR #2 de Rnz5/Inkr8-ISW2 hacia master». Autoriza merge commit, mantener rama y
+registrar integración; revisión del equipo posterior. No autorización de deploy
+Firebase, cambios de datos reales, reglas nuevas o cumplimiento individual.
+Codex marca ready y fusiona PR2 en6165415, con ambos padres7d879c2/180837d;
+13 commits originales preservados, rama disponible. No se atribuye revisión humana.
+Organización acotada: sin patrones/interfaces/formateo masivo nuevos para esta
+fusión; no hay necesidad demostrada que justifique modificar código ya probado.
