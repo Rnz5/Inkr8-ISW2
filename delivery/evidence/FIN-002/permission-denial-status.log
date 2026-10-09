@@ -1,4 +1,0 @@
-10-09 15:22:13.053  2248  2298 W Firestore: (26.0.0) [Firestore]: Listen for Query(target=Query(seasons/1997-01 order by __name__);limitType=LIMIT_TO_FIRST) failed: Status{code=PERMISSION_DENIED, description=
-10-09 15:25:17.215  2399  2446 W Firestore: (26.0.0) [Firestore]: Listen for Query(target=Query(seasons/1997-01 order by __name__);limitType=LIMIT_TO_FIRST) failed: Status{code=PERMISSION_DENIED, description=
-10-09 15:25:27.298  2399  2446 W Firestore: (26.0.0) [WriteStream]: (7622d97) Stream closed with status: Status{code=PERMISSION_DENIED, description=
-10-09 15:25:27.336  2399  2446 W Firestore: (26.0.0) [Firestore]: Write failed at submissions/6b531fdf-4052-4737-9ae2-c90d42fe56ec: Status{code=PERMISSION_DENIED, description=

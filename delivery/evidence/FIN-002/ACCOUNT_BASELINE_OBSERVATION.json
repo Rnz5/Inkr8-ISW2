@@ -1,7 +1,0 @@
-{
-  "source": "runs/account-closure-before/console.log",
-  "exit_code": 1,
-  "observed": "Parser failed on Function unknown response; closeAccount was not yet exported in the laboratory. No baseline acceptance assertions completed.",
-  "classification": "Before-change callable unavailable, not0/1 functional coverage; genuine post-change assertions are19 PASS.",
-  "original_log_preserved": true
-}
