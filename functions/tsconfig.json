@@ -1,17 +1,9 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
-    "esModuleInterop": true,
-    "moduleResolution": "nodenext",
-    "noImplicitReturns": true,
-    "noUnusedLocals": true,
-    "outDir": "lib",
-    "sourceMap": true,
-    "strict": true,
-    "target": "es2017"
+    "module": "NodeNext", "moduleResolution": "NodeNext", "esModuleInterop": true,
+    "strict": true, "noImplicitReturns": true, "noUnusedLocals": true,
+    "noUnusedParameters": true, "outDir": "lib", "rootDir": "src", "sourceMap": true,
+    "target": "es2022", "skipLibCheck": true
   },
-  "compileOnSave": true,
-  "include": [
-    "src"
-  ]
+  "include": ["src/domain/**/*.ts", "src/data/**/*.ts", "src/presentation/**/*.ts", "src/index.ts"]
 }

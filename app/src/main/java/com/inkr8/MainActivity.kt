@@ -1,166 +1,37 @@
 package com.inkr8
-
-import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.ads.MobileAds
-import com.google.firebase.auth.FirebaseUser
-import com.inkr8.data.Users
-import com.inkr8.repository.UserRepository
-import com.inkr8.screens.LoginScreen
-import com.inkr8.screens.UsernameSetupScreen
-import com.inkr8.screens.InitialLoadingScreen
-import com.inkr8.ui.theme.Inkr8Theme
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.flow.collectLatest
+import com.inkr8.di.Inkr8Root
+import com.inkr8.presentation.ui.ConfigurationScreen
+import com.inkr8.presentation.viewmodel.SessionViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
-
 class MainActivity : ComponentActivity() {
-
-    private lateinit var googleLauncher: androidx.activity.result.ActivityResultLauncher<Intent>
-    private val userRepository = UserRepository()
-    private var currentUserState = mutableStateOf<Users?>(null)
-    private var isCheckingAuthState = mutableStateOf(true)
-    private var userListenerJob: Job? = null
-
+    private var session: SessionViewModel? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
-
-        AuthManager.initGoogle(this)
-        MobileAds.initialize(this)
-        AdManager.loadAd(this)
-
-        googleLauncher = registerForActivityResult(
-            ActivityResultContracts.StartActivityForResult()
-        ) { result ->
-            if (result.resultCode == RESULT_OK) {
-                AuthManager.firebaseAuthWithGoogle(
-                    data = result.data,
-                    onSuccess = { firebaseUser ->
-                        loadOrCreateUser(firebaseUser)
-                    },
-                    onError = { it.printStackTrace() }
-                )
-            }
-        }
-
+        val graph = (application as Inkr8App).graph
+        if (graph == null) { setContent { ConfigurationScreen() }; return }
+        val viewModel = ViewModelProvider(this, graph.sessionFactory)[SessionViewModel::class.java]
+        session = viewModel
         setContent {
-            Inkr8Theme {
-                var currentUser by currentUserState
-                var isCheckingAuth by isCheckingAuthState
-                var usernameError by remember { mutableStateOf<String?>(null) }
-                var isSavingUsername by remember { mutableStateOf(false) }
-                var isSigningIn by remember { mutableStateOf(false) }
-
-
-                LaunchedEffect(Unit) {
-                    val firebaseUser = AuthManager.currentUser()
-
-                    if (firebaseUser != null) {
-                        loadOrCreateUser(firebaseUser)
-                    } else {
-                        isCheckingAuth = false
-                    }
-                }
-
-                when {
-                    isCheckingAuth -> {
-                        InitialLoadingScreen()
-                    }
-
-                    currentUser == null -> {
-                        LoginScreen(
-                            onGoogleLogin = {
-                                isSigningIn = true
-                                val signInIntent = AuthManager.getGoogleSignInIntent()
-                                googleLauncher.launch(signInIntent)
-                            }
-                        )
-                    }
-
-                    currentUser != null && !currentUser!!.hasChosenUsername -> {
-                        UsernameSetupScreen(
-                            isSaving = isSavingUsername,
-                            errorMessage = usernameError,
-                            onSubmit = { chosenName ->
-                                usernameError = null
-                                isSavingUsername = true
-
-                                userRepository.claimUsername(
-                                    userId = currentUser!!.id,
-                                    username = chosenName,
-                                    onSuccess = {
-                                        isSavingUsername = false
-                                    },
-                                    onError = { e ->
-                                        usernameError = e.message ?: "Username claim failed"
-                                        isSavingUsername = false
-                                    }
-                                )
-                            },
-                            checkAvailability = { name, callback ->
-                                userRepository.isUsernameAvailable(name, callback)
-                            },
-
-                            validateUsername = { name ->
-                                userRepository.validateUsername(name)
-                            }
-                        )
-                    }
-
-                    else -> {
-                        AppRoot(
-                            initialUser = currentUser!!,
-                            googleLauncher = googleLauncher,
-                            onSessionEnded = {
-                                userListenerJob?.cancel()
-                                currentUserState.value = null
-                                isCheckingAuthState.value = false
-                            }
-                        )
-                    }
+            Inkr8Root(graph, viewModel) {
+                viewModel.beginLogin()
+                lifecycleScope.launch {
+                    try { viewModel.login(graph.google.token(this@MainActivity)) }
+                    catch (error: CancellationException) { throw error }
+                    catch (error: Exception) { viewModel.authError(error.message ?: "No se pudo iniciar sesión con Google.") }
                 }
             }
         }
     }
-
-    private fun loadOrCreateUser(firebaseUser: FirebaseUser) {
-        userRepository.updateEmail(
-            userId = firebaseUser.uid,
-            email = firebaseUser.email
-        )
-
-        userRepository.ensureUserExists(
-            uid = firebaseUser.uid,
-            email = firebaseUser.email
-        ) { user ->
-            startUserListener(user.id)
-            isCheckingAuthState.value = false
-        }
-    }
-
-    private fun startUserListener(userId: String) {
-        userListenerJob?.cancel()
-        userListenerJob = lifecycleScope.launch {
-            userRepository.listenToUser(userId).collectLatest { updated ->
-                currentUserState.value = updated
-            }
-        }
-    }
-
-    override fun onDestroy() {
-        userListenerJob?.cancel()
-        super.onDestroy()
+    override fun onResume() {
+        super.onResume()
+        session?.let { if (it.state.value.signedIn) it.refresh() }
     }
 }

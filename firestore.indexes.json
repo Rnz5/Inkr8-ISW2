@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {"collectionGroup": "submissions", "queryScope": "COLLECTION", "fields": [
+      {"fieldPath": "matchStatus", "order": "ASCENDING"},
+      {"fieldPath": "seasonIndex", "order": "ASCENDING"}
+    ]},
+    {"collectionGroup": "submissions", "queryScope": "COLLECTION", "fields": [
+      {"fieldPath": "authorId", "order": "ASCENDING"},
+      {"fieldPath": "schemaVersion", "order": "ASCENDING"},
+      {"fieldPath": "timestamp", "order": "DESCENDING"}
+    ]},
+    {"collectionGroup": "submissions", "queryScope": "COLLECTION", "fields": [
+      {"fieldPath": "seasonIndex", "order": "ASCENDING"},
+      {"fieldPath": "matchStatus", "order": "ASCENDING"},
+      {"fieldPath": "timestamp", "order": "ASCENDING"}
+    ]}
+  ],
+  "fieldOverrides": []
+}

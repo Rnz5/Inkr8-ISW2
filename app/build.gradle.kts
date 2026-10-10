@@ -3,89 +3,57 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
 }
-
+// Firebase configuration is supplied by the owner; unconfigured debug builds show a setup error.
+val firebaseConfigured = file("google-services.json").exists()
+tasks.matching { it.name.endsWith("GoogleServices") }.configureEach { enabled = firebaseConfigured }
 android {
     namespace = "com.inkr8"
     compileSdk = 36
-
     defaultConfig {
         applicationId = "com.inkr8"
         minSdk = 24
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField("boolean", "FIREBASE_CONFIGURED", firebaseConfigured.toString())
     }
-
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+    buildFeatures { compose = true; buildConfig = true }
+    lint {
+        // Version upgrades are reviewed separately; these notices are not source defects.
+        disable += setOf("GradleDependency", "AndroidGradlePluginVersion", "NewerVersionAvailable")
+        warningsAsErrors = true
+    }
+    packaging { jniLibs { keepDebugSymbols += setOf("**/libandroidx.graphics.path.so", "**/libdatastore_shared_counter.so") } }
     buildTypes {
         release {
             isMinifyEnabled = false
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
-    }
-    buildFeatures {
-        compose = true
-    }
 }
-
+kotlin { jvmToolchain(21) }
 dependencies {
+    implementation(project(":domain"))
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(platform(libs.androidx.compose.bom))
-    implementation(libs.androidx.compose.ui)
-    implementation(libs.androidx.compose.ui.graphics)
-    implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.compose.foundation)
-    implementation(libs.androidx.room.ktx)
-    implementation(libs.androidx.ui)
-    implementation(libs.androidx.compose.runtime)
-    implementation(libs.androidx.compose.foundation.layout)
-    implementation(libs.androidx.benchmark.traceprocessor)
-    implementation(libs.androidx.compose.ui.unit)
-    implementation(libs.androidx.runtime)
-    implementation(libs.androidx.foundation)
-    implementation(libs.androidx.foundation.layout)
-    implementation(libs.foundation)
-    implementation(libs.androidx.media3.exoplayer)
-    implementation(libs.runtime)
-    implementation(libs.androidx.compose.foundation.foundation)
-    
-    // Navigation
-    implementation("androidx.navigation:navigation-compose:2.8.8")
-
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    implementation(libs.androidx.compose.ui.tooling.preview)
     debugImplementation(libs.androidx.compose.ui.tooling)
-    debugImplementation(libs.androidx.compose.ui.test.manifest)
-
-    implementation("com.google.android.gms:play-services-ads:25.1.0")
-
-    implementation(platform("com.google.firebase:firebase-bom:34.1.0"))
+    implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth)
     implementation(libs.firebase.firestore)
-    implementation("com.google.firebase:firebase-functions")
-    implementation("com.google.firebase:firebase-analytics-ktx:21.6.2")
-
-    implementation("androidx.compose.foundation:foundation:1.6.0")
-
-    implementation("com.google.android.gms:play-services-auth:21.5.0")
-
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
-    
-    implementation(libs.coil.compose)
+    implementation(libs.firebase.functions)
+    implementation(libs.credentials)
+    implementation(libs.credentials.play.services)
+    implementation(libs.googleid)
+    implementation(libs.coroutines.play.services)
+    testImplementation(libs.junit)
+    testImplementation(libs.coroutines.test)
 }

@@ -1,23 +1,28 @@
-
-export * from "./submissions/submissionEvaluationEngine";
-export * from "./submissions/ghostMatchProcessor";
-export * from "./submissions/submissionSavedTrigger";
-export * from "./submissions/pruneOldSubmissions";
-
-export * from "./users/userInitializer";
-export * from "./users/applyMeritAction";
-export * from "./users/meritReleaseController";
-export * from "./users/philosopherController";
-export * from "./users/systemTaxController";
-export * from "./users/rankedSessionCleaner";
-
-
-export * from "./stats/dailyStatsSnapshot";
-export * from "./stats/weeklyStatsSnapshot";
-export * from "./stats/monthlyStatsSnapshot";
-
-export * from "./seasons/seasonFunctions";
-
-export * from "./submissions/deleteSubmission";
-
-export * from "./users/accountAccess";
+import {firestore} from "./data/source/firestore";
+import {FirebaseUserRepository} from "./data/repository/firebaseUserRepository";
+import {FirebaseContentRepository} from "./data/repository/firebaseContentRepository";
+import {FirebaseGameRepository} from "./data/repository/firebaseGameRepository";
+import {FirebaseSeasonRepository} from "./data/repository/firebaseSeasonRepository";
+import {FirebaseMatchRepository} from "./data/repository/firebaseMatchRepository";
+import {OpenAiWritingEvaluator} from "./data/source/openAiWritingEvaluator";
+import {EvaluateGame, StartGame} from "./domain/usecase/gameUseCases";
+import {ResetLeagues} from "./domain/usecase/resetLeagues";
+import {gameHandlers, openAiKey} from "./presentation/handlers/gameHandlers";
+import {contentHandlers} from "./presentation/handlers/contentHandlers";
+import {seasonScheduler} from "./presentation/scheduler/seasonScheduler";
+const clock = {now: () => Date.now()};
+const users = new FirebaseUserRepository(firestore, clock), content = new FirebaseContentRepository(firestore);
+const games = new FirebaseGameRepository(firestore, clock), seasons = new FirebaseSeasonRepository(firestore);
+const matches = new FirebaseMatchRepository(firestore, clock);
+const evaluator = new OpenAiWritingEvaluator(() => openAiKey.value());
+const gameEndpoints = gameHandlers(users, games, new StartGame(games, content, clock), new EvaluateGame(games, evaluator, matches, clock));
+export const startGame = gameEndpoints.startGame;
+export const submitGame = gameEndpoints.submitGame;
+export const retryEvaluation = gameEndpoints.retryEvaluation;
+export const gameEvaluationWorker = gameEndpoints.submissionEvaluationEngine;
+const contentEndpoints = contentHandlers(users, content, seasons, clock);
+export const initializeUser = contentEndpoints.initializeUser;
+export const updateProfile = contentEndpoints.updateProfile;
+export const getHome = contentEndpoints.getHome;
+export const getSeasonRanking = contentEndpoints.getSeasonRanking;
+export const leagueReset = seasonScheduler(new ResetLeagues(seasons, clock), matches, clock);
