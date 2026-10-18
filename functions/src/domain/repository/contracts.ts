@@ -1,5 +1,6 @@
 import {Challenge, Evaluation, Game, PlayMode, Season, User, Word, WritingMode} from "../model/models";
 export interface Clock { now(): number }
+export interface SubmissionIdentity { resolve(value: unknown): string }
 export interface UserRepository {
   initialize(id: string, name: string, email: string | null, season: Season): Promise<User>;
   assertOpen(id: string): Promise<void>;

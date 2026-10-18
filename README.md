@@ -31,6 +31,10 @@ Los borradores pasan por `LoadDraft`, `SaveDraft`, `ClearDraft` y `FindDraft`. `
 
 En el backend, `FirebaseMatchRepository` conserva el contrato público como fachada. `Matchmaker` selecciona y empareja jugadores, `MatchBaseline` resuelve contra R8 al cumplirse 48 horas y `MatchRecovery` caduca partidas anteriores y reintenta las pendientes. La confirmación de rating y resultados sigue siendo transaccional e idempotente.
 
+La persistencia del backend se construye mediante `PersistenceProvider`: su método de creación delega en la implementación seleccionada y devuelve los cinco repositorios por sus contratos. `FirestoreProvider` conserva Firestore como único proveedor disponible; `DATABASE_PROVIDER` permite seleccionarlo con el valor `firestore`, que también es el predeterminado si la variable no existe. Un proveedor desconocido detiene la inicialización. Para incorporar otra base de datos se añade su proveedor en la carpeta Data/Source existente y se registra en el punto de composición, sin cambiar los casos de uso ni los handlers.
+
+`submissionIdentity` es una única instancia inmutable por proceso, inyectada en los handlers de inicio, envío y reintento. Valida y conserva el ID recibido de Android; no genera otro ID ni guarda estado de partidas. La unicidad entre instancias y la idempotencia siguen protegidas por los documentos y transacciones de Firestore. No se añade identificación ni historial de movimientos de Merit.
+
 ## Reglas de producto
 
 - Estándar: cuatro palabras requeridas, texto de 50–150 palabras. Sobre un tema: dos palabras y texto de 50–200 palabras. Ambos disponibles en Practice y Ranked; el servidor selecciona el desafío.

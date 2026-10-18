@@ -70,3 +70,15 @@ El verificador de arquitectura rechaza ahora también el uso de DraftRepository 
 | git diff --check | Sin errores de whitespace |
 
 Total actual: 28 pruebas aprobadas, ninguna fallida ni omitida. Los cuatro targets Gradle se ejecutaron juntos con --no-daemon; BUILD SUCCESSFUL in 2m 20s. Las nuevas pruebas cubren límites de escritura, restauración del contador/validación, cambios de modalidad/estado del servidor, resolución exactamente a las 48 horas con reintentos concurrentes y caducidad/recuperación sin cruzar temporadas. El SDK local mostró el aviso de versiones de metadatos XML; no impidió compilación, pruebas ni lint. La validación usó únicamente Firestore local; se detuvo el emulador al finalizar. Prompt de seguimiento registrado en ../refactoring_prompts/007-correccion-observaciones-solid.txt.
+
+## Parte 2: patrones de diseño del backend
+
+Implementación del plan aprobado el 17 de octubre de 2026, con la instrucción posterior de no ejecutar pruebas.
+
+- Se incorporó un creador de persistencia con un método sobrescribible y una implementación Firestore. El punto de composición selecciona `DATABASE_PROVIDER`, con `firestore` como predeterminado, y rechaza valores desconocidos. Los cinco repositorios se entregan mediante sus contratos; la inicialización de Firebase ocurre al crear la persistencia.
+- Se centralizó la identidad del submit en una instancia de módulo inmutable, inyectada explícitamente en los handlers. Conserva el ID de Android, su validación y el error anteriores. No almacena estado de partidas ni sustituye las comprobaciones transaccionales de propietario e idempotencia.
+- Se conservaron los adaptadores de infraestructura, la fachada de emparejamiento y los casos de uso por operación. No se añadieron abstracciones duplicadas para esos patrones.
+- Se excluyó expresamente el Singleton para transacciones de Merit. No se modificaron repositorios económicos, saldos, recompensas, costos, reglas Firestore, esquema persistido ni dependencias.
+- Se mantuvieron las carpetas existentes y los nueve exports públicos del backend. No se añadieron casos de prueba.
+
+No se ejecutaron pruebas, emuladores, compilación ni verificadores automáticos para esta implementación. Los resultados de validaciones anteriores no acreditan estos cambios. No hubo despliegue ni modificaciones de datos remotos.

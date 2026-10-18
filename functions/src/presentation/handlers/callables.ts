@@ -16,7 +16,3 @@ export function authenticated(users: UserRepository, handler: (uid: string, data
     }
   });
 }
-export function gameId(value: unknown): string {
-  if (typeof value !== "string" || !/^[a-zA-Z0-9-]{20,80}$/.test(value)) throw new DomainError("invalid-argument", "ID de partida inválido.");
-  return value;
-}
