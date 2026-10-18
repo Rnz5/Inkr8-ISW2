@@ -4,7 +4,7 @@
 - Mantener Kotlin/Compose en Android y TypeScript/Firebase Functions en backend.
 - Únicamente cinco destinos de navegación: Login, Home con palabra del día, Practice, Ranked y Profile. Escritura, espera y resultado pertenecen al mismo destino de juego.
 - Conservar temporadas, práctica, competitivo, ganancia básica de Merit y entrada Ranked. El costo fijo inicial será 100; saldo inicial 1000. Sin transferencias, impuestos, retenciones, membresías ni bonificaciones por rachas.
-- Purgar torneos, reputación, estadísticas, publicidad, pantallas ajenas al alcance y nombres conceptuales de ligas. Las ligas son números 1–6.
+- Purgar torneos, reputación, publicidad, pantallas ajenas al alcance y nombres conceptuales de ligas. Las ligas son números 1–6. La ampliación del 17 de octubre de 2026 reincorpora las estadísticas e historial competitivos en Perfil para atender las historias de usuario; Practice queda excluida de esas estadísticas.
 - El servidor determina períodos UTC de exactamente 14 días desde 2026-10-12T00:00:00Z. Antes del ancla se aplica también la misma fórmula de períodos. Reiniciar rating a cero en cada frontera; Merit no se reinicia. El proceso debe ser idempotente, paginado y seguro frente a partidas concurrentes.
 
 ## Arquitectura y SOLID

@@ -69,7 +69,31 @@ El verificador de arquitectura rechaza ahora también el uso de DraftRepository 
 | npm --prefix functions run test:integration, emulador local demo-inkr8 | 11 pruebas aprobadas |
 | git diff --check | Sin errores de whitespace |
 
-Total actual: 28 pruebas aprobadas, ninguna fallida ni omitida. Los cuatro targets Gradle se ejecutaron juntos con --no-daemon; BUILD SUCCESSFUL in 2m 20s. Las nuevas pruebas cubren límites de escritura, restauración del contador/validación, cambios de modalidad/estado del servidor, resolución exactamente a las 48 horas con reintentos concurrentes y caducidad/recuperación sin cruzar temporadas. El SDK local mostró el aviso de versiones de metadatos XML; no impidió compilación, pruebas ni lint. La validación usó únicamente Firestore local; se detuvo el emulador al finalizar. Prompt de seguimiento registrado en ../refactoring_prompts/007-correccion-observaciones-solid.txt.
+Total de ese seguimiento: 28 pruebas aprobadas, ninguna fallida ni omitida. Los cuatro targets Gradle se ejecutaron juntos con --no-daemon; BUILD SUCCESSFUL in 2m 20s. Las nuevas pruebas cubren límites de escritura, restauración del contador/validación, cambios de modalidad/estado del servidor, resolución exactamente a las 48 horas con reintentos concurrentes y caducidad/recuperación sin cruzar temporadas. El SDK local mostró el aviso de versiones de metadatos XML; no impidió compilación, pruebas ni lint. La validación usó únicamente Firestore local; se detuvo el emulador al finalizar. Prompt de seguimiento registrado en ../refactoring_prompts/007-correccion-observaciones-solid.txt.
+
+## Cuatro correcciones adicionales solicitadas
+
+Seguimiento del 9 de octubre de 2026, posterior al commit 83368c8. El alcance se limita a las cuatro correcciones especificadas:
+
+1. Políticas puras en Domain: matchingPolicy contiene delta máximo 30, espera de 48 horas, score de referencia 65, nombre R8 y las funciones de elegibilidad; userPolicy valida nombres sin controles Unicode y con longitud visible admitida; gamePolicy exporta WORDS_PER_MODE. Los adaptadores Data utilizan esas políticas. El endpoint de nombres conserva su trim previo a la validación.
+2. Casos de uso inyectados en handlers: SubmitGame, RetryEvaluation, GetDailyHome y UpdateUserName. InitializeUser y GetSeasonRanking trasladan también las acciones restantes de contenido al mismo recorrido. Index conecta las dependencias; las nueve funciones exportadas conservan nombres, payloads y respuestas.
+3. SeasonReader y SeasonResetter separan lectura y reinicio. SeasonRepository extiende ambos, preservando su contrato. ResetLeagues depende únicamente de SeasonResetter y la lectura de ranking utiliza SeasonReader.
+4. GoogleTokenProvider está en Presentation. MainActivity llama a esa interfaz, y AppGraph permite reemplazarla y adapta el Data Source privado de Google mediante una implementación del composition root. Data no importa Presentation; Domain Android no recibió dependencias ni cambios.
+
+No se modificaron package.json, package-lock.json, los archivos de dependencias Gradle, reglas Firestore ni la lógica transaccional económica. El verificador cubre ahora también Data → Presentation en Android y accesos concretos desde MainActivity. No se desplegó código ni se modificaron datos remotos.
+
+| Validación de las cuatro correcciones | Resultado |
+|---|---|
+| npm --prefix functions test, Node 20.20.2 | 13 pruebas aprobadas; build TypeScript aprobado |
+| npm --prefix functions run lint | tsc --noEmit, cero errores |
+| npm --prefix functions run test:integration | 12 pruebas aprobadas en Firestore local demo-inkr8 |
+| :domain:test y :app:testDebugUnitTest --no-daemon | 3 y 6 pruebas aprobadas respectivamente |
+| :app:assembleDebug y :app:lintDebug --no-daemon | BUILD SUCCESSFUL in 1m 45s; No issues found. |
+| scripts/verify-architecture.ps1 | Architecture boundaries and excluded systems: PASS |
+| Carga de exports del backend | Los mismos 9 exports públicos |
+| git diff --check | Sin errores de whitespace en los cambios |
+
+Total actual: 34 pruebas aprobadas, ninguna fallida ni omitida. Las nuevas pruebas verifican fronteras de delta/48 horas, nombre y controles Unicode, palabra del día/temporada en medianoche UTC, validación previa a persistencia, reinicio sin capacidad de ranking y contratos de callables con autenticación, respuestas, trim y reintento sin nuevo cobro. Se detuvo el emulador de pruebas al finalizar. El SDK mantuvo el aviso ambiental de versiones de metadatos XML; no afectó los resultados. La autenticación Google real no se ejercitó en esta validación local. Prompt registrado en ../refactoring_prompts/008-cuatro-inconsistencias.txt.
 
 ## Parte 2: patrones de diseño del backend
 
@@ -82,3 +106,28 @@ Implementación del plan aprobado el 17 de octubre de 2026, con la instrucción 
 - Se mantuvieron las carpetas existentes y los nueve exports públicos del backend. No se añadieron casos de prueba.
 
 No se ejecutaron pruebas, emuladores, compilación ni verificadores automáticos para esta implementación. Los resultados de validaciones anteriores no acreditan estos cambios. No hubo despliegue ni modificaciones de datos remotos.
+
+## Continuación: criterios de aceptación de épicas e historias
+
+17 de octubre de 2026, America/Lima. Se revisó el documento `prompt_picas_e_historias_de_usuario.md` y se añadieron las funciones faltantes en backend y Android, preservando los cambios locales anteriores y los cinco destinos existentes. El detalle por historia y las condiciones de operación están en `ACCEPTANCE_REPORT.md`.
+
+Se incorporaron username único/permanente con reserva transaccional, metadatos y audio de la palabra, ejemplo bajo demanda, historial competitivo y estadísticas por cuenta, temporadas anteriores, posición propia fuera del top 50, feedback por categoría y detalle de restricciones. On-Topic solicita primera persona y una pregunta. Los timeouts conservan el envío y se recuperan desde un scheduler persistente; los resultados observados generan un aviso dentro de la aplicación. La referencia tras 48 horas ahora usa el promedio Ranked del jugador y la espera se cuenta desde el envío, sin reiniciarla por reintentos de evaluación.
+
+Las estadísticas se calculan desde las partidas Ranked evaluadas: las prácticas quedan fuera del historial competitivo y de las métricas oficiales. Esto amplía el alcance anterior que había eliminado estadísticas. No se añadieron dependencias, escrituras cliente ni acceso público a perfiles o reservas de usernames. Se mantienen los límites de temporada y la idempotencia económica.
+
+| Validación de esta continuación | Resultado |
+|---|---|
+| Backend `npm --prefix functions test` / ejecución final de la suite compilada | 17 pruebas aprobadas |
+| Backend `npm --prefix functions run lint` y build TypeScript | Aprobados |
+| Firestore local `demo-inkr8`, puerto 8189, suite completa final | 17 pruebas aprobadas |
+| `:domain:test` | 3 pruebas aprobadas |
+| `:app:testDebugUnitTest` | 10 pruebas aprobadas |
+| `:app:assembleDebug :app:testDebugUnitTest :domain:test :app:lintDebug --offline --no-daemon --max-workers=2` | BUILD SUCCESSFUL in 2m 11s |
+| Lint Android debug | No issues found. |
+| `scripts/verify-architecture.ps1` y `git diff --check` | Aprobados |
+
+Total: **47 pruebas aprobadas**, ninguna fallida ni omitida en las suites completas finales. Las pruebas nuevas cubren el username concurrente y permanente; recuperación de timeout sin repetir cargos/recompensas; preservación del tiempo original del envío; exclusión de prácticas; recompensas históricas; posición fuera del top 50; error y recuperación del emparejamiento; ejemplos por día; feedback incompleto; sesión restaurada y fallo/reintento de cierre de sesión.
+
+Validación con Node 24.20.0 local (el runtime de despliegue sigue configurado como Node 20), JDK 21 y SDK Android 36. El primer intento Android encontró una caché Gradle incompleta sin `gradle-worker.jar`; se apartó esa caché y Gradle la regeneró antes de la ejecución final aprobada. El aviso ambiental de versiones XML del SDK no impidió compilar ni ejecutar lint. APK debug actualizado: `app/build/outputs/apk/debug/app-debug.apk`, 16 905 744 bytes. No se recompiló release en esta continuación.
+
+No se validaron OAuth con cuentas reales, voz instalada en dispositivo ni llamadas reales a OpenAI. Sigue faltando `app/google-services.json`. Para operación remota se requieren configuración y contenido completos, secreto OpenAI, doce exports del backend y nuevos índices. No se desplegó código ni se modificaron servicios remotos. Los avisos de resultado son dentro de la aplicación, sin push cuando está cerrada. No se reconstruyeron recompensas históricas no contabilizadas.

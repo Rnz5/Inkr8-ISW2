@@ -1,6 +1,7 @@
 import {DomainError, WritingMode} from "../model/models";
 export const INITIAL_MERIT = 1000;
 export const RANKED_COST = 100;
+export const WORDS_PER_MODE: Record<WritingMode, number> = {STANDARD: 4, ON_TOPIC: 2};
 export function league(rating: number): number {
   return rating < 30 ? 1 : rating < 60 ? 2 : rating < 90 ? 3 : rating < 120 ? 4 : rating < 150 ? 5 : 6;
 }

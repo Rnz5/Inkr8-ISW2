@@ -7,6 +7,7 @@ import {FirebaseGameRepository} from "../repository/firebaseGameRepository";
 import {FirebaseSeasonRepository} from "../repository/firebaseSeasonRepository";
 import {FirebaseMatchRepository} from "../repository/firebaseMatchRepository";
 import {Persistence, PersistenceProvider} from "./persistenceProvider";
+import {FirebaseProgressRepository} from "../repository/firebaseProgressRepository";
 
 export class FirestoreProvider extends PersistenceProvider {
   protected createPersistence(clock: Clock): Persistence {
@@ -18,6 +19,7 @@ export class FirestoreProvider extends PersistenceProvider {
       games: new FirebaseGameRepository(db, clock),
       seasons: new FirebaseSeasonRepository(db),
       matches: new FirebaseMatchRepository(db, clock),
+      progress: new FirebaseProgressRepository(db),
     };
   }
 }

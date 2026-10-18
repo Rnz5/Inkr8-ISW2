@@ -10,14 +10,22 @@ export class FirebaseMatchRepository implements MatchRepository {
   private readonly baseline: MatchBaseline;
   private readonly recovery: MatchRecovery;
 
-  constructor(db: Firestore, clock: Clock) {
+  constructor(private db: Firestore, clock: Clock) {
     this.matchmaker = new Matchmaker(db, clock);
     this.baseline = new MatchBaseline(db, clock);
     this.recovery = new MatchRecovery(db);
   }
 
   async match(id: string, season: Season): Promise<void> {
-    if (!await this.matchmaker.pairCandidates(id, season)) await this.baseline.resolve(id, season);
+    try {
+      if (!await this.matchmaker.pairCandidates(id, season)) await this.baseline.resolve(id, season);
+    } catch (error) {
+      await this.db.runTransaction(async (tx) => {
+        const ref = this.db.doc(`submissions/${id}`), game = await tx.get(ref);
+        if (game.get("matchStatus") === "PENDING") tx.update(ref, {matchError: "No se pudo actualizar el ranking de la partida"});
+      });
+      throw error;
+    }
   }
 
   async recover(season: Season): Promise<void> {

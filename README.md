@@ -1,6 +1,6 @@
 # Inkr8
 
-Aplicación Android Kotlin/Compose con backend TypeScript/Firebase Functions. Login con Google, Home con palabra del día, Practice, Ranked y Profile son los únicos destinos. Escritura, espera y resultado están integrados en cada modo de juego.
+Aplicación Android Kotlin/Compose con backend TypeScript/Firebase Functions. Login con Google, Home con palabra del día, Practice, Ranked y Profile son los únicos destinos. Escritura, espera y resultado están integrados en cada modo de juego. El perfil incluye username único y permanente, rendimiento competitivo, historial y temporadas anteriores.
 
 ## Arquitectura
 
@@ -31,20 +31,26 @@ Los borradores pasan por `LoadDraft`, `SaveDraft`, `ClearDraft` y `FindDraft`. `
 
 En el backend, `FirebaseMatchRepository` conserva el contrato público como fachada. `Matchmaker` selecciona y empareja jugadores, `MatchBaseline` resuelve contra R8 al cumplirse 48 horas y `MatchRecovery` caduca partidas anteriores y reintenta las pendientes. La confirmación de rating y resultados sigue siendo transaccional e idempotente.
 
+Las políticas puras `matchingPolicy`, `userPolicy` y `WORDS_PER_MODE` centralizan los límites solicitados de emparejamiento, referencia R8, nombres y palabras por modalidad. Los handlers de juego y contenido ejecutan casos de uso; mantienen la autenticación, las entradas y las respuestas públicas. `SeasonRepository` conserva sus métodos y extiende `SeasonReader` y `SeasonResetter`; `ResetLeagues` requiere sólo la capacidad de reinicio.
+
 La persistencia del backend se construye mediante `PersistenceProvider`: su método de creación delega en la implementación seleccionada y devuelve los cinco repositorios por sus contratos. `FirestoreProvider` conserva Firestore como único proveedor disponible; `DATABASE_PROVIDER` permite seleccionarlo con el valor `firestore`, que también es el predeterminado si la variable no existe. Un proveedor desconocido detiene la inicialización. Para incorporar otra base de datos se añade su proveedor en la carpeta Data/Source existente y se registra en el punto de composición, sin cambiar los casos de uso ni los handlers.
 
 `submissionIdentity` es una única instancia inmutable por proceso, inyectada en los handlers de inicio, envío y reintento. Valida y conserva el ID recibido de Android; no genera otro ID ni guarda estado de partidas. La unicidad entre instancias y la idempotencia siguen protegidas por los documentos y transacciones de Firestore. No se añade identificación ni historial de movimientos de Merit.
+
+`MainActivity` obtiene el token mediante `GoogleTokenProvider`, una interfaz de Presentation que recibe el Context de la Activity. `AppGraph` permite inyectar ese proveedor y conecta su implementación predeterminada con el Data Source privado de Google. El adaptador está en el composition root para que Data no importe Presentation y el módulo Domain siga sin dependencias Android.
 
 ## Reglas de producto
 
 - Estándar: cuatro palabras requeridas, texto de 50–150 palabras. Sobre un tema: dos palabras y texto de 50–200 palabras. Ambos disponibles en Practice y Ranked; el servidor selecciona el desafío.
 - Saldo inicial: 1000 Merit. Practice no cobra entrada; Ranked descuenta 100 al empezar, incluyendo partidas abandonadas. Los reintentos usan el mismo ID y no repiten el cobro.
 - Merit al finalizar: recompensa básica por calidad y extensión; Ranked conserva el multiplicador 1.5. No hay otros gastos, retenciones, impuestos, membresías, transferencias o bonificaciones por comportamiento.
-- Ligas 1–6: umbrales de rating 0, 30, 60, 90, 120 y 150. El resultado Ranked se decide por puntuación frente a un rival cercano en rating. A las 48 horas sin rival se utiliza una referencia R8 de 65 puntos, identificada expresamente en el resultado.
+- Ligas 1–6: umbrales de rating 0, 30, 60, 90, 120 y 150. El resultado Ranked se decide por puntuación frente a un rival de la misma modalidad de escritura y rating cercano. A las 48 horas en cola sin rival se utiliza el promedio de las puntuaciones Ranked evaluadas del jugador, incluida la actual; se identifica expresamente en el resultado. Una primera partida sin historial se compara con su propia puntuación.
 - Temporadas de exactamente 14 días UTC, ancladas en `2026-10-12T00:00:00Z` (11 de octubre, 19:00 en Lima). La fórmula también define los períodos anteriores al ancla.
 - `leagueReset` comprueba el período cada cinco minutos. Procesa hasta 500 usuarios por ejecución, guarda cursor y reanuda páginas pendientes; la propagación física a todos los documentos es gradual. Los accesos y partidas normalizan el usuario dentro de transacciones sin esperar al barrido global.
 - Cada nueva temporada comienza en rating 0 y liga 1; se conserva Merit. El reinicio nunca sobrescribe puntos de usuarios ya normalizados en la temporada nueva. Las evaluaciones tardías conservan la recompensa y no afectan el rating nuevo. Partidas sin emparejamiento al cierre pasan a `EXPIRED`.
-- R8 usa evaluación real. Una falla deja la partida en `FAILED` con reintento explícito; no se inventan puntuaciones. Cobro, recompensa y resultado se protegen con transacciones idempotentes por ID.
+- R8 usa evaluación real y devuelve comentarios de ortografía, vocabulario, coherencia y creatividad. El servidor comprueba palabras, extensión y restricciones avanzadas; la pertinencia temática la evalúa R8. Un fallo en el detalle conserva un puntaje base válido y muestra el error correspondiente.
+- Las evaluaciones tienen un timeout de 90 segundos. Un timeout conserva el envío como `FAILED` con `nextRetryAt`; el scheduler lo reencola después de cinco minutos, sin nuevo cobro. También recupera envíos `PENDING` interrumpidos durante diez minutos. Otros fallos permiten reintento explícito. La aplicación avisa de resultados nuevos mientras mantiene el observador activo; no se incorporaron notificaciones push.
+- Las estadísticas e historial competitivo se derivan de las partidas Ranked evaluadas, conservadas por cuenta. Las prácticas no los afectan. Las recompensas de temporada se acumulan transaccionalmente en su miembro. Los empates de rating comparten posición y se muestra la posición propia aunque esté fuera de los primeros 50.
 
 ## Configuración y compilación
 
@@ -65,7 +71,7 @@ La copia recibida no incluye `app/google-services.json`. Sin ese archivo compila
 
 1. Registrar `com.inkr8` en el proyecto Firebase, habilitar Google y registrar SHA-1/SHA-256 del certificado utilizado. Descargar el archivo con OAuth web configurado y colocarlo en `app/google-services.json` (ignorado por Git).
 2. Configurar el secreto `OPENAI_API_KEY` del backend en el proyecto Firebase. Ninguna clave debe entrar al repositorio.
-3. Tener al menos cuatro documentos activos en `words` con `word`, `definition`, `sentence`, `isActive: true`. Para escritura por tema: documentos `topics` con `name` y `themeId`, y `themes` con `name`; los temas antiguos sin `isActive` siguen siendo válidos.
+3. Tener al menos cuatro documentos activos en `words` con `word`, `definition`, `sentence`, `phonetic`, `partOfSpeech`, `rarity`, `isActive: true`. La oración debe contener la palabra completa. Home no inventa metadatos: rechaza una palabra incompleta. La caché diaria anterior puede completarse desde su palabra activa conservando el texto original. El audio usa el motor TTS inglés del dispositivo. Para escritura por tema: documentos `topics` con `name` y `themeId`, y `themes` con `name`; los temas antiguos sin `isActive` siguen siendo válidos. On-Topic solicita primera persona y una pregunta, además del tópico, palabras y extensión.
 4. Publicar reglas, índices y funciones del proyecto correcto, luego recompilar Android con su configuración. El reinicio remoto requiere el despliegue de `leagueReset` y su Cloud Scheduler.
 
 Configuración de Google basada en la [documentación oficial Firebase/Credential Manager](https://firebase.google.com/docs/auth/android/google-signin). La compatibilidad Gradle/Kotlin sigue la [documentación de AGP 9](https://developer.android.com/build/releases/agp-9-0-0-release-notes).
@@ -77,18 +83,23 @@ Todos los callables requieren autenticación y rechazan cuentas cerradas. Regió
 | Endpoint | Entrada | Salida / efecto |
 |---|---|---|
 | `initializeUser` | `{}` | Perfil; inicializa saldo o normaliza temporada |
-| `updateProfile` | `{name}` | Actualiza nombre de 2–20 caracteres visibles |
-| `getHome` | `{}` | Palabra estable del día UTC, temporada y costo Ranked |
-| `getSeasonRanking` | `{}` | Temporada vigente y primeros 50 participantes |
+| `updateProfile` | `{name}` | Reserva username permanente de 2–20 caracteres visibles, único sin distinguir mayúsculas y con normalización Unicode |
+| `getHome` | `{}` | Palabra estable, `wordDay` UTC, temporada y costo Ranked |
+| `getWordExample` | `{day}` | Ejemplo de la palabra del día indicado, solicitado al pulsar el botón |
+| `getSeasonRanking` | `{}` | Temporada vigente, primeros 50 participantes y `own` con posición propia |
+| `getProfileProgress` | `{}` | Historial Ranked evaluado en orden descendente y estadísticas acumuladas |
+| `getSeasonHistory` | `{}` | Temporadas anteriores con posición final, rating y Merit obtenido |
 | `startGame` | `{id, mode, writingMode}` | Partida DRAFT; cobra Ranked una sola vez |
 | `submitGame` | `{id, content}` | Valida y pasa la partida a PENDING |
 | `retryEvaluation` | `{id}` | Reencola FAILED sin nuevo cobro |
 | `gameEvaluationWorker` | Evento Firestore actualizado | Evalúa PENDING, confirma Merit y busca rival |
-| `leagueReset` | Scheduler cada 5 min UTC | Reinicia usuarios por páginas y recupera emparejamientos |
+| `leagueReset` | Scheduler cada 5 min UTC | Recupera evaluaciones diferidas, reinicia usuarios y recupera emparejamientos |
 
 `mode`: `PRACTICE` o `RANKED`; `writingMode`: `STANDARD` o `ON_TOPIC`. El ID de partida es un UUID generado una vez por cliente y persistido antes del primer intento. Los documentos nuevos llevan `schemaVersion: 2`. Android consulta sólo esas partidas; no interpreta registros antiguos con el esquema retirado.
 
 Usuarios y partidas permiten lectura sólo por propietario; todos los writes cliente están denegados. Rankings y palabras se sirven por funciones autenticadas. Los borradores locales se aíslan por usuario y partida, y se excluyen de respaldo/transferencia.
+
+Las reservas de username sólo son accesibles por backend y se confirman en la misma transacción que el perfil. Cerrar sesión no borra progreso. Los usernames anteriores no se asignan automáticamente a partir del nombre de Google: se eligen en Perfil. Las recompensas antiguas de temporada que no se contabilizaron no se reconstruyen automáticamente. La ampliación de octubre está descrita por historia en `ACCEPTANCE_REPORT.md`.
 
 ## Pruebas de integración y transición
 

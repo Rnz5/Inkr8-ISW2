@@ -61,12 +61,22 @@ class GameViewModel(
                 updateState { it.copy(game = game, busy = false, error = null) }
                 watch(id)
             } catch (error: CancellationException) { throw error }
-            catch (error: Exception) { fail(error) }
+            catch (error: Exception) {
+                val message = when {
+                    error.message?.contains("Merit insuficiente") == true -> "No se puede iniciar la partida Ranked. Merit insuficiente"
+                    error.message?.contains("restricciones") == true -> "No se pudieron cargar las restricciones de la partida"
+                    mode == PlayMode.PRACTICE -> "No se pudo cargar la acción. Verifica tu conexión"
+                    state.value.writingMode == WritingMode.ON_TOPIC -> "No se pudo iniciar la partida On-Topic. Inténtalo nuevamente"
+                    else -> "No se puede ejecutar acción. Verifica tu conexión a internet"
+                }
+                updateState { it.copy(busy = false, error = message) }
+            }
         }
     }
     fun send() {
         val game = state.value.game ?: return
-        if (state.value.busy || !state.value.canSubmit) return
+        if (state.value.busy) return
+        if (!state.value.canSubmit) { updateState { it.copy(error = "Tu texto no cumple con los requerimientos") }; return }
         updateState { it.copy(busy = true, error = null) }
         viewModelScope.launch {
             try { submit(game, state.value.text); updateState { it.copy(busy = false) }; refreshRecent() }
@@ -97,24 +107,26 @@ class GameViewModel(
         refreshRecent()
     }
     fun reconnect() { state.value.requestId?.let { watch(it) }; refreshRecent() }
+    fun clearNotice() { updateState { it.copy(resultNotice = null) } }
     private fun watch(id: String) {
         gameJob?.cancel()
         gameJob = viewModelScope.launch {
             try { observeGame(id).collect { game ->
                 updateState { it.copy(game = game, writingMode = game.writingMode,
-                    text = if (game.status == GameStatus.DRAFT) it.text else game.content, error = null) }
+                    text = if (game.status == GameStatus.DRAFT) it.text else game.content, error = null,
+                    resultNotice = if (game.status == GameStatus.EVALUATED && it.game?.status in listOf(GameStatus.PENDING, GameStatus.FAILED)) "Tu resultado está listo: ${game.evaluation?.score} puntos" else it.resultNotice) }
             } } catch (error: CancellationException) { throw error }
             catch (error: Exception) { fail(error) }
         }
     }
     fun refreshRecent() { viewModelScope.launch {
-        updateState { it.copy(loadingRecent = true) }
+        updateState { it.copy(loadingRecent = true, recentError = null) }
         try {
             val recent = recentGames().filter { game -> game.mode == mode }
             updateState { it.copy(recent = recent, loadingRecent = false) }
         }
         catch (error: CancellationException) { throw error }
-        catch (error: Exception) { updateState { it.copy(loadingRecent = false, error = error.message ?: "No se pudieron cargar las partidas.") } }
+        catch (error: Exception) { updateState { it.copy(loadingRecent = false, recentError = "No se pudo cargar el historial de partidas.") } }
     } }
     private fun fail(error: Exception) { updateState { it.copy(busy = false, error = error.message ?: "No se pudo completar la operación.") } }
 }

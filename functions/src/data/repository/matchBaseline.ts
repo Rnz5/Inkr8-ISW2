@@ -2,6 +2,7 @@ import {Firestore} from "firebase-admin/firestore";
 import {Season} from "../../domain/model/models";
 import {Clock} from "../../domain/repository/contracts";
 import {league, ratingChange} from "../../domain/policy/gamePolicy";
+import {baselineScore, BASELINE_OPPONENT_NAME, isEligibleForBaseline} from "../../domain/policy/matchingPolicy";
 import {mapGame} from "../mapper/gameMapper";
 import {mapUser} from "../dto/userDto";
 import {seasonAt} from "../../domain/policy/seasonPolicy";
@@ -14,14 +15,18 @@ export class MatchBaseline {
       const ref = this.db.doc(`submissions/${id}`), snapshot = await tx.get(ref);
       if (!snapshot.exists || snapshot.get("matchStatus") !== "PENDING") return;
       const game = mapGame(snapshot);
-      if (game.status !== "EVALUATED" || game.seasonIndex !== season.index || !game.evaluation || game.timestamp > this.clock.now() - 48 * 60 * 60 * 1000) return;
+      if (game.status !== "EVALUATED" || game.seasonIndex !== season.index || !game.evaluation || !isEligibleForBaseline(game.queuedAt ?? game.timestamp, this.clock.now())) return;
       const userRef = this.db.doc(`users/${game.authorId}`), userSnapshot = await tx.get(userRef);
       if (!userSnapshot.exists || userSnapshot.get("accountClosed") === true) return;
+      const history = await tx.get(this.db.collection("submissions").where("authorId", "==", game.authorId).where("schemaVersion", "==", 2));
+      const scores = history.docs.filter((doc) => doc.get("mode") === "RANKED" && doc.get("status") === "EVALUATED")
+        .map((doc) => Number(doc.get("evaluation.score"))).filter(Number.isFinite);
+      const reference = baselineScore(scores, game.evaluation.score);
       const user = writeCurrentUser(this.db, tx, mapUser(game.authorId, userSnapshot.data()!), season);
-      const outcome = game.evaluation.score === 65 ? "DRAW" : game.evaluation.score > 65 ? "WIN" : "LOSS";
+      const outcome = game.evaluation.score === reference ? "DRAW" : game.evaluation.score > reference ? "WIN" : "LOSS";
       const rating = Math.max(0, user.rating + ratingChange(user.rating, user.rating, outcome));
       tx.update(userRef, {rating, league: league(rating)});
-      tx.update(ref, {matchStatus: "MATCHED", match: {opponentName: "R8 (referencia de 65 puntos)", opponentScore: 65, outcome, ratingChange: rating - user.rating}});
+      tx.update(ref, {matchStatus: "MATCHED", matchError: null, match: {opponentName: BASELINE_OPPONENT_NAME, opponentScore: reference, outcome, ratingChange: rating - user.rating}});
       writeMember(this.db, tx, {...user, rating});
     });
   }

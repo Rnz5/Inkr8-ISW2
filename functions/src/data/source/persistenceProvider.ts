@@ -1,4 +1,5 @@
 import {Clock, ContentRepository, GameRepository, MatchRepository, SeasonRepository, UserRepository} from "../../domain/repository/contracts";
+import {ProgressReader} from "../../domain/repository/contracts";
 
 export interface Persistence {
   readonly users: UserRepository;
@@ -6,6 +7,7 @@ export interface Persistence {
   readonly games: GameRepository;
   readonly seasons: SeasonRepository;
   readonly matches: MatchRepository;
+  readonly progress: ProgressReader;
 }
 
 export abstract class PersistenceProvider {

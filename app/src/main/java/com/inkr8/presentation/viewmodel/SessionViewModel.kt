@@ -31,7 +31,7 @@ class SessionViewModel(private val observeSession: ObserveSession, private val i
                 mutableState.update { it.copy(user = user, loading = false) }
                 observeUser(user.id).collect { updated -> mutableState.update { it.copy(user = updated, loading = false, error = null) } }
             } catch (error: CancellationException) { throw error }
-            catch (error: Exception) { mutableState.update { it.copy(loading = false, error = error.message ?: "No se pudo cargar el perfil.") } }
+            catch (error: Exception) { mutableState.update { it.copy(loading = false, error = "No se pudo recuperar tu información de progreso. Inténtalo nuevamente") } }
         }
     }
     fun beginLogin() { mutableState.update { it.copy(loading = true, error = null) } }
@@ -48,7 +48,7 @@ class SessionViewModel(private val observeSession: ObserveSession, private val i
         viewModelScope.launch {
             try { signOut() }
             catch (error: CancellationException) { throw error }
-            catch (error: Exception) { authError(error.message ?: "No se pudo cerrar sesión.") }
+            catch (error: Exception) { authError("Fallo al cerrar sesión. Inténtelo nuevamente") }
         }
     }
 }

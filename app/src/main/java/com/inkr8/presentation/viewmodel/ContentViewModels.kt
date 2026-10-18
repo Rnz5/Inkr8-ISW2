@@ -9,17 +9,28 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
-class HomeViewModel(private val getHome: GetHome) : ViewModel() {
+class HomeViewModel(private val getHome: GetHome, private val getExample: GetWordExample) : ViewModel() {
     private val mutableState = MutableStateFlow(HomeUiState())
     val state = mutableState.asStateFlow()
     private var refreshJob: Job? = null
+    private var exampleJob: Job? = null
     init { refresh() }
-    fun refresh() { refreshJob?.cancel(); refreshJob = viewModelScope.launch {
-        mutableState.update { it.copy(loading = true, error = null) }
+    fun refresh() { exampleJob?.cancel(); refreshJob?.cancel(); refreshJob = viewModelScope.launch {
+        mutableState.value = HomeUiState()
         try { mutableState.value = HomeUiState(home = getHome(), loading = false) }
         catch (error: CancellationException) { throw error }
-        catch (error: Exception) { mutableState.update { it.copy(loading = false, error = error.message ?: "No se pudo cargar el inicio.") } }
+        catch (error: Exception) { mutableState.update { it.copy(loading = false, error = "No se pudo cargar la palabra del momento. Revisa tu conexión") } }
     } }
+    fun showExample() {
+        val day = state.value.home?.wordDay ?: return
+        if (state.value.exampleLoading) return
+        exampleJob = viewModelScope.launch {
+            mutableState.update { it.copy(exampleLoading = true, exampleError = null) }
+            try { val sentence = getExample(day); mutableState.update { it.copy(example = sentence, exampleLoading = false) } }
+            catch (error: CancellationException) { throw error }
+            catch (error: Exception) { mutableState.update { it.copy(exampleLoading = false, exampleError = "No se pudo cargar el ejemplo. Por favor, intenta de nuevo") } }
+        }
+    }
 }
 class RankingViewModel(private val getRanking: GetSeasonRanking) : ViewModel() {
     private val mutableState = MutableStateFlow(RankingUiState())
@@ -30,19 +41,40 @@ class RankingViewModel(private val getRanking: GetSeasonRanking) : ViewModel() {
         mutableState.update { it.copy(loading = true, error = null) }
         try { mutableState.value = RankingUiState(ranking = getRanking(), loading = false) }
         catch (error: CancellationException) { throw error }
-        catch (error: Exception) { mutableState.update { it.copy(loading = false, error = error.message ?: "No se pudo cargar la temporada.") } }
+        catch (error: Exception) { mutableState.update { it.copy(loading = false, error = "No se pudo cargar el ranking de la temporada") } }
     } }
 }
-class ProfileViewModel(private val updateName: UpdateName) : ViewModel() {
+class ProfileViewModel(private val updateName: UpdateName, private val getProgress: GetProgress, private val getSeasons: GetSeasonHistory) : ViewModel() {
     private val mutableState = MutableStateFlow(ProfileUiState())
     val state = mutableState.asStateFlow()
+    private var refreshJob: Job? = null
+    private var seasonsJob: Job? = null
+    fun refresh() {
+        refreshJob?.cancel()
+        refreshJob = viewModelScope.launch {
+            mutableState.update { it.copy(loading = true, progressError = null) }
+            try { val progress = getProgress(); mutableState.update { it.copy(progress = progress, loading = false) } }
+            catch (error: CancellationException) { throw error }
+            catch (error: Exception) { mutableState.update { it.copy(loading = false, progressError = "No se pudo recuperar la información de rendimiento.") } }
+        }
+        loadSeasons()
+    }
+    fun loadSeasons() {
+        seasonsJob?.cancel()
+        seasonsJob = viewModelScope.launch {
+            mutableState.update { it.copy(seasonsLoading = true, seasonsError = null) }
+            try { val seasons = getSeasons(); mutableState.update { it.copy(seasons = seasons, seasonsLoading = false) } }
+            catch (error: CancellationException) { throw error }
+            catch (error: Exception) { mutableState.update { it.copy(seasonsLoading = false, seasonsError = "No se pudo cargar el historial de temporadas") } }
+        }
+    }
     fun save(name: String) {
         if (state.value.saving) return
-        mutableState.value = ProfileUiState(saving = true)
+        mutableState.update { it.copy(saving = true, saved = false, error = null) }
         viewModelScope.launch {
-            try { updateName(name); mutableState.value = ProfileUiState(saved = true) }
+            try { updateName(name); mutableState.update { it.copy(saving = false, saved = true) } }
             catch (error: CancellationException) { throw error }
-            catch (error: Exception) { mutableState.value = ProfileUiState(error = error.message ?: "No se pudo actualizar el nombre.") }
+            catch (error: Exception) { mutableState.update { it.copy(saving = false, error = error.message ?: "No se pudo actualizar el username.") } }
         }
     }
 }

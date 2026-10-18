@@ -1,6 +1,6 @@
 import {FieldPath, Firestore} from "firebase-admin/firestore";
 import {Season} from "../../domain/model/models";
-import {SeasonRepository} from "../../domain/repository/contracts";
+import {SeasonHistory, SeasonRepository} from "../../domain/repository/contracts";
 import {mapUser} from "../dto/userDto";
 import {writeCurrentUser, writeMember} from "./seasonWrites";
 import {league} from "../../domain/policy/gamePolicy";
@@ -38,6 +38,26 @@ export class FirebaseSeasonRepository implements SeasonRepository {
   }
   async ranking(season: Season) {
     const members = await this.db.collection(`seasons/${season.id}/members`).orderBy("rating", "desc").limit(50).get();
-    return members.docs.map((doc) => ({userId: doc.id, name: String(doc.get("name") ?? "Writer"), rating: Number(doc.get("rating") ?? 0), league: league(Number(doc.get("rating") ?? 0))}));
+    return members.docs.map((doc) => ({userId: doc.id, name: String(doc.get("name") ?? "Writer"), rating: Number(doc.get("rating") ?? 0), league: league(Number(doc.get("rating") ?? 0)),
+      position: members.docs.findIndex((entry) => Number(entry.get("rating") ?? 0) === Number(doc.get("rating") ?? 0)) + 1}));
+  }
+  async position(userId: string, season: Season) {
+    const member = await this.db.doc(`seasons/${season.id}/members/${userId}`).get();
+    if (!member.exists) return null;
+    const rating = Number(member.get("rating") ?? 0);
+    const above = await this.db.collection(`seasons/${season.id}/members`).where("rating", ">", rating).count().get();
+    return {userId, name: String(member.get("name") ?? "Writer"), rating, league: league(rating), position: above.data().count + 1};
+  }
+  async history(userId: string, season: Season): Promise<SeasonHistory[]> {
+    const documents = await this.db.collection("seasons").where("index", "<", season.index).orderBy("index", "desc").get();
+    const history: SeasonHistory[] = [];
+    for (const document of documents.docs) {
+      const previous = document.data() as Season;
+      const member = await this.db.doc(`seasons/${previous.id}/members/${userId}`).get();
+      if (!member.exists) continue;
+      const position = await this.position(userId, previous);
+      if (position) history.push({season: previous, position: position.position, rating: position.rating, meritEarned: Number(member.get("meritEarned") ?? 0)});
+    }
+    return history;
   }
 }

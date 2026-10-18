@@ -2,6 +2,7 @@ package com.inkr8.data.source
 
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.Source
 import com.inkr8.data.dto.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -19,6 +20,6 @@ internal class FirestoreDataSource(private val firestore: FirebaseFirestore) {
     }
     suspend fun recentGames(userId: String): List<GameDto> = firestore.collection("submissions")
         .whereEqualTo("authorId", userId).whereEqualTo("schemaVersion", 2)
-        .orderBy("timestamp", Query.Direction.DESCENDING).limit(20).get().await()
+        .orderBy("timestamp", Query.Direction.DESCENDING).limit(20).get(Source.SERVER).await()
         .documents.map { GameDto(it.id, it.data!!.wire()) }
 }

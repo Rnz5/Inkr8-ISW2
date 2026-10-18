@@ -11,6 +11,7 @@ import com.inkr8.data.source.*
 import com.inkr8.domain.model.PlayMode
 import com.inkr8.domain.repository.*
 import com.inkr8.domain.usecase.*
+import com.inkr8.presentation.auth.GoogleTokenProvider
 import com.inkr8.presentation.viewmodel.*
 
 class AppGraph(
@@ -20,9 +21,16 @@ class AppGraph(
     gameRepository: GameRepository? = null,
     homeRepository: HomeRepository? = null,
     seasonRepository: SeasonRepository? = null,
-    draftRepository: DraftRepository? = null
+    draftRepository: DraftRepository? = null,
+    tokenProvider: GoogleTokenProvider? = null,
+    progressRepository: ProgressRepository? = null
 ) {
-    val google by lazy { GoogleSignInDataSource(context) }
+    private val google by lazy { GoogleSignInDataSource(context) }
+    val googleTokenProvider: GoogleTokenProvider by lazy {
+        tokenProvider ?: object : GoogleTokenProvider {
+            override suspend fun token(activityContext: Context): String = google.token(activityContext)
+        }
+    }
     private val authSource by lazy { FirebaseAuthDataSource(FirebaseAuth.getInstance()) }
     private val functions by lazy { FunctionsDataSource(FirebaseFunctions.getInstance("us-central1")) }
     private val firestore by lazy { FirestoreDataSource(FirebaseFirestore.getInstance()) }
@@ -31,6 +39,7 @@ class AppGraph(
     private val games: GameRepository by lazy { gameRepository ?: FirebaseGameRepository(functions, firestore, authSource) }
     private val home: HomeRepository by lazy { homeRepository ?: FirebaseHomeRepository(functions) }
     private val seasons: SeasonRepository by lazy { seasonRepository ?: FirebaseSeasonRepository(functions) }
+    private val progress: ProgressRepository by lazy { progressRepository ?: FirebaseProgressRepository(functions) }
     private val drafts: DraftRepository by lazy {
         draftRepository ?: PreferencesDraftRepository(context.getSharedPreferences("writing_drafts", Context.MODE_PRIVATE))
     }
@@ -39,9 +48,9 @@ class AppGraph(
     private val clearDraft by lazy { ClearDraft(drafts) }
     private val findDraft by lazy { FindDraft(drafts) }
     val sessionFactory = factory { SessionViewModel(ObserveSession(auth), InitializeUser(users), ObserveUser(users), SignIn(auth), SignOut(auth)) }
-    val homeFactory = factory { HomeViewModel(GetHome(home)) }
+    val homeFactory = factory { HomeViewModel(GetHome(home), GetWordExample(home)) }
     val rankingFactory = factory { RankingViewModel(GetSeasonRanking(seasons)) }
-    val profileFactory = factory { ProfileViewModel(UpdateName(users)) }
+    val profileFactory = factory { ProfileViewModel(UpdateName(users), GetProgress(progress), GetSeasonHistory(seasons)) }
     fun gameFactory(userId: String, mode: PlayMode) = factory {
         GameViewModel(userId, mode, StartGame(games), SubmitWriting(games), ObserveGame(games), GetRecentGames(games), RetryEvaluation(games),
             loadDraft, saveDraft, clearDraft, findDraft)

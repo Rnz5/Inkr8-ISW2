@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
             Inkr8Root(graph, viewModel) {
                 viewModel.beginLogin()
                 lifecycleScope.launch {
-                    try { viewModel.login(graph.google.token(this@MainActivity)) }
+                    try { viewModel.login(graph.googleTokenProvider.token(this@MainActivity)) }
                     catch (error: CancellationException) { throw error }
                     catch (error: Exception) { viewModel.authError(error.message ?: "No se pudo iniciar sesión con Google.") }
                 }

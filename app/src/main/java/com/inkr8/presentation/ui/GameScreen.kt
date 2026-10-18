@@ -20,7 +20,8 @@ fun GameScreen(viewModel: GameViewModel, mode: PlayMode, ranking: RankingViewMod
     val state by viewModel.state.collectAsStateWithLifecycle()
     LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         item {
-            ErrorMessage(state.error, viewModel::reconnect)
+            ErrorMessage(state.error, { if (state.game == null) viewModel.start() else viewModel.reconnect() })
+            if (state.error == "No se puede iniciar la partida Ranked. Merit insuficiente") ErrorMessage("No tienes Merit suficiente para ingresar.")
             if (state.busy || state.loadingRecent) LinearProgressIndicator(Modifier.fillMaxWidth())
             val game = state.game
             if (game == null) SectionCard {
@@ -35,15 +36,18 @@ fun GameScreen(viewModel: GameViewModel, mode: PlayMode, ranking: RankingViewMod
                 Button(onClick = viewModel::start, enabled = !state.busy) { Text(if (state.requestId == null) "Empezar" else "Reintentar entrada") }
             } else SectionCard {
                 Text("${if (mode == PlayMode.RANKED) "Ranked" else "Práctica"} · ${game.seasonId}")
-                Text("Palabras: ${game.challenge.words.joinToString { it.text }}")
+                game.challenge.words.forEach { word -> Text("Usar «${word.text}»") }
                 game.challenge.topic?.let { Text("Tema: $it") }
                 game.challenge.theme?.let { Text("Categoría: $it") }
+                Text("Límite: ${game.writingMode.minWords}–${game.writingMode.maxWords} palabras")
+                game.challenge.advanced.forEach { rule -> Text(when (rule) { "FIRST_PERSON" -> "Escribir en primera persona"; "QUESTION" -> "Incluir una pregunta"; else -> rule }) }
                 when (game.status) {
                     GameStatus.DRAFT -> {
                         OutlinedTextField(value = state.text, onValueChange = viewModel::edit,
                             modifier = Modifier.fillMaxWidth().heightIn(min = 220.dp), label = { Text("Tu texto") }, enabled = !state.busy)
                         Text("${state.wordCount} / ${game.writingMode.minWords}–${game.writingMode.maxWords} palabras")
-                        Button(onClick = viewModel::send, enabled = !state.busy && state.canSubmit) { Text("Enviar para evaluar") }
+                        if (!state.canSubmit) Text("Tu texto no cumple con los requerimientos", color = MaterialTheme.colorScheme.error)
+                        Button(onClick = viewModel::send, enabled = !state.busy && state.canSubmit) { Text("Enviar Respuesta") }
                     }
                     GameStatus.PENDING -> { CircularProgressIndicator(); Text("R8 está evaluando tu texto. Puedes regresar más tarde y consultar esta partida.") }
                     GameStatus.FAILED -> {
@@ -51,15 +55,30 @@ fun GameScreen(viewModel: GameViewModel, mode: PlayMode, ranking: RankingViewMod
                         Button(onClick = viewModel::retryEvaluation, enabled = !state.busy) { Text("Reintentar evaluación sin otro costo") }
                     }
                     GameStatus.EVALUATED -> {
+                        ErrorMessage(game.matchError, viewModel::reconnect)
                         Image(painter = painterResource(R.drawable.r8pfp), contentDescription = "R8", modifier = Modifier.size(48.dp))
                         game.evaluation?.let { evaluation ->
                             Text("Puntuación: ${evaluation.score}", style = MaterialTheme.typography.headlineMedium)
                             Text(evaluation.feedback)
+                            ErrorMessage(evaluation.feedbackError)
+                            if (evaluation.spelling.isNotBlank()) Text("Ortografía: ${evaluation.spelling}")
+                            if (evaluation.vocabulary.isNotBlank()) Text("Vocabulario: ${evaluation.vocabulary}")
+                            if (evaluation.coherence.isNotBlank()) Text("Coherencia: ${evaluation.coherence}")
+                            if (evaluation.creativity.isNotBlank()) Text("Creatividad: ${evaluation.creativity}")
+                            Text("Cumplimiento de restricciones", style = MaterialTheme.typography.titleMedium)
+                            ErrorMessage(evaluation.constraintsError)
+                            evaluation.constraints.forEach { rule -> Text("${if (rule.fulfilled) "✓ Cumplida" else "✕ Incumplida"}: ${rule.label}") }
                             Text("+${evaluation.meritEarned} Merit")
                         }
-                        game.match?.let { match -> Text("${match.outcome} · ${match.opponentName} (${match.opponentScore}) · Rating ${if (match.ratingChange >= 0) "+" else ""}${match.ratingChange}") }
+                        game.match?.let { match ->
+                            Text("${when (match.outcome) { "WIN" -> "Victoria"; "LOSS" -> "Derrota"; else -> "Empate" }} · ${match.opponentName} (${match.opponentScore})")
+                            val delta = match.ratingChange
+                            if (delta == null) { ErrorMessage("No se pudo actualizar el ranking de la partida"); ErrorMessage("Fallo del servidor") }
+                            else Text("Rating ${if (delta >= 0) "+" else ""}$delta")
+                        }
+                        if (game.matchStatus == MatchStatus.MATCHED && game.match == null) ErrorMessage("No se pudo actualizar el resultado de la partida")
                         if (game.matchStatus == MatchStatus.EXPIRED) Text("La temporada terminó antes del emparejamiento. La recompensa de Merit se conserva; esta partida no cambia el rating de la nueva temporada.")
-                        else if (mode == PlayMode.RANKED && game.match == null) Text("Buscando rival. Después de 48 horas sin rival se usa la referencia R8 de 65 puntos.")
+                        else if (mode == PlayMode.RANKED && game.matchStatus == MatchStatus.PENDING) Text("Buscando rival. Después de 48 horas sin rival se usará tu puntuación promedio como referencia.")
                     }
                 }
                 TextButton(onClick = viewModel::newGame, enabled = !state.busy) { Text("Otra partida") }
@@ -67,6 +86,7 @@ fun GameScreen(viewModel: GameViewModel, mode: PlayMode, ranking: RankingViewMod
         }
         if (ranking != null) item { SeasonRankingCard(ranking) }
         item { Row { Text("Partidas recientes", style = MaterialTheme.typography.titleMedium); TextButton(onClick = viewModel::refreshRecent) { Text("Actualizar") } } }
+        item { ErrorMessage(state.recentError, viewModel::refreshRecent) }
         items(state.recent, key = { it.id }) { game ->
             OutlinedButton(onClick = { viewModel.open(game) }, enabled = !state.busy, modifier = Modifier.fillMaxWidth()) {
                 Text("${game.writingMode} · ${game.status} · ${game.evaluation?.score ?: "—"}")
@@ -86,7 +106,12 @@ private fun SeasonRankingCard(viewModel: RankingViewModel) {
         state.ranking?.let { ranking ->
             Text(seasonDates(ranking.season))
             if (ranking.members.isEmpty()) Text("La temporada aún no tiene participantes.")
-            ranking.members.forEachIndexed { index, member -> Text("${index + 1}. ${member.name} · Liga ${member.league} · ${member.rating}") }
+            ranking.members.forEach { member -> Text("${member.position}. ${member.name} · Liga ${member.league} · ${member.rating}") }
+            ranking.own?.let { member ->
+                Surface(color = MaterialTheme.colorScheme.primaryContainer) {
+                    Text("Tu posición: ${member.position} · ${member.name} · Rating ${member.rating}", modifier = Modifier.padding(12.dp))
+                }
+            }
         }
         TextButton(onClick = viewModel::refresh) { Text("Actualizar clasificación") }
     }

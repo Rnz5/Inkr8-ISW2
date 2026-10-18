@@ -1,6 +1,14 @@
 {
   "indexes": [
     {"collectionGroup": "submissions", "queryScope": "COLLECTION", "fields": [
+      {"fieldPath": "status", "order": "ASCENDING"},
+      {"fieldPath": "nextRetryAt", "order": "ASCENDING"}
+    ]},
+    {"collectionGroup": "submissions", "queryScope": "COLLECTION", "fields": [
+      {"fieldPath": "status", "order": "ASCENDING"},
+      {"fieldPath": "pendingAt", "order": "ASCENDING"}
+    ]},
+    {"collectionGroup": "submissions", "queryScope": "COLLECTION", "fields": [
       {"fieldPath": "matchStatus", "order": "ASCENDING"},
       {"fieldPath": "seasonIndex", "order": "ASCENDING"}
     ]},
